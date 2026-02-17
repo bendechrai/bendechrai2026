@@ -5,6 +5,7 @@ import TerminalTheme from "@/components/themes/terminal/TerminalTheme";
 import CyberpunkTheme from "@/components/themes/cyberpunk/CyberpunkTheme";
 import LcarsTheme from "@/components/themes/lcars/LcarsTheme";
 import HolographicTheme from "@/components/themes/holographic/HolographicTheme";
+import Win31Theme from "@/components/themes/win31/Win31Theme";
 import PlaceholderTheme from "@/components/themes/PlaceholderTheme";
 
 const THEME_COMPONENTS: Record<string, React.ComponentType> = {
@@ -12,6 +13,7 @@ const THEME_COMPONENTS: Record<string, React.ComponentType> = {
   cyberpunk: CyberpunkTheme,
   lcars: LcarsTheme,
   holographic: HolographicTheme,
+  win31: Win31Theme,
 };
 
 export default function Home() {
