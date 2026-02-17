@@ -2,6 +2,11 @@
 
 import { useState, useRef, useCallback } from "react";
 import { useTheme } from "@/context/ThemeContext";
+
+const STARDATE = (() => {
+  const now = typeof performance !== "undefined" ? performance.timeOrigin : 0;
+  return `SD ${Math.floor(now / 86400000)}.${Math.floor((now % 86400000) / 8640000)}`;
+})();
 import styles from "./lcars.module.css";
 
 type Section = "articles" | "events" | "talks" | "contact";
@@ -94,7 +99,7 @@ export default function LcarsTheme() {
         <div className={styles.topBarLeft} />
         <div className={styles.topBarHeader}>
           <span className={styles.headerText}>BEN DE CHRAI</span>
-          <span className={styles.stardate}>SD {Math.floor(Date.now() / 86400000)}.{Math.floor((Date.now() % 86400000) / 8640000)}</span>
+          <span className={styles.stardate}>{STARDATE}</span>
         </div>
       </div>
 

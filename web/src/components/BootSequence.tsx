@@ -368,50 +368,31 @@ const BOOT_COMPONENTS: Record<ThemeName, React.ComponentType<{ onComplete: () =>
   win31: Win31Boot,
 };
 
-export default function BootSequence({ children }: { children: React.ReactNode }) {
-  const { theme } = useTheme();
-  const [booted, setBooted] = useState(false);
-  const [skipped, setSkipped] = useState(false);
+function markBooted(t: string) {
+  const existing = sessionStorage.getItem("booted-themes");
+  const parsed: string[] = existing ? JSON.parse(existing) : [];
+  if (!parsed.includes(t)) parsed.push(t);
+  sessionStorage.setItem("booted-themes", JSON.stringify(parsed));
+}
 
-  // Check if already booted this session
-  useEffect(() => {
-    const bootedThemes = sessionStorage.getItem("booted-themes");
-    if (bootedThemes) {
-      const parsed = JSON.parse(bootedThemes) as string[];
-      if (parsed.includes(theme)) {
-        setBooted(true);
-        return;
-      }
-    }
+function isAlreadyBooted(t: string): boolean {
+  const existing = sessionStorage.getItem("booted-themes");
+  if (!existing) return false;
+  return (JSON.parse(existing) as string[]).includes(t);
+}
 
-    // Check prefers-reduced-motion
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      setBooted(true);
-      markBooted(theme);
-    }
-  }, [theme]);
+function shouldSkipBoot(theme: string): boolean {
+  if (typeof window === "undefined") return true;
+  if (isAlreadyBooted(theme)) return true;
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    markBooted(theme);
+    return true;
+  }
+  return false;
+}
 
-  // Reset boot on theme change
-  useEffect(() => {
-    const bootedThemes = sessionStorage.getItem("booted-themes");
-    if (bootedThemes) {
-      const parsed = JSON.parse(bootedThemes) as string[];
-      if (parsed.includes(theme)) {
-        setBooted(true);
-        setSkipped(false);
-        return;
-      }
-    }
-    setBooted(false);
-    setSkipped(false);
-  }, [theme]);
-
-  const markBooted = (t: string) => {
-    const existing = sessionStorage.getItem("booted-themes");
-    const parsed: string[] = existing ? JSON.parse(existing) : [];
-    if (!parsed.includes(t)) parsed.push(t);
-    sessionStorage.setItem("booted-themes", JSON.stringify(parsed));
-  };
+function BootSequenceInner({ theme, children }: { theme: ThemeName; children: React.ReactNode }) {
+  const [booted, setBooted] = useState(() => shouldSkipBoot(theme));
 
   const handleComplete = useCallback(() => {
     setBooted(true);
@@ -420,24 +401,26 @@ export default function BootSequence({ children }: { children: React.ReactNode }
 
   // Skip handler
   useEffect(() => {
-    if (booted || skipped) return;
-    const handleSkip = () => {
-      setSkipped(true);
-      handleComplete();
-    };
+    if (booted) return;
+    const handleSkip = () => handleComplete();
     window.addEventListener("click", handleSkip);
     window.addEventListener("keydown", handleSkip);
-    // Auto-complete as fallback
     const timeout = setTimeout(handleComplete, BOOT_DURATION[theme] + 1000);
     return () => {
       window.removeEventListener("click", handleSkip);
       window.removeEventListener("keydown", handleSkip);
       clearTimeout(timeout);
     };
-  }, [booted, skipped, theme, handleComplete]);
+  }, [booted, theme, handleComplete]);
 
   if (booted) return <>{children}</>;
 
   const BootComponent = BOOT_COMPONENTS[theme];
   return <BootComponent onComplete={handleComplete} />;
+}
+
+export default function BootSequence({ children }: { children: React.ReactNode }) {
+  const { theme } = useTheme();
+  // Key on theme so the inner component re-mounts (fresh state) on theme change
+  return <BootSequenceInner key={theme} theme={theme}>{children}</BootSequenceInner>;
 }

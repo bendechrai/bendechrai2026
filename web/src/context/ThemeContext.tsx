@@ -6,6 +6,7 @@ import {
   useState,
   useEffect,
   useCallback,
+  useSyncExternalStore,
   type ReactNode,
 } from "react";
 import {
@@ -36,14 +37,24 @@ function getInitialTheme(): ThemeName {
   return DEFAULT_THEME;
 }
 
-export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setThemeState] = useState<ThemeName>(DEFAULT_THEME);
-  const [mounted, setMounted] = useState(false);
+// Track mount state externally to avoid setState-in-effect lint error
+function useMounted() {
+  return useSyncExternalStore(
+    (cb) => {
+      // Subscribe is a no-op since mounted state doesn't change after mount
+      cb();
+      return () => {};
+    },
+    () => true,   // client: always mounted
+    () => false,   // server: not mounted
+  );
+}
 
-  useEffect(() => {
-    setThemeState(getInitialTheme());
-    setMounted(true);
-  }, []);
+export function ThemeProvider({ children }: { children: ReactNode }) {
+  const mounted = useMounted();
+  const [theme, setThemeState] = useState<ThemeName>(() =>
+    typeof window !== "undefined" ? getInitialTheme() : DEFAULT_THEME,
+  );
 
   const setTheme = useCallback((newTheme: ThemeName) => {
     if (!THEME_NAMES.includes(newTheme)) return;

@@ -35,7 +35,7 @@ export default function TerminalTheme() {
   const { setTheme } = useTheme();
   const [lines, setLines] = useState<TerminalLine[]>(WELCOME_LINES);
   const [input, setInput] = useState("");
-  const [nextId, setNextId] = useState(100);
+  const nextIdRef = useRef(100);
   const inputRef = useRef<HTMLInputElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -54,14 +54,12 @@ export default function TerminalTheme() {
   }, []);
 
   const addLines = useCallback((newLines: string[], type: TerminalLine["type"] = "output") => {
-    setNextId((prev) => {
-      const startId = prev;
-      setLines((old) => [
-        ...old,
-        ...newLines.map((text, i) => ({ id: startId + i, text, type })),
-      ]);
-      return prev + newLines.length;
-    });
+    const startId = nextIdRef.current;
+    nextIdRef.current += newLines.length;
+    setLines((old) => [
+      ...old,
+      ...newLines.map((text, i) => ({ id: startId + i, text, type })),
+    ]);
   }, []);
 
   const handleCommand = useCallback(
