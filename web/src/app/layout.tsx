@@ -3,8 +3,8 @@ import { ThemeProvider } from "@/context/ThemeContext";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Ben de Chrai",
-  description: "Personal homepage of Ben de Chrai",
+  title: "Ben Dechrai",
+  description: "Personal homepage of Ben Dechrai",
 };
 
 export default function RootLayout({

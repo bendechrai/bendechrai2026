@@ -26,7 +26,7 @@ function PanelContent({ id }: { id: PanelId }) {
         <>
           <div className={styles.dataLine}>
             <span className={styles.label}>IDENTITY</span>
-            <span>Ben de Chrai</span>
+            <span>Ben Dechrai</span>
           </div>
           <div className={styles.dataLine}>
             <span className={styles.label}>ROLE</span>

@@ -25,7 +25,7 @@ function TerminalBoot({ onComplete }: { onComplete: () => void }) {
     "Establishing connection...",
     `Connection established: ${new Date().toISOString().replace("T", " ").slice(0, 19)} UTC`,
     "",
-    "WELCOME TO THE PERSONAL TERMINAL OF BEN DE CHRAI",
+    "WELCOME TO THE PERSONAL TERMINAL OF BEN DECHRAI",
     "Type 'help' for available commands.",
   ];
 

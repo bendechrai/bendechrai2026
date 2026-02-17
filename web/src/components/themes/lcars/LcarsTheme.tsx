@@ -98,7 +98,7 @@ export default function LcarsTheme() {
       <div className={styles.topBar}>
         <div className={styles.topBarLeft} />
         <div className={styles.topBarHeader}>
-          <span className={styles.headerText}>BEN DE CHRAI</span>
+          <span className={styles.headerText}>BEN DECHRAI</span>
           <span className={styles.stardate}>{STARDATE}</span>
         </div>
       </div>

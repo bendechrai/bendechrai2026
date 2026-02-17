@@ -12,10 +12,10 @@ interface TerminalLine {
 
 const WELCOME_LINES: TerminalLine[] = [
   { id: 1, text: "SYSTEM v2.4.7", type: "header" },
-  { id: 2, text: "BEN DE CHRAI PERSONAL TERMINAL", type: "header" },
+  { id: 2, text: "BEN DECHRAI PERSONAL TERMINAL", type: "header" },
   { id: 3, text: "────────────────────────────────", type: "separator" },
   { id: 4, text: "", type: "output" },
-  { id: 5, text: "Welcome to the personal terminal of Ben de Chrai.", type: "output" },
+  { id: 5, text: "Welcome to the personal terminal of Ben Dechrai.", type: "output" },
   { id: 6, text: "", type: "output" },
   { id: 7, text: "Available commands:", type: "output" },
   { id: 8, text: "", type: "output" },

@@ -40,7 +40,7 @@ function TabContent({ tab }: { tab: Tab }) {
           <div className={styles.dataGrid}>
             <div className={styles.dataCard}>
               <div className={styles.dataLabel}>IDENTITY</div>
-              <div className={styles.dataValue}>Ben de Chrai</div>
+              <div className={styles.dataValue}>Ben Dechrai</div>
             </div>
             <div className={styles.dataCard}>
               <div className={styles.dataLabel}>ROLE</div>

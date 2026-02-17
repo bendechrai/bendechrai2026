@@ -26,7 +26,7 @@ export default function PlaceholderTheme() {
           textTransform: "uppercase",
         }}
       >
-        Ben de Chrai
+        Ben Dechrai
       </h1>
       <p style={{ color: "var(--color-fg)", opacity: 0.7 }}>
         Active theme: <strong>{THEME_CONFIGS[theme].label}</strong>
