@@ -3,11 +3,13 @@
 import { useTheme } from "@/context/ThemeContext";
 import TerminalTheme from "@/components/themes/terminal/TerminalTheme";
 import CyberpunkTheme from "@/components/themes/cyberpunk/CyberpunkTheme";
+import LcarsTheme from "@/components/themes/lcars/LcarsTheme";
 import PlaceholderTheme from "@/components/themes/PlaceholderTheme";
 
 const THEME_COMPONENTS: Record<string, React.ComponentType> = {
   terminal: TerminalTheme,
   cyberpunk: CyberpunkTheme,
+  lcars: LcarsTheme,
 };
 
 export default function Home() {
