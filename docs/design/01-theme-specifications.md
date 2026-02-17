@@ -1,6 +1,6 @@
 # Theme Design Specifications
 
-> Research and design decisions for the four sci-fi homepage themes.
+> Research and design decisions for the five homepage themes.
 > Each theme is not just a color swap — it has its own layout, navigation, animation,
 > typography, and interaction patterns.
 
@@ -15,6 +15,7 @@
 - **Theme via query string** (`?theme=lcars`) with `localStorage` persistence
 - **Default theme**: Cyberpunk (most visually striking first impression)
 - **Boot sequence**: Skippable (click/keypress), plays only on first visit per session
+- **Window behavior**: Theme-dependent — most themes use fixed grid panels, but holographic and Windows 3.1 use a shared window manager with different physics (see `06-window-manager.md`)
 
 ---
 
@@ -606,25 +607,199 @@ Holographic panels:
 
 ---
 
+## 5. Windows 3.1
+
+### Reference Material
+
+- Microsoft Windows 3.1 Program Manager (1992)
+- Windows 3.1 File Manager, Notepad, Write, Paintbrush
+- The classic "About Program Manager" dialog box
+- Solitaire, Minesweeper — the peak of desktop aesthetics
+- Hot Dog Stand color scheme (as an easter egg alternative)
+
+### Layout Structure
+
+**Desktop with Program Manager and child windows.** Each content section opens as a movable, resizable window. Minimized windows become icons at the bottom of the desktop. This is the only theme (alongside holographic) that uses the window manager.
+
+```
++--[Desktop - Teal #008080]--------------------------------------+
+|                                                                  |
+|  +--[Program Manager]------------------[_][^][X]--+             |
+|  | File  Options  Window  Help                     |             |
+|  |  +--[Main]-----------[_][^]--+                  |             |
+|  |  | [📄 Articles] [📅 Events]  |                  |             |
+|  |  | [🎤 Talks]    [✉ Contact] |                  |             |
+|  |  +----------------------------+                  |             |
+|  |                                                  |             |
+|  +--------------------------------------------------+             |
+|                                                                  |
+|  +--[Articles]---------------------------[_][^][X]--+           |
+|  | File  Edit  Search  Help                          |           |
+|  | +--------------------------------------------------+          |
+|  | | Content displayed in a Notepad-style scrollable  |          |
+|  | | text area with a white background...             |          |
+|  | +--------------------------------------------------+          |
+|  +----------------------------------------------------+          |
+|                                                                  |
+|  [📄]  [📅]                                                      |
+|  Articles  Events    <-- minimized window icons                  |
++------------------------------------------------------------------+
+```
+
+Key structural elements:
+- **Title bar**: Navy blue (#000080) for active window, gray (#808080) for inactive. Contains window title (left-aligned), minimize/maximize/close buttons (right-aligned)
+- **Menu bar**: Gray background with text menu items (File, Edit, etc.) — decorative, no functionality needed
+- **3D beveled borders**: Every element uses the classic raised/sunken border technique
+- **Client area**: White background for content windows, gray for Program Manager
+- **Resize handles**: All four edges and corners of each window are draggable to resize
+- **Minimized icons**: Windows minimize to labeled icons at the bottom of the desktop
+
+### Navigation
+
+- **Program Manager group window** contains icons for each content section
+- **Double-click** an icon to open the corresponding content window
+- Each section opens as a separate window (Notepad-style for articles, etc.)
+- Windows can be **moved** (drag title bar), **resized** (drag edges), **minimized** (to icon), **maximized** (fill desktop), and **closed** (X button)
+- **Window menu**: Cascade and Tile operations (via Window > Cascade / Tile)
+- Z-order: clicking a window brings it to front
+
+### Icons
+
+- **32×32 pixel-art style** icons rendered as small SVGs
+- Each section gets a recognizable icon:
+  - Articles: Notepad document icon
+  - Events: Calendar icon
+  - Talks: Presentation/podium icon
+  - Contact: Envelope/mailbox icon
+- Icons sit on the gray Program Manager background with labels underneath
+
+### Typography
+
+| Role | Font | Style |
+|------|------|-------|
+| Title bars | system-ui | Bold, 12px-equivalent, white on blue |
+| Menu items | system-ui | Regular, 12px-equivalent |
+| Body text | system-ui | Regular, 12-14px equivalent |
+| Program icons | system-ui | Regular, 10-11px, centered under icon |
+| DOS Prompt | 'Courier New', monospace | Fixed width, for command input window |
+
+Windows 3.1 used bitmap fonts (MS Sans Serif, Fixedsys). We use `system-ui` as a clean stand-in. The small sizing and lack of anti-aliasing feel is part of the charm. For the DOS prompt window, Courier New provides the monospace feel.
+
+### Color Palette
+
+The most constrained palette. No gradients, no transparency, no glow. Pure solid colors.
+
+| Name | Hex | Usage |
+|------|-----|-------|
+| Desktop Teal | `#008080` | Desktop background |
+| Window Gray | `#C0C0C0` | Window backgrounds, buttons, toolbar |
+| Title Bar Blue | `#000080` | Active window title bar |
+| Title Bar Gray | `#808080` | Inactive window title bar |
+| White | `#FFFFFF` | Content area backgrounds, button highlight edge |
+| Black | `#000000` | Text, outer border shadow edge |
+| Button Shadow | `#808080` | Inner shadow edge (bottom-right) |
+| Selection Blue | `#000080` | Selected text background |
+| Selection White | `#FFFFFF` | Selected text color |
+
+**3D bevel technique** (the heart of the entire visual style):
+```css
+/* Raised (buttons, window frames) */
+.win31-raised {
+  background: #C0C0C0;
+  border: none;
+  box-shadow:
+    inset  1px  1px 0 #FFFFFF,
+    inset -1px -1px 0 #808080,
+           1px  1px 0 #000000;
+}
+
+/* Sunken (text inputs, content wells) */
+.win31-sunken {
+  background: #FFFFFF;
+  box-shadow:
+    inset  1px  1px 0 #808080,
+    inset -1px -1px 0 #FFFFFF,
+    inset  2px  2px 0 #000000;
+}
+
+/* Title bar (active) */
+.win31-titlebar {
+  background: #000080;
+  color: #FFFFFF;
+  font-weight: bold;
+  padding: 2px 4px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+```
+
+### Animations & Transitions
+
+- **None.** This is critical to the authenticity.
+- Windows appear and disappear instantly. No fades, no transitions, no easing.
+- Drag operations show a dotted rectangle outline during drag (the classic "wireframe drag"), then the window snaps to position on release.
+- Maximize/restore is instant — no animation.
+- The only "animation" is the boot sequence.
+- `transition: none` enforced on all elements in this theme.
+
+### Persistent UI Elements
+
+- **Desktop background**: Solid teal (#008080), always visible behind windows
+- **Minimized window icons**: Along the bottom of the desktop
+- **Program Manager**: Always available (can be minimized but is the anchor window)
+
+### Command Input
+
+- **DOS Prompt window**: Opens as a standard Win 3.1 window
+- Styled like the real MS-DOS Prompt app — black background, white/gray text, in a window with title bar and borders
+- Prompt: `C:\BENDECHRAI> _` with blinking underscore cursor
+- This window can be moved and resized like any other window
+- It's always open by default (minimized or visible)
+
+### Boot Sequence
+
+- Solid blue screen with the Windows 3.1 logo (colored blocks arranged in a flag/window shape — recreated in CSS/SVG)
+- "Microsoft Windows" text below the logo
+- "Version 3.1" beneath that
+- Pause for 1.5 seconds
+- Screen clears to teal desktop
+- Program Manager window draws in
+- Total duration: ~2-3 seconds
+- Feels fast and utilitarian compared to the other themes — Windows didn't waste your time
+
+### Window Manager Behavior
+
+This theme uses the **rigid** window manager mode (see `06-window-manager.md`):
+- **Drag**: Title bar only. Wireframe outline during drag, snap on release.
+- **Resize**: All edges and corners. Wireframe outline during resize.
+- **Minimize**: Window collapses to an icon at the bottom of the desktop.
+- **Maximize**: Window fills the desktop area. Title bar buttons update.
+- **Z-order**: Click to raise. Active window gets blue title bar, others get gray.
+- **No momentum, no physics, no smooth anything.** Pixel-perfect, immediate.
+
+---
+
 ## Theme Comparison Matrix
 
-| Aspect | LCARS | Cyberpunk | Retro Terminal | Holographic |
-|--------|-------|-----------|----------------|-------------|
-| **Layout** | Frame + elbows | Overlapping glassmorphic panels | Full-screen text, 80-col | Floating translucent panels |
-| **Borders** | Colored bars | Angled clip-path + neon glow | Box-drawing chars | Corner brackets only |
-| **Navigation** | Sidebar pills | Tab bar | Numbered menu + commands | Command palette (center) |
-| **Icons** | None (text only) | Thin neon outlines | None (ASCII only) | Thin-line SVG with draw-in |
-| **Font (display)** | Antonio | Orbitron | VT323 | Exo 2 Light |
-| **Font (body)** | Antonio | Rajdhani | VT323 | Exo 2 Regular |
-| **Font (mono)** | Antonio | Share Tech Mono | VT323 | Share Tech Mono |
-| **Primary BG** | `#000000` | `#0a0a0f` | `#0D0208` | `#0a0e1a` |
-| **Primary Accent** | `#ffaa00` (gold) | `#00f3ff` (cyan) | `#00FF41` (green) | `#00DCDC` (cyan) |
-| **Secondary Accent** | `#cc6699` (pink) | `#ff0055` (magenta) | `#008F11` (dim green) | `#FF6B35` (warm) |
-| **Text Color** | `#ffffff` | `#e0e0ff` | `#00FF41` | `#E4EFF0` |
-| **Animations** | Minimal, snappy | Glitch, scanlines, CRT | Typewriter, flicker, scanroll | Materialize, pulse, shimmer |
-| **Boot Duration** | ~2s | ~3s | ~4-5s | ~3s |
-| **Boot Character** | Clean, professional | Aggressive, flashy | Dramatic, nostalgic | Elegant, ethereal |
-| **Overall Mood** | Advanced, utilitarian | Gritty, dangerous | Nostalgic, authentic | Ethereal, futuristic |
+| Aspect | LCARS | Cyberpunk | Retro Terminal | Holographic | Windows 3.1 |
+|--------|-------|-----------|----------------|-------------|-------------|
+| **Layout** | Frame + elbows | Overlapping glassmorphic panels | Full-screen text, 80-col | Floating translucent panels | Desktop + movable windows |
+| **Borders** | Colored bars | Angled clip-path + neon glow | Box-drawing chars | Corner brackets only | 3D beveled box-shadow |
+| **Navigation** | Sidebar pills | Tab bar | Numbered menu + commands | Command palette (center) | Program Manager icons |
+| **Icons** | None (text only) | Thin neon outlines | None (ASCII only) | Thin-line SVG with draw-in | 32×32 pixel-art SVG |
+| **Font (display)** | Antonio | Orbitron | VT323 | Exo 2 Light | system-ui (bold) |
+| **Font (body)** | Antonio | Rajdhani | VT323 | Exo 2 Regular | system-ui |
+| **Font (mono)** | Antonio | Share Tech Mono | VT323 | Share Tech Mono | Courier New |
+| **Primary BG** | `#000000` | `#0a0a0f` | `#0D0208` | `#0a0e1a` | `#008080` (teal) |
+| **Primary Accent** | `#ffaa00` (gold) | `#00f3ff` (cyan) | `#00FF41` (green) | `#00DCDC` (cyan) | `#000080` (navy) |
+| **Secondary Accent** | `#cc6699` (pink) | `#ff0055` (magenta) | `#008F11` (dim green) | `#FF6B35` (warm) | `#C0C0C0` (gray) |
+| **Text Color** | `#ffffff` | `#e0e0ff` | `#00FF41` | `#E4EFF0` | `#000000` |
+| **Animations** | Minimal, snappy | Glitch, scanlines, CRT | Typewriter, flicker, scanroll | Materialize, pulse, shimmer | None (instant) |
+| **Boot Duration** | ~2s | ~3s | ~4-5s | ~3s | ~2s |
+| **Boot Character** | Clean, professional | Aggressive, flashy | Dramatic, nostalgic | Elegant, ethereal | Fast, utilitarian |
+| **Overall Mood** | Advanced, utilitarian | Gritty, dangerous | Nostalgic, authentic | Ethereal, futuristic | Cozy, nostalgic |
+| **Window Behavior** | Static (grid) | Static (grid) | Static (grid) | Draggable (gestural) | Draggable + resizable (rigid) |
 
 ---
 
