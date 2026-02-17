@@ -105,7 +105,8 @@
 
 /* ===== Lines ===== */
 .line {
-  white-space: pre;
+  white-space: pre-wrap;
+  word-break: break-all;
   min-height: 1.4em;
 }
 
@@ -159,6 +160,14 @@
   text-shadow: inherit;
   caret-color: #00FF41;
   padding: 0;
+}
+
+/* ===== Mobile ===== */
+@media (max-width: 640px) {
+  .screen {
+    padding: 1rem;
+    font-size: 0.875rem;
+  }
 }
 
 /* ===== Reduced Motion ===== */

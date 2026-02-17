@@ -281,6 +281,53 @@
   padding: 0;
 }
 
+/* ===== Mobile ===== */
+@media (max-width: 640px) {
+  .statusBar {
+    flex-wrap: wrap;
+    gap: 0.25rem 1rem;
+    padding: 0.4rem 0.75rem;
+    font-size: 0.7rem;
+  }
+
+  .mainPanel {
+    margin: 0.5rem;
+    clip-path: none;
+  }
+
+  .tabBar {
+    overflow-x: auto;
+  }
+
+  .tab {
+    padding: 0.5rem 0.5rem;
+    font-size: 0.65rem;
+    letter-spacing: 0.08em;
+  }
+
+  .tabContent {
+    padding: 1rem;
+  }
+
+  .sectionTitle {
+    font-size: 0.9rem;
+    letter-spacing: 0.1em;
+  }
+
+  .dataGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .terminal {
+    margin: 0 0.5rem 0.5rem;
+  }
+
+  .commsItem {
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+}
+
 /* ===== Reduced Motion ===== */
 @media (prefers-reduced-motion: reduce) {
   .scanlineOverlay {

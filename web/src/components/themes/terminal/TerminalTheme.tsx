@@ -11,24 +11,23 @@ interface TerminalLine {
 }
 
 const WELCOME_LINES: TerminalLine[] = [
-  { id: 1, text: "╔════════════════════════════════════════════════════════════════╗", type: "separator" },
-  { id: 2, text: "║  SYSTEM v2.4.7 - BEN DE CHRAI PERSONAL TERMINAL              ║", type: "header" },
-  { id: 3, text: "║  Connection established: " + new Date().toISOString().replace("T", " ").slice(0, 19) + " UTC          ║", type: "header" },
-  { id: 4, text: "╚════════════════════════════════════════════════════════════════╝", type: "separator" },
-  { id: 5, text: "", type: "output" },
-  { id: 6, text: "  Welcome to the personal terminal of Ben de Chrai.", type: "output" },
-  { id: 7, text: "", type: "output" },
-  { id: 8, text: "  Available commands:", type: "output" },
-  { id: 9, text: "", type: "output" },
-  { id: 10, text: "    1) articles    - Published writings", type: "menu" },
-  { id: 11, text: "    2) events      - Upcoming appearances", type: "menu" },
-  { id: 12, text: "    3) talks       - Talks & workshops", type: "menu" },
-  { id: 13, text: "    4) contact     - Get in touch", type: "menu" },
-  { id: 14, text: "    5) help        - Show this menu", type: "menu" },
-  { id: 15, text: "    6) theme <n>   - Change visual theme", type: "menu" },
-  { id: 16, text: "", type: "output" },
-  { id: 17, text: "  Type a command or number to continue.", type: "output" },
-  { id: 18, text: "", type: "output" },
+  { id: 1, text: "SYSTEM v2.4.7", type: "header" },
+  { id: 2, text: "BEN DE CHRAI PERSONAL TERMINAL", type: "header" },
+  { id: 3, text: "────────────────────────────────", type: "separator" },
+  { id: 4, text: "", type: "output" },
+  { id: 5, text: "Welcome to the personal terminal of Ben de Chrai.", type: "output" },
+  { id: 6, text: "", type: "output" },
+  { id: 7, text: "Available commands:", type: "output" },
+  { id: 8, text: "", type: "output" },
+  { id: 9, text: "  1) articles  - Published writings", type: "menu" },
+  { id: 10, text: "  2) events    - Upcoming appearances", type: "menu" },
+  { id: 11, text: "  3) talks     - Talks & workshops", type: "menu" },
+  { id: 12, text: "  4) contact   - Get in touch", type: "menu" },
+  { id: 13, text: "  5) help      - Show this menu", type: "menu" },
+  { id: 14, text: "  6) theme <n> - Change visual theme", type: "menu" },
+  { id: 15, text: "", type: "output" },
+  { id: 16, text: "Type a command or number to continue.", type: "output" },
+  { id: 17, text: "", type: "output" },
 ];
 
 export default function TerminalTheme() {
@@ -87,50 +86,37 @@ export default function TerminalTheme() {
       } else if (trimmed === "articles" || trimmed === "1") {
         addLines([
           "",
-          "┌──────────────────────────────────────────────────────────┐",
-          "│  ARTICLES                                                │",
-          "├──────────────────────────────────────────────────────────┤",
-          "│                                                          │",
-          "│  No articles loaded yet. Check back soon.                │",
-          "│                                                          │",
-          "└──────────────────────────────────────────────────────────┘",
+          "── ARTICLES ──────────────",
+          "",
+          "  No articles loaded yet.",
+          "  Check back soon.",
           "",
         ]);
       } else if (trimmed === "events" || trimmed === "2") {
         addLines([
           "",
-          "┌──────────────────────────────────────────────────────────┐",
-          "│  EVENTS                                                  │",
-          "├──────────────────────────────────────────────────────────┤",
-          "│                                                          │",
-          "│  No upcoming events. Check back soon.                    │",
-          "│                                                          │",
-          "└──────────────────────────────────────────────────────────┘",
+          "── EVENTS ────────────────",
+          "",
+          "  No upcoming events.",
+          "  Check back soon.",
           "",
         ]);
       } else if (trimmed === "talks" || trimmed === "3") {
         addLines([
           "",
-          "┌──────────────────────────────────────────────────────────┐",
-          "│  TALKS & WORKSHOPS                                      │",
-          "├──────────────────────────────────────────────────────────┤",
-          "│                                                          │",
-          "│  No talks scheduled. Check back soon.                    │",
-          "│                                                          │",
-          "└──────────────────────────────────────────────────────────┘",
+          "── TALKS & WORKSHOPS ─────",
+          "",
+          "  No talks scheduled.",
+          "  Check back soon.",
           "",
         ]);
       } else if (trimmed === "contact" || trimmed === "4") {
         addLines([
           "",
-          "┌──────────────────────────────────────────────────────────┐",
-          "│  CONTACT                                                 │",
-          "├──────────────────────────────────────────────────────────┤",
-          "│                                                          │",
-          "│  Email:   hello@bendechrai.com                           │",
-          "│  GitHub:  github.com/bendechrai                          │",
-          "│                                                          │",
-          "└──────────────────────────────────────────────────────────┘",
+          "── CONTACT ───────────────",
+          "",
+          "  Email:  hello@bendechrai.com",
+          "  GitHub: github.com/bendechrai",
           "",
         ]);
       } else if (trimmed.startsWith("theme ") || trimmed === "6") {

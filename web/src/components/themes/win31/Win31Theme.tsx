@@ -25,30 +25,36 @@ const DESKTOP_ICONS: { id: ContentId; label: string }[] = [
   { id: "contact", label: "Contact" },
 ];
 
-const INITIAL_WINDOWS: WindowState[] = [
-  {
-    id: "program-manager",
-    title: "Program Manager",
-    x: 40,
-    y: 30,
-    width: 460,
-    height: 280,
-    minimized: false,
-    maximized: false,
-    zIndex: 1,
-  },
-  {
-    id: "dos",
-    title: "DOS Prompt",
-    x: 80,
-    y: 200,
-    width: 500,
-    height: 260,
-    minimized: true,
-    maximized: false,
-    zIndex: 0,
-  },
-];
+function getInitialWindows(): WindowState[] {
+  const vw = typeof window !== "undefined" ? window.innerWidth : 800;
+  const vh = typeof window !== "undefined" ? window.innerHeight : 600;
+  const isMobile = vw < 640;
+
+  return [
+    {
+      id: "program-manager",
+      title: "Program Manager",
+      x: isMobile ? 4 : 40,
+      y: isMobile ? 4 : 30,
+      width: isMobile ? vw - 8 : Math.min(460, vw - 80),
+      height: isMobile ? vh * 0.45 : 280,
+      minimized: false,
+      maximized: isMobile,
+      zIndex: 1,
+    },
+    {
+      id: "dos",
+      title: "DOS Prompt",
+      x: isMobile ? 4 : 80,
+      y: isMobile ? vh * 0.5 : 200,
+      width: isMobile ? vw - 8 : Math.min(500, vw - 80),
+      height: isMobile ? vh * 0.45 : 260,
+      minimized: true,
+      maximized: false,
+      zIndex: 0,
+    },
+  ];
+}
 
 function WindowContent({ windowId, onOpenWindow }: { windowId: string; onOpenWindow: (id: ContentId) => void }) {
   const { setTheme } = useTheme();
@@ -180,7 +186,7 @@ function WindowContent({ windowId, onOpenWindow }: { windowId: string; onOpenWin
 }
 
 export default function Win31Theme() {
-  const [windows, setWindows] = useState<WindowState[]>(INITIAL_WINDOWS);
+  const [windows, setWindows] = useState<WindowState[]>(() => getInitialWindows());
   const [topZ, setTopZ] = useState(2);
   const dragRef = useRef<{ winId: string; offsetX: number; offsetY: number } | null>(null);
 
@@ -213,13 +219,16 @@ export default function Win31Theme() {
           contact: "Contact - Notepad",
           dos: "DOS Prompt",
         };
+        const vw = window.innerWidth;
+        const vh = window.innerHeight;
+        const isMobile = vw < 640;
         const newWin: WindowState = {
           id: contentId,
           title: titles[contentId] || contentId,
-          x: 100 + Math.random() * 100,
-          y: 60 + Math.random() * 80,
-          width: 420,
-          height: 300,
+          x: isMobile ? 4 : 100 + Math.random() * 100,
+          y: isMobile ? 4 : 60 + Math.random() * 80,
+          width: isMobile ? vw - 8 : Math.min(420, vw - 80),
+          height: isMobile ? vh - 40 : 300,
           minimized: false,
           maximized: false,
           zIndex: topZ + 1,

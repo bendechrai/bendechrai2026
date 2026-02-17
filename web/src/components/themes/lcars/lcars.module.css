@@ -250,6 +250,117 @@
   caret-color: #ffaa00;
 }
 
+/* ===== Mobile ===== */
+@media (max-width: 640px) {
+  .frame {
+    padding: 4px;
+  }
+
+  /* Collapse sidebar: horizontal pills above content */
+  .topBar {
+    height: 36px;
+  }
+
+  .topBarLeft {
+    width: 60px;
+    min-width: 60px;
+  }
+
+  .topBarHeader {
+    padding: 0 0.75rem;
+  }
+
+  .headerText {
+    font-size: 0.9rem;
+    letter-spacing: 0.08em;
+  }
+
+  .stardate {
+    font-size: 0.65rem;
+    display: none;
+  }
+
+  .mainArea {
+    flex-direction: column;
+  }
+
+  .sidebarColumn {
+    width: 100%;
+    min-width: unset;
+    flex-direction: row;
+    align-items: stretch;
+    overflow-x: auto;
+  }
+
+  .elbowTop,
+  .elbowBottom {
+    display: none;
+  }
+
+  .sidebar {
+    flex-direction: row;
+    gap: 4px;
+    padding: 4px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    flex-shrink: 0;
+  }
+
+  .pill {
+    width: auto;
+    border-radius: 12px;
+    padding: 0.4rem 0.75rem;
+    font-size: 0.75rem;
+    white-space: nowrap;
+    text-align: center;
+  }
+
+  .statusBlock {
+    display: none;
+  }
+
+  .content {
+    padding: 1rem;
+  }
+
+  .contentTitle {
+    font-size: 1.1rem;
+    letter-spacing: 0.1em;
+  }
+
+  .dataRow {
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .dataLabel {
+    min-width: unset;
+  }
+
+  /* Bottom bar */
+  .bottomBar {
+    height: 40px;
+  }
+
+  .bottomBarLeft {
+    width: 60px;
+    min-width: 60px;
+  }
+
+  .commandArea {
+    padding: 0 0.5rem;
+    gap: 0.5rem;
+  }
+
+  .promptLabel {
+    font-size: 0.75rem;
+  }
+
+  .commandInput {
+    font-size: 0.85rem;
+  }
+}
+
 /* ===== Reduced Motion ===== */
 @media (prefers-reduced-motion: reduce) {
   .pill {

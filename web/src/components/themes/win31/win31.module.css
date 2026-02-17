@@ -234,3 +234,25 @@
     inset 1px 1px 0 #808080,
     inset -1px -1px 0 #FFFFFF;
 }
+
+/* ===== Mobile ===== */
+@media (max-width: 640px) {
+  .iconGrid {
+    gap: 16px;
+    padding: 12px;
+  }
+
+  .desktopIcon {
+    width: 60px;
+  }
+
+  .taskbar {
+    flex-wrap: wrap;
+    right: 4px;
+  }
+
+  .taskbarIcon {
+    font-size: 10px;
+    padding: 2px 8px;
+  }
+}
