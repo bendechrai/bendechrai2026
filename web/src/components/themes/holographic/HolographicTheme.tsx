@@ -2,6 +2,8 @@
 
 import { useState, useRef, useCallback, useEffect } from "react";
 import { useTheme } from "@/context/ThemeContext";
+import { ARTICLES, EVENTS, TALKS, SOCIAL_LINKS } from "@/data/content";
+import { sendMessage } from "@/lib/sendMessage";
 import styles from "./holographic.module.css";
 
 type PanelId = "about" | "articles" | "events" | "talks" | "contact";
@@ -16,10 +18,34 @@ const PANELS: PanelConfig[] = [
   { id: "articles", title: "ARTICLES" },
   { id: "events", title: "EVENTS" },
   { id: "talks", title: "TALKS" },
-  { id: "contact", title: "CONTACT" },
+  { id: "contact", title: "QUANTUM RELAY" },
 ];
 
+function formatDate(dateStr: string) {
+  const d = new Date(dateStr + "T00:00:00");
+  return d.toLocaleDateString("en-AU", { day: "2-digit", month: "short", year: "numeric" });
+}
+
 function PanelContent({ id }: { id: PanelId }) {
+  const [msgHandle, setMsgHandle] = useState("");
+  const [msgBody, setMsgBody] = useState("");
+  const [msgSent, setMsgSent] = useState(false);
+
+  const [sending, setSending] = useState(false);
+
+  const handleSend = async () => {
+    if (!msgHandle.trim() || !msgBody.trim() || sending) return;
+    setSending(true);
+    await sendMessage(msgHandle.trim(), msgBody.trim());
+    setSending(false);
+    setMsgSent(true);
+    setTimeout(() => {
+      setMsgSent(false);
+      setMsgHandle("");
+      setMsgBody("");
+    }, 4000);
+  };
+
   switch (id) {
     case "about":
       return (
@@ -36,25 +62,110 @@ function PanelContent({ id }: { id: PanelId }) {
             <span className={styles.label}>LOCATION</span>
             <span>Melbourne, AU</span>
           </div>
+          <div className={styles.dataLine}>
+            <span className={styles.label}>GITHUB</span>
+            <a href={SOCIAL_LINKS.github} target="_blank" rel="noopener noreferrer" className={styles.holoLink}>
+              github.com/bendechrai
+            </a>
+          </div>
+          <div className={styles.dataLine}>
+            <span className={styles.label}>LINKEDIN</span>
+            <a href={SOCIAL_LINKS.linkedin} target="_blank" rel="noopener noreferrer" className={styles.holoLink}>
+              linkedin.com/in/bendechrai
+            </a>
+          </div>
+          <div className={styles.dataLine}>
+            <span className={styles.label}>TWITTER</span>
+            <a href={SOCIAL_LINKS.twitter} target="_blank" rel="noopener noreferrer" className={styles.holoLink}>
+              twitter.com/bendechrai
+            </a>
+          </div>
         </>
       );
     case "articles":
-      return <p className={styles.emptyText}>No articles loaded. Stand by.</p>;
+      return (
+        <>
+          {ARTICLES.map((a) => (
+            <div key={a.title} className={styles.dataLine} style={{ flexDirection: "column", gap: "0.25rem" }}>
+              <span className={styles.label}>{formatDate(a.date)}</span>
+              <span>{a.title}</span>
+              <span className={styles.holoDetail}>{a.summary}</span>
+            </div>
+          ))}
+        </>
+      );
     case "events":
-      return <p className={styles.emptyText}>No events scheduled. Monitoring channels.</p>;
+      return (
+        <>
+          {EVENTS.map((ev) => (
+            <div key={ev.name} className={styles.dataLine} style={{ flexDirection: "column", gap: "0.25rem" }}>
+              <span className={styles.label}>
+                {ev.role === "workshop" ? "WORKSHOP" : ev.role === "speaking" ? "SPEAKING" : "ATTENDING"}
+              </span>
+              <span>{ev.name}</span>
+              <span className={styles.holoDetail}>
+                {formatDate(ev.date)} &mdash; {ev.location}
+              </span>
+              {ev.talk && <span className={styles.holoDetail}>{ev.talk}</span>}
+            </div>
+          ))}
+        </>
+      );
     case "talks":
-      return <p className={styles.emptyText}>Presentation archives initializing.</p>;
+      return (
+        <>
+          {TALKS.map((t) => (
+            <div key={t.title} className={styles.dataLine} style={{ flexDirection: "column", gap: "0.25rem" }}>
+              <span className={styles.label}>{t.type === "workshop" ? "WORKSHOP" : "TALK"}</span>
+              <span>{t.title}</span>
+              <span className={styles.holoDetail}>{t.event} &mdash; {formatDate(t.date)}</span>
+              <span className={styles.holoDetail}>{t.description}</span>
+            </div>
+          ))}
+        </>
+      );
     case "contact":
       return (
         <>
-          <div className={styles.dataLine}>
-            <span className={styles.label}>EMAIL</span>
-            <span>hello@bendechrai.com</span>
-          </div>
-          <div className={styles.dataLine}>
-            <span className={styles.label}>GITHUB</span>
-            <span>github.com/bendechrai</span>
-          </div>
+          {msgSent ? (
+            <div className={styles.holoMsgSent}>
+              <p>QUANTUM RELAY TRANSMISSION COMPLETE</p>
+              <p className={styles.holoDetail}>Entangled photon delivery confirmed. Ben will respond shortly.</p>
+            </div>
+          ) : (
+            <div className={styles.holoMsgForm}>
+              <div className={styles.holoField}>
+                <span className={styles.label}>IDENTIFIER</span>
+                <input
+                  type="text"
+                  value={msgHandle}
+                  onChange={(e) => setMsgHandle(e.target.value)}
+                  className={styles.holoInput}
+                  placeholder="Your identity"
+                  spellCheck={false}
+                  autoComplete="off"
+                />
+              </div>
+              <div className={styles.holoField}>
+                <span className={styles.label}>MESSAGE</span>
+                <textarea
+                  value={msgBody}
+                  onChange={(e) => setMsgBody(e.target.value)}
+                  className={styles.holoTextarea}
+                  placeholder="Compose transmission..."
+                  rows={3}
+                  spellCheck={false}
+                />
+              </div>
+              <button
+                className={styles.holoSendBtn}
+                onClick={handleSend}
+                disabled={!msgHandle.trim() || !msgBody.trim() || sending}
+              >
+                {sending ? "TRANSMITTING..." : "TRANSMIT"}
+              </button>
+            </div>
+          )}
         </>
       );
   }
@@ -115,7 +226,7 @@ export default function HolographicTheme() {
 
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
-      if (e.key === "/" && !paletteOpen && !(e.target instanceof HTMLInputElement)) {
+      if (e.key === "/" && !paletteOpen && !(e.target instanceof HTMLInputElement) && !(e.target instanceof HTMLTextAreaElement)) {
         e.preventDefault();
         openPalette();
       }

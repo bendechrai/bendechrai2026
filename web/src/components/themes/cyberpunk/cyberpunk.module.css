@@ -210,12 +210,138 @@
   font-size: 0.9rem;
 }
 
+/* ===== Detail Text ===== */
+.commsDetail {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.8rem;
+  color: rgba(224, 224, 255, 0.45);
+  margin-top: 0.15rem;
+}
+
 /* ===== Empty State ===== */
 .emptyState {
   color: rgba(224, 224, 255, 0.4);
   font-family: 'Share Tech Mono', monospace;
   font-size: 0.9rem;
   padding: 2rem 0;
+}
+
+/* ===== Message Form ===== */
+.msgForm {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.msgField {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.msgLabel {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.65rem;
+  letter-spacing: 0.15em;
+  color: rgba(0, 243, 255, 0.5);
+  text-transform: uppercase;
+}
+
+.msgInput,
+.msgTextarea {
+  background: rgba(0, 243, 255, 0.04);
+  border: 1px solid rgba(0, 243, 255, 0.15);
+  color: #e0e0ff;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.9rem;
+  padding: 0.6rem 0.75rem;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  clip-path: polygon(
+    0 0,
+    calc(100% - 8px) 0,
+    100% 8px,
+    100% 100%,
+    8px 100%,
+    0 calc(100% - 8px)
+  );
+}
+
+.msgInput:focus,
+.msgTextarea:focus {
+  border-color: rgba(0, 243, 255, 0.4);
+  box-shadow: 0 0 8px rgba(0, 243, 255, 0.1);
+}
+
+.msgInput::placeholder,
+.msgTextarea::placeholder {
+  color: rgba(0, 243, 255, 0.2);
+}
+
+.msgTextarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.msgSendBtn {
+  align-self: flex-start;
+  padding: 0.6rem 1.5rem;
+  background: rgba(255, 0, 85, 0.15);
+  border: 1px solid rgba(255, 0, 85, 0.4);
+  color: #ff0055;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.75rem;
+  letter-spacing: 0.2em;
+  cursor: pointer;
+  transition: background 0.2s, box-shadow 0.2s;
+  text-transform: uppercase;
+  clip-path: polygon(
+    0 0,
+    calc(100% - 6px) 0,
+    100% 6px,
+    100% 100%,
+    6px 100%,
+    0 calc(100% - 6px)
+  );
+}
+
+.msgSendBtn:hover:not(:disabled) {
+  background: rgba(255, 0, 85, 0.25);
+  box-shadow: 0 0 12px rgba(255, 0, 85, 0.2);
+}
+
+.msgSendBtn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/* ===== Message Sent ===== */
+.msgSent {
+  text-align: center;
+  padding: 2rem 0;
+  animation: fadeIn 0.3s ease;
+}
+
+.msgSentIcon {
+  font-size: 2.5rem;
+  color: #00ff9f;
+  text-shadow: 0 0 15px #00ff9f;
+  margin-bottom: 1rem;
+}
+
+.msgSent p {
+  margin: 0.25rem 0;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.85rem;
+  letter-spacing: 0.15em;
+  color: #00ff9f;
+}
+
+.msgSentSub {
+  font-family: 'Share Tech Mono', monospace !important;
+  font-size: 0.8rem !important;
+  letter-spacing: 0.05em !important;
+  color: rgba(224, 224, 255, 0.4) !important;
 }
 
 /* ===== Terminal ===== */

@@ -133,6 +133,24 @@
   color: #00FF41;
 }
 
+.linkLine {
+  color: #00FF41;
+}
+
+.termLink {
+  color: #00FF41;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+.termLink:hover {
+  color: #ffffff;
+  text-shadow:
+    0 0 8px rgba(0, 255, 65, 0.9),
+    0 0 15px rgba(0, 255, 65, 0.5);
+}
+
 /* ===== Prompt ===== */
 .prompt {
   display: flex;

@@ -2,6 +2,8 @@
 
 import { useState, useCallback, useRef, useEffect } from "react";
 import { useTheme } from "@/context/ThemeContext";
+import { ARTICLES, EVENTS, TALKS, SOCIAL_LINKS } from "@/data/content";
+import { sendMessage } from "@/lib/sendMessage";
 import styles from "./win31.module.css";
 
 interface WindowState {
@@ -22,8 +24,13 @@ const DESKTOP_ICONS: { id: ContentId; label: string }[] = [
   { id: "articles", label: "Articles" },
   { id: "events", label: "Events" },
   { id: "talks", label: "Talks" },
-  { id: "contact", label: "Contact" },
+  { id: "contact", label: "WinMsg" },
 ];
+
+function formatDate(dateStr: string) {
+  const d = new Date(dateStr + "T00:00:00");
+  return d.toLocaleDateString("en-AU", { day: "2-digit", month: "short", year: "numeric" });
+}
 
 function getInitialWindows(): WindowState[] {
   const vw = typeof window !== "undefined" ? window.innerWidth : 800;
@@ -65,6 +72,25 @@ function WindowContent({ windowId, onOpenWindow }: { windowId: string; onOpenWin
     "",
   ]);
   const dosInputRef = useRef<HTMLInputElement>(null);
+
+  const [msgName, setMsgName] = useState("");
+  const [msgBody, setMsgBody] = useState("");
+  const [msgSent, setMsgSent] = useState(false);
+
+  const [sending, setSending] = useState(false);
+
+  const handleMsgSend = async () => {
+    if (!msgName.trim() || !msgBody.trim() || sending) return;
+    setSending(true);
+    await sendMessage(msgName.trim(), msgBody.trim());
+    setSending(false);
+    setMsgSent(true);
+    setTimeout(() => {
+      setMsgSent(false);
+      setMsgName("");
+      setMsgBody("");
+    }, 4000);
+  };
 
   const handleDosCommand = useCallback(
     (cmd: string) => {
@@ -113,10 +139,10 @@ function WindowContent({ windowId, onOpenWindow }: { windowId: string; onOpenWin
               onClick={() => onOpenWindow(icon.id)}
             >
               <div className={styles.iconImage}>
-                {icon.id === "articles" && "📄"}
-                {icon.id === "events" && "📅"}
-                {icon.id === "talks" && "🎤"}
-                {icon.id === "contact" && "✉️"}
+                {icon.id === "articles" && "\u{1F4C4}"}
+                {icon.id === "events" && "\u{1F4C5}"}
+                {icon.id === "talks" && "\u{1F3A4}"}
+                {icon.id === "contact" && "\u{1F4E8}"}
               </div>
               <span className={styles.iconLabel}>{icon.label}</span>
             </button>
@@ -157,27 +183,97 @@ function WindowContent({ windowId, onOpenWindow }: { windowId: string; onOpenWin
     );
   }
 
+  if (windowId === "contact") {
+    return (
+      <div className={styles.notepadContent}>
+        <div className={styles.winMsgHeader}>WinMessage 1.0</div>
+        <div className={styles.winMsgLinks}>
+          <p><a href={SOCIAL_LINKS.github} target="_blank" rel="noopener noreferrer">GitHub: github.com/bendechrai</a></p>
+          <p><a href={SOCIAL_LINKS.linkedin} target="_blank" rel="noopener noreferrer">LinkedIn: linkedin.com/in/bendechrai</a></p>
+          <p><a href={SOCIAL_LINKS.twitter} target="_blank" rel="noopener noreferrer">Twitter: twitter.com/bendechrai</a></p>
+        </div>
+        <hr className={styles.winMsgDivider} />
+        {msgSent ? (
+          <div className={styles.winMsgSent}>
+            <p><b>Message Sent!</b></p>
+            <p>Your message has been delivered to Ben&apos;s inbox.</p>
+          </div>
+        ) : (
+          <div className={styles.winMsgForm}>
+            <div className={styles.winMsgField}>
+              <label>From:</label>
+              <input
+                type="text"
+                value={msgName}
+                onChange={(e) => setMsgName(e.target.value)}
+                className={styles.winMsgInput}
+                placeholder="Your name"
+              />
+            </div>
+            <div className={styles.winMsgField}>
+              <label>Message:</label>
+              <textarea
+                value={msgBody}
+                onChange={(e) => setMsgBody(e.target.value)}
+                className={styles.winMsgTextarea}
+                placeholder="Type your message here..."
+                rows={4}
+              />
+            </div>
+            <button
+              className={styles.winMsgSendBtn}
+              onClick={handleMsgSend}
+              disabled={!msgName.trim() || !msgBody.trim() || sending}
+            >
+              {sending ? "Sending..." : "Send"}
+            </button>
+          </div>
+        )}
+      </div>
+    );
+  }
+
   const contentMap: Record<string, React.ReactNode> = {
     articles: (
       <div className={styles.notepadContent}>
-        <p>No articles published yet.</p>
-        <p>Check back soon for new content.</p>
+        {ARTICLES.map((a) => (
+          <div key={a.title} style={{ marginBottom: "12px" }}>
+            <p><b>{a.title}</b></p>
+            <p><i>{formatDate(a.date)}</i></p>
+            <p>{a.summary}</p>
+          </div>
+        ))}
       </div>
     ),
     events: (
       <div className={styles.notepadContent}>
-        <p>No upcoming events scheduled.</p>
+        {EVENTS.map((ev) => (
+          <div key={ev.name} style={{ marginBottom: "12px" }}>
+            <p><b>{ev.name}</b> [{ev.role.toUpperCase()}]</p>
+            <p>{formatDate(ev.date)} - {ev.location}</p>
+            {ev.talk && <p>Talk: {ev.talk}</p>}
+          </div>
+        ))}
+        <hr />
+        <p><b>Talks &amp; Workshops</b></p>
+        {TALKS.map((t) => (
+          <div key={t.title} style={{ marginBottom: "12px" }}>
+            <p><b>{t.title}</b> [{t.type.toUpperCase()}]</p>
+            <p>{t.event} - {formatDate(t.date)}</p>
+            <p>{t.description}</p>
+          </div>
+        ))}
       </div>
     ),
     talks: (
       <div className={styles.notepadContent}>
-        <p>Talks and workshop information coming soon.</p>
-      </div>
-    ),
-    contact: (
-      <div className={styles.notepadContent}>
-        <p>Email: hello@bendechrai.com</p>
-        <p>GitHub: github.com/bendechrai</p>
+        {TALKS.map((t) => (
+          <div key={t.title} style={{ marginBottom: "12px" }}>
+            <p><b>{t.title}</b> [{t.type.toUpperCase()}]</p>
+            <p>{t.event} - {formatDate(t.date)}</p>
+            <p>{t.description}</p>
+          </div>
+        ))}
       </div>
     ),
   };
@@ -216,7 +312,7 @@ export default function Win31Theme() {
           articles: "Articles - Notepad",
           events: "Events - Notepad",
           talks: "Talks - Notepad",
-          contact: "Contact - Notepad",
+          contact: "WinMessage 1.0",
           dos: "DOS Prompt",
         };
         const vw = window.innerWidth;

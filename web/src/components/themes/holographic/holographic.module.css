@@ -140,6 +140,102 @@
   margin: 0;
 }
 
+/* ===== Links ===== */
+.holoLink {
+  color: #E4EFF0;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.holoLink:hover {
+  color: #00DCDC;
+}
+
+/* ===== Detail Text ===== */
+.holoDetail {
+  font-size: 0.8rem;
+  font-weight: 300;
+  color: rgba(228, 239, 240, 0.45);
+}
+
+/* ===== Message Form ===== */
+.holoMsgForm {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.holoField {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.holoInput,
+.holoTextarea {
+  background: rgba(0, 220, 220, 0.04);
+  border: 1px solid rgba(0, 220, 220, 0.15);
+  color: #E4EFF0;
+  font-family: 'Exo 2', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 300;
+  padding: 0.5rem 0.75rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.holoInput:focus,
+.holoTextarea:focus {
+  border-color: rgba(0, 220, 220, 0.4);
+}
+
+.holoInput::placeholder,
+.holoTextarea::placeholder {
+  color: rgba(0, 220, 220, 0.2);
+}
+
+.holoTextarea {
+  resize: vertical;
+  min-height: 50px;
+}
+
+.holoSendBtn {
+  align-self: flex-start;
+  padding: 0.45rem 1.25rem;
+  background: rgba(0, 220, 220, 0.08);
+  border: 1px solid rgba(0, 220, 220, 0.3);
+  color: #00DCDC;
+  font-family: 'Exo 2', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 200;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.2s, box-shadow 0.2s;
+}
+
+.holoSendBtn:hover:not(:disabled) {
+  background: rgba(0, 220, 220, 0.15);
+  box-shadow: 0 0 12px rgba(0, 220, 220, 0.15);
+}
+
+.holoSendBtn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.holoMsgSent {
+  text-align: center;
+  padding: 0.5rem 0;
+}
+
+.holoMsgSent p {
+  margin: 0.25rem 0;
+  font-weight: 200;
+  letter-spacing: 0.1em;
+  color: #00DCDC;
+}
+
 /* ===== Empty Hint ===== */
 .emptyHint {
   text-align: center;

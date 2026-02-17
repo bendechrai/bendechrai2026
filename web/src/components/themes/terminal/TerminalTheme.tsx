@@ -2,12 +2,15 @@
 
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useTheme } from "@/context/ThemeContext";
+import { ARTICLES, EVENTS, TALKS, SOCIAL_LINKS } from "@/data/content";
+import { sendMessage } from "@/lib/sendMessage";
 import styles from "./terminal.module.css";
 
 interface TerminalLine {
   id: number;
   text: string;
-  type: "output" | "input" | "header" | "separator" | "menu" | "ascii";
+  type: "output" | "input" | "header" | "separator" | "menu" | "ascii" | "link";
+  href?: string;
 }
 
 const WELCOME_LINES: TerminalLine[] = [
@@ -22,13 +25,15 @@ const WELCOME_LINES: TerminalLine[] = [
   { id: 9, text: "  1) articles  - Published writings", type: "menu" },
   { id: 10, text: "  2) events    - Upcoming appearances", type: "menu" },
   { id: 11, text: "  3) talks     - Talks & workshops", type: "menu" },
-  { id: 12, text: "  4) contact   - Get in touch", type: "menu" },
+  { id: 12, text: "  4) contact   - Subspace relay", type: "menu" },
   { id: 13, text: "  5) help      - Show this menu", type: "menu" },
   { id: 14, text: "  6) theme <n> - Change visual theme", type: "menu" },
   { id: 15, text: "", type: "output" },
   { id: 16, text: "Type a command or number to continue.", type: "output" },
   { id: 17, text: "", type: "output" },
 ];
+
+type MessageStep = "idle" | "handle" | "body" | "confirm";
 
 export default function TerminalTheme() {
   const { setTheme } = useTheme();
@@ -37,6 +42,10 @@ export default function TerminalTheme() {
   const nextIdRef = useRef(100);
   const inputRef = useRef<HTMLInputElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  const [msgStep, setMsgStep] = useState<MessageStep>("idle");
+  const [msgHandle, setMsgHandle] = useState("");
+  const [msgBody, setMsgBody] = useState("");
 
   const scrollToBottom = useCallback(() => {
     if (scrollRef.current) {
@@ -52,73 +61,171 @@ export default function TerminalTheme() {
     inputRef.current?.focus();
   }, []);
 
-  const addLines = useCallback((newLines: string[], type: TerminalLine["type"] = "output") => {
-    const startId = nextIdRef.current;
-    nextIdRef.current += newLines.length;
-    setLines((old) => [
-      ...old,
-      ...newLines.map((text, i) => ({ id: startId + i, text, type })),
-    ]);
-  }, []);
+  const addLines = useCallback(
+    (newLines: (string | { text: string; href: string })[], type: TerminalLine["type"] = "output") => {
+      const startId = nextIdRef.current;
+      nextIdRef.current += newLines.length;
+      setLines((old) => [
+        ...old,
+        ...newLines.map((item, i) => {
+          if (typeof item === "string") {
+            return { id: startId + i, text: item, type };
+          }
+          return { id: startId + i, text: item.text, type: "link" as const, href: item.href };
+        }),
+      ]);
+    },
+    [],
+  );
+
+  const formatDate = (dateStr: string) => {
+    const d = new Date(dateStr + "T00:00:00");
+    return d.toLocaleDateString("en-AU", { day: "2-digit", month: "short", year: "numeric" });
+  };
 
   const handleCommand = useCallback(
     (cmd: string) => {
       const trimmed = cmd.trim().toLowerCase();
-      addLines([`> ${cmd}`], "input");
 
-      if (trimmed === "" ) return;
-
-      if (trimmed === "help" || trimmed === "5") {
+      // Handle message composition flow
+      if (msgStep === "handle") {
+        addLines([`> ${cmd}`], "input");
+        setMsgHandle(cmd.trim());
         addLines([
           "",
-          "  Available commands:",
+          "  ENTER TRANSMISSION BODY:",
+          "  (Type your message and press Enter)",
           "",
-          "    1) articles    - Published writings",
-          "    2) events      - Upcoming appearances",
-          "    3) talks       - Talks & workshops",
-          "    4) contact     - Get in touch",
-          "    5) help        - Show this menu",
-          "    6) theme <n>   - Change visual theme",
+        ]);
+        setMsgStep("body");
+        return;
+      }
+      if (msgStep === "body") {
+        addLines([`> ${cmd}`], "input");
+        setMsgBody(cmd.trim());
+        addLines([
           "",
-        ], "menu");
+          `  SENDER:  ${msgHandle}`,
+          `  MESSAGE: ${cmd.trim()}`,
+          "",
+          "  TRANSMIT? (y/n)",
+          "",
+        ]);
+        setMsgStep("confirm");
+        return;
+      }
+      if (msgStep === "confirm") {
+        addLines([`> ${cmd}`], "input");
+        if (trimmed === "y" || trimmed === "yes") {
+          addLines([
+            "",
+            "  ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ TRANSMITTING...",
+          ]);
+          sendMessage(msgHandle, msgBody).then(() => {
+            addLines([
+              "  SUBSPACE RELAY LOCKED",
+              "  ENCRYPTION: AES-512 QUANTUM",
+              "  ROUTING: NODE 7 → NODE 3 → DEST",
+              "  ✓ TRANSMISSION COMPLETE",
+              "",
+              "  Message queued for delivery.",
+              "  Ben will receive your transmission shortly.",
+              "",
+            ]);
+          });
+        } else {
+          addLines(["", "  TRANSMISSION ABORTED.", ""]);
+        }
+        setMsgStep("idle");
+        setMsgHandle("");
+        setMsgBody("");
+        return;
+      }
+
+      addLines([`> ${cmd}`], "input");
+
+      if (trimmed === "") return;
+
+      if (trimmed === "help" || trimmed === "5") {
+        addLines(
+          [
+            "",
+            "  Available commands:",
+            "",
+            "    1) articles    - Published writings",
+            "    2) events      - Upcoming appearances",
+            "    3) talks       - Talks & workshops",
+            "    4) contact     - Subspace relay",
+            "    5) help        - Show this menu",
+            "    6) theme <n>   - Change visual theme",
+            "",
+          ],
+          "menu",
+        );
       } else if (trimmed === "clear") {
         setLines([]);
       } else if (trimmed === "articles" || trimmed === "1") {
-        addLines([
+        const articleLines: (string | { text: string; href: string })[] = [
           "",
           "── ARTICLES ──────────────",
           "",
-          "  No articles loaded yet.",
-          "  Check back soon.",
-          "",
-        ]);
+        ];
+        ARTICLES.forEach((a) => {
+          articleLines.push(`  [${formatDate(a.date)}]`);
+          articleLines.push(`  ${a.title}`);
+          articleLines.push(`  ${a.summary}`);
+          articleLines.push("");
+        });
+        addLines(articleLines);
       } else if (trimmed === "events" || trimmed === "2") {
-        addLines([
+        const eventLines: (string | { text: string; href: string })[] = [
           "",
           "── EVENTS ────────────────",
           "",
-          "  No upcoming events.",
-          "  Check back soon.",
-          "",
-        ]);
+        ];
+        EVENTS.forEach((e) => {
+          const roleTag = e.role === "workshop" ? "[WORKSHOP]" : e.role === "speaking" ? "[SPEAKING]" : "[ATTENDING]";
+          eventLines.push(`  ${roleTag} ${e.name}`);
+          eventLines.push(`  Date: ${formatDate(e.date)}  |  Location: ${e.location}`);
+          if (e.talk) eventLines.push(`  Talk: ${e.talk}`);
+          eventLines.push("");
+        });
+        addLines(eventLines);
       } else if (trimmed === "talks" || trimmed === "3") {
-        addLines([
+        const talkLines: (string | { text: string; href: string })[] = [
           "",
           "── TALKS & WORKSHOPS ─────",
           "",
-          "  No talks scheduled.",
-          "  Check back soon.",
-          "",
-        ]);
+        ];
+        TALKS.forEach((t) => {
+          const tag = t.type === "workshop" ? "[WORKSHOP]" : "[TALK]";
+          talkLines.push(`  ${tag} ${t.title}`);
+          talkLines.push(`  ${t.event} — ${formatDate(t.date)}`);
+          talkLines.push(`  ${t.description}`);
+          talkLines.push("");
+        });
+        addLines(talkLines);
       } else if (trimmed === "contact" || trimmed === "4") {
         addLines([
           "",
-          "── CONTACT ───────────────",
+          "── SUBSPACE RELAY ────────",
           "",
-          "  Email:  hello@bendechrai.com",
-          "  GitHub: github.com/bendechrai",
+          "  COMMUNICATION CHANNELS:",
           "",
         ]);
+        addLines([
+          { text: "  [GIT]  github.com/bendechrai", href: SOCIAL_LINKS.github },
+          { text: "  [NET]  linkedin.com/in/bendechrai", href: SOCIAL_LINKS.linkedin },
+          { text: "  [SIG]  twitter.com/bendechrai", href: SOCIAL_LINKS.twitter },
+        ]);
+        addLines([
+          "",
+          "  ── SEND TRANSMISSION ──",
+          "",
+          "  ENTER YOUR HANDLE / CALLSIGN:",
+          "",
+        ]);
+        setMsgStep("handle");
       } else if (trimmed.startsWith("theme ") || trimmed === "6") {
         const themeName = trimmed === "6" ? "" : trimmed.slice(6).trim();
         const validThemes = ["lcars", "cyberpunk", "terminal", "holographic", "win31"];
@@ -142,7 +249,7 @@ export default function TerminalTheme() {
         ]);
       }
     },
-    [addLines, setTheme],
+    [addLines, setTheme, msgStep, msgHandle, msgBody],
   );
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -156,6 +263,14 @@ export default function TerminalTheme() {
     inputRef.current?.focus();
   };
 
+  const promptLabel = msgStep === "handle"
+    ? "HANDLE> "
+    : msgStep === "body"
+      ? "MSG> "
+      : msgStep === "confirm"
+        ? "Y/N> "
+        : "> ";
+
   return (
     <div className={styles.crt} onClick={handleScreenClick}>
       <div className={styles.scanline} />
@@ -165,19 +280,31 @@ export default function TerminalTheme() {
             <div
               key={line.id}
               className={`${styles.line} ${
-                line.type === "header" ? styles.bright :
-                line.type === "separator" ? styles.dim :
-                line.type === "input" ? styles.inputLine :
-                line.type === "menu" ? styles.menu :
-                ""
+                line.type === "header"
+                  ? styles.bright
+                  : line.type === "separator"
+                    ? styles.dim
+                    : line.type === "input"
+                      ? styles.inputLine
+                      : line.type === "menu"
+                        ? styles.menu
+                        : line.type === "link"
+                          ? styles.linkLine
+                          : ""
               }`}
             >
-              {line.text || "\u00A0"}
+              {line.href ? (
+                <a href={line.href} target="_blank" rel="noopener noreferrer" className={styles.termLink}>
+                  {line.text}
+                </a>
+              ) : (
+                line.text || "\u00A0"
+              )}
             </div>
           ))}
         </div>
         <div className={styles.prompt}>
-          <span className={styles.promptChar}>&gt; </span>
+          <span className={styles.promptChar}>{promptLabel}</span>
           <input
             ref={inputRef}
             type="text"

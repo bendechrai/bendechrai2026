@@ -166,6 +166,106 @@
   margin: 0 0 4px 0;
 }
 
+.notepadContent a {
+  color: #000080;
+}
+
+.notepadContent a:hover {
+  color: #FF0000;
+}
+
+/* ===== WinMessage ===== */
+.winMsgHeader {
+  font-weight: bold;
+  font-size: 14px;
+  margin-bottom: 8px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid #808080;
+}
+
+.winMsgLinks {
+  margin-bottom: 4px;
+}
+
+.winMsgLinks p {
+  margin: 2px 0;
+}
+
+.winMsgDivider {
+  border: none;
+  border-top: 1px solid #808080;
+  margin: 8px 0;
+}
+
+.winMsgForm {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.winMsgField {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.winMsgField label {
+  font-weight: bold;
+  font-size: 12px;
+  min-width: 55px;
+  padding-top: 2px;
+}
+
+.winMsgInput,
+.winMsgTextarea {
+  flex: 1;
+  background: #FFFFFF;
+  border: none;
+  box-shadow:
+    inset 1px 1px 0 #808080,
+    inset -1px -1px 0 #FFFFFF,
+    inset 2px 2px 0 #000000;
+  font-family: system-ui, sans-serif;
+  font-size: 12px;
+  padding: 2px 4px;
+  outline: none;
+}
+
+.winMsgTextarea {
+  resize: vertical;
+  min-height: 40px;
+}
+
+.winMsgSendBtn {
+  align-self: flex-end;
+  padding: 2px 16px;
+  background: #C0C0C0;
+  border: none;
+  box-shadow:
+    inset 1px 1px 0 #FFFFFF,
+    inset -1px -1px 0 #808080,
+    1px 1px 0 #000000;
+  font-family: system-ui, sans-serif;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.winMsgSendBtn:active {
+  box-shadow:
+    inset 1px 1px 0 #808080,
+    inset -1px -1px 0 #FFFFFF;
+}
+
+.winMsgSendBtn:disabled {
+  color: #808080;
+  cursor: not-allowed;
+}
+
+.winMsgSent {
+  padding: 8px 0;
+  text-align: center;
+}
+
 /* ===== DOS Window ===== */
 .dosWindow {
   background: #000000;

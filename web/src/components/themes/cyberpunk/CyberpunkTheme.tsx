@@ -2,6 +2,8 @@
 
 import { useState, useRef, useCallback } from "react";
 import { useTheme } from "@/context/ThemeContext";
+import { ARTICLES, EVENTS, TALKS, SOCIAL_LINKS } from "@/data/content";
+import { sendMessage } from "@/lib/sendMessage";
 import styles from "./cyberpunk.module.css";
 
 type Tab = "data" | "comms" | "events" | "archives";
@@ -31,7 +33,31 @@ function StatusBar() {
   );
 }
 
+function formatDate(dateStr: string) {
+  const d = new Date(dateStr + "T00:00:00");
+  return d.toLocaleDateString("en-AU", { day: "2-digit", month: "short", year: "numeric" });
+}
+
 function TabContent({ tab }: { tab: Tab }) {
+  const [msgHandle, setMsgHandle] = useState("");
+  const [msgBody, setMsgBody] = useState("");
+  const [msgSent, setMsgSent] = useState(false);
+
+  const [sending, setSending] = useState(false);
+
+  const handleSend = async () => {
+    if (!msgHandle.trim() || !msgBody.trim() || sending) return;
+    setSending(true);
+    await sendMessage(msgHandle.trim(), msgBody.trim());
+    setSending(false);
+    setMsgSent(true);
+    setTimeout(() => {
+      setMsgSent(false);
+      setMsgHandle("");
+      setMsgBody("");
+    }, 4000);
+  };
+
   switch (tab) {
     case "data":
       return (
@@ -57,36 +83,120 @@ function TabContent({ tab }: { tab: Tab }) {
               <div className={styles.dataValue}>Melbourne, AU</div>
             </div>
           </div>
+          <h2 className={styles.sectionTitle} style={{ marginTop: "2rem" }}>NETWORK NODES</h2>
+          <div className={styles.commsList}>
+            <a href={SOCIAL_LINKS.github} target="_blank" rel="noopener noreferrer" className={styles.commsItem}>
+              <span className={styles.commsLabel}>GITHUB</span>
+              <span className={styles.commsValue}>github.com/bendechrai</span>
+            </a>
+            <a href={SOCIAL_LINKS.linkedin} target="_blank" rel="noopener noreferrer" className={styles.commsItem}>
+              <span className={styles.commsLabel}>LINKEDIN</span>
+              <span className={styles.commsValue}>linkedin.com/in/bendechrai</span>
+            </a>
+            <a href={SOCIAL_LINKS.twitter} target="_blank" rel="noopener noreferrer" className={styles.commsItem}>
+              <span className={styles.commsLabel}>SIGNAL</span>
+              <span className={styles.commsValue}>twitter.com/bendechrai</span>
+            </a>
+          </div>
         </div>
       );
     case "comms":
       return (
         <div className={styles.contentSection}>
-          <h2 className={styles.sectionTitle}>COMMUNICATION CHANNELS</h2>
-          <div className={styles.commsList}>
-            <div className={styles.commsItem}>
-              <span className={styles.commsLabel}>EMAIL</span>
-              <span className={styles.commsValue}>hello@bendechrai.com</span>
+          <h2 className={styles.sectionTitle}>ENCRYPTED RELAY</h2>
+          {msgSent ? (
+            <div className={styles.msgSent}>
+              <div className={styles.msgSentIcon}>&#x25C8;</div>
+              <p>TRANSMISSION ENCRYPTED &amp; DISPATCHED</p>
+              <p className={styles.msgSentSub}>Routing through darknet relay nodes...</p>
+              <p className={styles.msgSentSub}>Ben will decrypt your message shortly.</p>
             </div>
-            <div className={styles.commsItem}>
-              <span className={styles.commsLabel}>GITHUB</span>
-              <span className={styles.commsValue}>github.com/bendechrai</span>
+          ) : (
+            <div className={styles.msgForm}>
+              <div className={styles.msgField}>
+                <label className={styles.msgLabel}>HANDLE / ALIAS</label>
+                <input
+                  type="text"
+                  value={msgHandle}
+                  onChange={(e) => setMsgHandle(e.target.value)}
+                  className={styles.msgInput}
+                  placeholder="your.handle"
+                  spellCheck={false}
+                  autoComplete="off"
+                />
+              </div>
+              <div className={styles.msgField}>
+                <label className={styles.msgLabel}>TRANSMISSION</label>
+                <textarea
+                  value={msgBody}
+                  onChange={(e) => setMsgBody(e.target.value)}
+                  className={styles.msgTextarea}
+                  placeholder="Enter encrypted message..."
+                  rows={4}
+                  spellCheck={false}
+                />
+              </div>
+              <button
+                className={styles.msgSendBtn}
+                onClick={handleSend}
+                disabled={!msgHandle.trim() || !msgBody.trim() || sending}
+              >
+                {sending ? "ENCRYPTING..." : "TRANSMIT \u25B6"}
+              </button>
             </div>
-          </div>
+          )}
         </div>
       );
     case "events":
       return (
         <div className={styles.contentSection}>
           <h2 className={styles.sectionTitle}>UPCOMING EVENTS</h2>
-          <p className={styles.emptyState}>No events in the queue. Stand by.</p>
+          <div className={styles.commsList}>
+            {EVENTS.map((ev) => (
+              <div key={ev.name} className={styles.commsItem}>
+                <span className={styles.commsLabel}>
+                  {ev.role === "workshop" ? "WKSHP" : ev.role === "speaking" ? "SPEAK" : "ATND"}
+                </span>
+                <div>
+                  <div className={styles.commsValue}>{ev.name}</div>
+                  <div className={styles.commsDetail}>{formatDate(ev.date)} &mdash; {ev.location}</div>
+                  {ev.talk && <div className={styles.commsDetail}>&gt; {ev.talk}</div>}
+                </div>
+              </div>
+            ))}
+          </div>
+          <h2 className={styles.sectionTitle} style={{ marginTop: "2rem" }}>TALKS &amp; WORKSHOPS</h2>
+          <div className={styles.commsList}>
+            {TALKS.map((t) => (
+              <div key={t.title} className={styles.commsItem}>
+                <span className={styles.commsLabel}>
+                  {t.type === "workshop" ? "WKSHP" : "TALK"}
+                </span>
+                <div>
+                  <div className={styles.commsValue}>{t.title}</div>
+                  <div className={styles.commsDetail}>{t.event} &mdash; {formatDate(t.date)}</div>
+                  <div className={styles.commsDetail}>{t.description}</div>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       );
     case "archives":
       return (
         <div className={styles.contentSection}>
           <h2 className={styles.sectionTitle}>ARCHIVED DATA</h2>
-          <p className={styles.emptyState}>Archives loading... Check back soon.</p>
+          <div className={styles.commsList}>
+            {ARTICLES.map((a) => (
+              <div key={a.title} className={styles.commsItem}>
+                <span className={styles.commsLabel}>{formatDate(a.date).replace(/ /g, "\u00A0")}</span>
+                <div>
+                  <div className={styles.commsValue}>{a.title}</div>
+                  <div className={styles.commsDetail}>{a.summary}</div>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       );
   }
