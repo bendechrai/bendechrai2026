@@ -1,6 +1,7 @@
 "use client";
 
 import { useTheme } from "@/context/ThemeContext";
+import BootSequence from "@/components/BootSequence";
 import TerminalTheme from "@/components/themes/terminal/TerminalTheme";
 import CyberpunkTheme from "@/components/themes/cyberpunk/CyberpunkTheme";
 import LcarsTheme from "@/components/themes/lcars/LcarsTheme";
@@ -19,5 +20,10 @@ const THEME_COMPONENTS: Record<string, React.ComponentType> = {
 export default function Home() {
   const { theme } = useTheme();
   const ThemeComponent = THEME_COMPONENTS[theme] || PlaceholderTheme;
-  return <ThemeComponent />;
+
+  return (
+    <BootSequence>
+      <ThemeComponent />
+    </BootSequence>
+  );
 }
