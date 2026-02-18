@@ -431,6 +431,7 @@ export default function FmsTheme() {
   const [scratchpad, setScratchpad] = useState("");
   const scratchRef = useRef<HTMLInputElement>(null);
   const initializedRef = useRef(false);
+  const [screenOnly, setScreenOnly] = useState(false);
 
   // Pagination per page type
   const [listPage, setListPage] = useState(0);
@@ -609,7 +610,10 @@ export default function FmsTheme() {
     [activePage, articleSlug, detailPage, screenRows, handleSendMessage],
   );
 
-  // Slew keys for pagination
+  // Slew keys for pagination - use ref for totalPages to avoid stale closures
+  const totalPagesRef = useRef(totalPages);
+  totalPagesRef.current = totalPages;
+
   const handleSlewUp = useCallback(() => {
     if (articleSlug) {
       setDetailPage((p) => Math.max(0, p - 1));
@@ -619,12 +623,13 @@ export default function FmsTheme() {
   }, [articleSlug]);
 
   const handleSlewDown = useCallback(() => {
+    const tp = totalPagesRef.current;
     if (articleSlug) {
-      setDetailPage((p) => p < totalPages - 1 ? p + 1 : p);
+      setDetailPage((p) => p < tp - 1 ? p + 1 : p);
     } else {
-      setListPage((p) => p < totalPages - 1 ? p + 1 : p);
+      setListPage((p) => p < tp - 1 ? p + 1 : p);
     }
-  }, [articleSlug, totalPages]);
+  }, [articleSlug]);
 
   const handlePageKey = useCallback(
     (page: McduPage) => {
@@ -650,124 +655,213 @@ export default function FmsTheme() {
     { id: "airport" as const, label: "AIRPORT", page: "prog" as McduPage },
   ];
 
+  // Screen-only reading mode: scrollable content without MCDU hardware
+  if (screenOnly) {
+    // Build all body content for current article or page
+    const article = articleSlug ? getArticleBySlug(articleSlug) : null;
+
+    return (
+      <div className={styles.mcdu}>
+        <div className={styles.readingMode}>
+          <button className={styles.readingToggle} onClick={() => setScreenOnly(false)} aria-label="Back to MCDU view">
+            MCDU
+          </button>
+          <div className={styles.readingScreen}>
+            {article ? (
+              <>
+                <div className={styles.readingTitle}>{article.title}</div>
+                <div className={styles.readingDate}>{formatDate(article.date)}</div>
+                <div className={styles.readingSummary}>{article.summary}</div>
+                {article.body && article.body.split("\n\n").map((para, i) => (
+                  <p key={i} className={styles.readingPara}>{para}</p>
+                ))}
+                <button className={styles.readingBack} onClick={() => { navigate("/articles"); setScreenOnly(false); }}>
+                  &lt; RETURN TO F-PLN
+                </button>
+              </>
+            ) : (
+              <>
+                <div className={styles.readingTitle}>{screenTitle}</div>
+                {screenRows.filter(r => r.leftData || r.rightData).map((row, i) => (
+                  <div key={i} className={styles.readingRow}>
+                    {row.leftLabel && <span className={styles.readingLabel}>{row.leftLabel}</span>}
+                    {row.leftData && (
+                      row.leftHref ? (
+                        <a href={row.leftHref} target="_blank" rel="noopener noreferrer" className={styles.readingLink}>{row.leftData}</a>
+                      ) : (
+                        <span className={styles.readingData} onClick={row.onLeftClick} style={row.onLeftClick ? { cursor: "pointer" } : undefined}>{row.leftData}</span>
+                      )
+                    )}
+                    {row.rightData && <span className={styles.readingData}>{row.rightData}</span>}
+                  </div>
+                ))}
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className={styles.mcdu}>
-      <div className={styles.unit}>
-        {/* Annunciator strip */}
-        <div className={styles.annunciators}>
-          <span className={styles.annunciator}>FM1</span>
-          <span className={styles.annunciator}>IND</span>
-          <span className={`${styles.annunciator} ${styles.annunciatorActive}`}>RDY</span>
-          <span className={styles.annunciator}>FM2</span>
+      {/* Cockpit surround wraps the MCDU; panels hidden on mobile via CSS */}
+      <div className={styles.cockpit}>
+        <div className={styles.cockpitTop}>
+          <div className={styles.glareshield}>
+            <span className={styles.cockpitLabel}>GLARESHIELD</span>
+            <div className={styles.cockpitIndicators}>
+              <span className={styles.indicatorGreen} />
+              <span className={styles.indicatorAmber} />
+              <span className={styles.indicatorGreen} />
+            </div>
+          </div>
         </div>
-
-        {/* Screen area with LSKs on both sides */}
-        <div className={styles.screenArea}>
-          {/* Left LSKs (L1-L6) */}
-          <div className={styles.lskColumn}>
-            {[1, 2, 3, 4, 5, 6].map((n) => (
-              <button key={n} className={styles.lsk} onClick={() => handleLsk("left", n)} aria-label={`L${n}`}>
-                &lt;
-              </button>
-            ))}
+        <div className={styles.cockpitMiddle}>
+          <div className={styles.cockpitPanel}>
+            <span className={styles.cockpitLabel}>ECAM</span>
+            <div className={styles.cockpitGauge} />
+            <div className={styles.cockpitGauge} />
           </div>
 
-          {/* Screen */}
-          <div className={styles.screen}>
-            {activePage === "atcComm" ? (
-              <AtcCommScreen
-                activeField={activeField}
-                setActiveField={setActiveField}
-                name={msgName}
-                message={msgBody}
-                msgSent={msgSent}
-                onSend={handleSendMessage}
-                sending={sending}
-              />
-            ) : (
-              <SixRowScreen
-                title={screenTitle}
-                rows={screenRows}
-                pageNum={pageNum}
-                totalPages={totalPages}
-              />
-            )}
-            {/* Scratchpad */}
-            <div className={styles.scratchpad} onClick={() => scratchRef.current?.focus()}>
-              <div className={styles.scratchpadBox}>
-                <input
-                  ref={scratchRef}
-                  type="text"
-                  value={scratchpad}
-                  onChange={(e) => setScratchpad(e.target.value)}
-                  onKeyDown={handleScratchKeyDown}
-                  className={styles.scratchpadInput}
-                  placeholder="[ ]"
-                  spellCheck={false}
-                  autoComplete="off"
-                  aria-label="Scratchpad input"
-                />
+          <div className={styles.unit}>
+            {/* Toggle button */}
+            <button className={styles.screenToggle} onClick={() => setScreenOnly(true)} aria-label="Switch to reading mode">
+              RDR
+            </button>
+
+            {/* Annunciator strip */}
+            <div className={styles.annunciators}>
+              <span className={styles.annunciator}>FM1</span>
+              <span className={styles.annunciator}>IND</span>
+              <span className={`${styles.annunciator} ${styles.annunciatorActive}`}>RDY</span>
+              <span className={styles.annunciator}>FM2</span>
+            </div>
+
+            {/* Screen area with LSKs on both sides */}
+            <div className={styles.screenArea}>
+              {/* Left LSKs (L1-L6) */}
+              <div className={styles.lskColumn}>
+                {[1, 2, 3, 4, 5, 6].map((n) => (
+                  <button key={n} className={styles.lsk} onClick={() => handleLsk("left", n)} aria-label={`L${n}`}>
+                    &lt;
+                  </button>
+                ))}
               </div>
+
+              {/* Screen */}
+              <div className={styles.screen}>
+                {activePage === "atcComm" ? (
+                  <AtcCommScreen
+                    activeField={activeField}
+                    setActiveField={setActiveField}
+                    name={msgName}
+                    message={msgBody}
+                    msgSent={msgSent}
+                    onSend={handleSendMessage}
+                    sending={sending}
+                  />
+                ) : (
+                  <SixRowScreen
+                    title={screenTitle}
+                    rows={screenRows}
+                    pageNum={pageNum}
+                    totalPages={totalPages}
+                  />
+                )}
+                {/* Scratchpad */}
+                <div className={styles.scratchpad} onClick={() => scratchRef.current?.focus()}>
+                  <div className={styles.scratchpadBox}>
+                    <input
+                      ref={scratchRef}
+                      type="text"
+                      value={scratchpad}
+                      onChange={(e) => setScratchpad(e.target.value)}
+                      onKeyDown={handleScratchKeyDown}
+                      className={styles.scratchpadInput}
+                      placeholder="[ ]"
+                      spellCheck={false}
+                      autoComplete="off"
+                      aria-label="Scratchpad input"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Right LSKs (R1-R6) */}
+              <div className={styles.lskColumn}>
+                {[1, 2, 3, 4, 5, 6].map((n) => (
+                  <button key={n} className={styles.lsk} onClick={() => handleLsk("right", n)} aria-label={`R${n}`}>
+                    &gt;
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Page keys - Row 1 */}
+            <nav className={styles.pageKeys} role="navigation" aria-label="FMS page navigation">
+              {pageKeysRow1.map((pk) => (
+                <button
+                  key={pk.id}
+                  className={`${styles.pageKey} ${activePage === pk.page ? styles.pageKeyActive : ""}`}
+                  onClick={() => handlePageKey(pk.page)}
+                  style={{ whiteSpace: "pre-line" }}
+                >
+                  {pk.label}
+                </button>
+              ))}
+            </nav>
+
+            {/* Page keys - Row 2 */}
+            <div className={styles.pageKeys}>
+              {pageKeysRow2.map((pk) => (
+                <button
+                  key={pk.id}
+                  className={`${styles.pageKey} ${activePage === pk.page ? styles.pageKeyActive : ""}`}
+                  onClick={() => handlePageKey(pk.page)}
+                  style={{ whiteSpace: "pre-line" }}
+                >
+                  {pk.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Slew keys */}
+            <div className={styles.slewKeys}>
+              <button className={styles.slewKey} aria-label="Slew left">&larr;</button>
+              <button className={styles.slewKey} onClick={handleSlewUp} aria-label="Slew up">&uarr;</button>
+              <button className={styles.slewKey} onClick={handleSlewDown} aria-label="Slew down">&darr;</button>
+              <button className={styles.slewKey} aria-label="Slew right">&rarr;</button>
+            </div>
+
+            {/* Keyboard */}
+            <MCDUKeyboard
+              onKey={handleKeyPress}
+              onClear={handleKeyClear}
+              onSpace={handleKeySpace}
+            />
+
+            {/* BRT / DIM */}
+            <div className={styles.bottomControls}>
+              <span className={styles.bottomBtn}>BRT</span>
+              <span className={styles.bottomBtn}>DIM</span>
             </div>
           </div>
 
-          {/* Right LSKs (R1-R6) */}
-          <div className={styles.lskColumn}>
-            {[1, 2, 3, 4, 5, 6].map((n) => (
-              <button key={n} className={styles.lsk} onClick={() => handleLsk("right", n)} aria-label={`R${n}`}>
-                &gt;
-              </button>
-            ))}
+          <div className={styles.cockpitPanel}>
+            <span className={styles.cockpitLabel}>RADIO</span>
+            <div className={styles.cockpitGauge} />
+            <div className={styles.cockpitGauge} />
           </div>
         </div>
-
-        {/* Page keys - Row 1 */}
-        <nav className={styles.pageKeys} role="navigation" aria-label="FMS page navigation">
-          {pageKeysRow1.map((pk) => (
-            <button
-              key={pk.id}
-              className={`${styles.pageKey} ${activePage === pk.page ? styles.pageKeyActive : ""}`}
-              onClick={() => handlePageKey(pk.page)}
-              style={{ whiteSpace: "pre-line" }}
-            >
-              {pk.label}
-            </button>
-          ))}
-        </nav>
-
-        {/* Page keys - Row 2 */}
-        <div className={styles.pageKeys}>
-          {pageKeysRow2.map((pk) => (
-            <button
-              key={pk.id}
-              className={`${styles.pageKey} ${activePage === pk.page ? styles.pageKeyActive : ""}`}
-              onClick={() => handlePageKey(pk.page)}
-              style={{ whiteSpace: "pre-line" }}
-            >
-              {pk.label}
-            </button>
-          ))}
-        </div>
-
-        {/* Slew keys */}
-        <div className={styles.slewKeys}>
-          <button className={styles.slewKey} aria-label="Slew left">&larr;</button>
-          <button className={styles.slewKey} onClick={handleSlewUp} aria-label="Slew up">&uarr;</button>
-          <button className={styles.slewKey} onClick={handleSlewDown} aria-label="Slew down">&darr;</button>
-          <button className={styles.slewKey} aria-label="Slew right">&rarr;</button>
-        </div>
-
-        {/* Keyboard */}
-        <MCDUKeyboard
-          onKey={handleKeyPress}
-          onClear={handleKeyClear}
-          onSpace={handleKeySpace}
-        />
-
-        {/* BRT / DIM */}
-        <div className={styles.bottomControls}>
-          <span className={styles.bottomBtn}>BRT</span>
-          <span className={styles.bottomBtn}>DIM</span>
+        <div className={styles.cockpitBottom}>
+          <span className={styles.cockpitLabel}>PEDESTAL</span>
+          <div className={styles.cockpitIndicators}>
+            <span className={styles.indicatorDim} />
+            <span className={styles.indicatorDim} />
+            <span className={styles.indicatorGreen} />
+            <span className={styles.indicatorDim} />
+          </div>
         </div>
       </div>
     </div>

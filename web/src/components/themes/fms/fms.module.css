@@ -513,6 +513,329 @@
   margin: 2px 4px;
 }
 
+/* ============ SCREEN-ONLY TOGGLE BUTTON ============ */
+.screenToggle {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: #333;
+  border: 1px solid #555;
+  border-radius: 3px;
+  color: #00ff00;
+  font-family: 'B612 Mono', 'Courier New', monospace;
+  font-size: 7px;
+  padding: 2px 6px;
+  cursor: pointer;
+  z-index: 5;
+  letter-spacing: 0.1em;
+  transition: background 0.1s;
+}
+
+.screenToggle:hover {
+  background: #444;
+  color: #88ff88;
+}
+
+/* ============ READING MODE ============ */
+.readingMode {
+  width: 100%;
+  max-width: 600px;
+  max-height: 100vh;
+  overflow-y: auto;
+  padding: 1rem;
+}
+
+.readingToggle {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  background: #222;
+  border: 1px solid #00ff00;
+  border-radius: 4px;
+  color: #00ff00;
+  font-family: 'B612 Mono', 'Courier New', monospace;
+  font-size: 11px;
+  padding: 6px 14px;
+  cursor: pointer;
+  z-index: 20;
+  letter-spacing: 0.1em;
+  transition: background 0.15s;
+}
+
+.readingToggle:hover {
+  background: #333;
+}
+
+.readingScreen {
+  background: #080808;
+  border: 2px solid #222;
+  border-radius: 4px;
+  padding: 1.5rem;
+  position: relative;
+}
+
+.readingScreen::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent 0px,
+    transparent 3px,
+    rgba(0,0,0,0.06) 3px,
+    rgba(0,0,0,0.06) 6px
+  );
+  pointer-events: none;
+  border-radius: 4px;
+}
+
+.readingTitle {
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 0.75rem;
+  text-align: center;
+}
+
+.readingDate {
+  color: #ffaa00;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.readingSummary {
+  color: #44ddff;
+  font-size: 13px;
+  line-height: 1.6;
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid #222;
+}
+
+.readingPara {
+  color: #00ff00;
+  font-size: 12px;
+  line-height: 1.7;
+  margin: 0 0 0.75rem 0;
+}
+
+.readingRow {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #111;
+}
+
+.readingLabel {
+  color: #ffffff;
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.readingData {
+  color: #00ff00;
+  font-size: 13px;
+}
+
+.readingLink {
+  color: #44ddff;
+  font-size: 13px;
+  text-decoration: none;
+}
+
+.readingLink:hover {
+  color: #88eeff;
+}
+
+.readingBack {
+  display: block;
+  margin-top: 1.5rem;
+  background: none;
+  border: 1px solid #ffaa00;
+  border-radius: 3px;
+  color: #ffaa00;
+  font-family: 'B612 Mono', 'Courier New', monospace;
+  font-size: 11px;
+  padding: 6px 14px;
+  cursor: pointer;
+  letter-spacing: 0.1em;
+}
+
+.readingBack:hover {
+  background: rgba(255, 170, 0, 0.1);
+}
+
+/* ============ COCKPIT SURROUND ============ */
+
+/* On mobile: cockpit is a pass-through, panels hidden */
+.cockpit {
+  display: contents;
+}
+
+.cockpitTop,
+.cockpitBottom,
+.cockpitPanel {
+  display: none;
+}
+
+.cockpitMiddle {
+  display: contents;
+}
+
+.glareshield {
+  display: none;
+}
+
+/* Desktop: full cockpit surround */
+@media (min-width: 521px) {
+  .cockpit {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    width: 100%;
+    max-width: 780px;
+  }
+
+  .cockpitTop {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .glareshield {
+    display: flex;
+    background: linear-gradient(180deg, #2a2a30 0%, #1e1e24 100%);
+    border-radius: 8px 8px 0 0;
+    padding: 10px 40px;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 700px;
+    border: 1px solid #333;
+    border-bottom: none;
+  }
+
+  .cockpitMiddle {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    width: 100%;
+    max-width: 700px;
+  }
+
+  .cockpitPanel {
+    display: flex;
+    flex: 1;
+    background: linear-gradient(180deg, #1e1e24 0%, #161618 100%);
+    border: 1px solid #2a2a30;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 20px 12px;
+    min-width: 80px;
+  }
+
+  .cockpitPanel:first-child {
+    border-radius: 0 0 0 6px;
+    border-right: none;
+  }
+
+  .cockpitPanel:last-child {
+    border-radius: 0 0 6px 0;
+    border-left: none;
+  }
+
+  .cockpitLabel {
+    color: #444;
+    font-family: 'B612 Mono', 'Courier New', monospace;
+    font-size: 7px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+  }
+
+  .cockpitGauge {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid #333;
+    background: radial-gradient(circle at 30% 30%, #1a1a1e, #0a0a0c);
+    box-shadow: inset 0 0 6px rgba(0,0,0,0.5);
+    position: relative;
+  }
+
+  .cockpitGauge::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 2px;
+    height: 14px;
+    background: #00cc00;
+    transform-origin: bottom center;
+    transform: translate(-50%, -100%) rotate(-30deg);
+    border-radius: 1px;
+    opacity: 0.6;
+  }
+
+  .cockpitIndicators {
+    display: flex;
+    gap: 8px;
+  }
+
+  .indicatorGreen {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #00cc00;
+    box-shadow: 0 0 4px #00cc00;
+  }
+
+  .indicatorAmber {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #ffaa00;
+    box-shadow: 0 0 4px #ffaa00;
+  }
+
+  .indicatorDim {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #222;
+    border: 1px solid #333;
+  }
+
+  .cockpitBottom {
+    display: flex;
+    width: 100%;
+    max-width: 700px;
+    background: linear-gradient(180deg, #161618 0%, #111113 100%);
+    border: 1px solid #2a2a30;
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    padding: 8px 40px;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .cockpitMiddle > .unit {
+    position: relative;
+    border-radius: 0;
+    max-height: none;
+    overflow-y: visible;
+    flex-shrink: 0;
+  }
+}
+
 /* BRT/DIM at bottom */
 .bottomControls {
   display: flex;
@@ -537,6 +860,8 @@
 @media (max-width: 520px) {
   .mcdu {
     align-items: flex-start;
+    /* Prevent zoom on input focus */
+    touch-action: manipulation;
   }
 
   .unit {
@@ -570,7 +895,10 @@
     font-size: 12px;
   }
 
+  /* Prevent iOS zoom on input focus - must be >= 16px */
   .scratchpadInput {
-    font-size: 12px;
+    font-size: 16px;
   }
+
+  /* On mobile, cockpit surround already hidden via base styles */
 }

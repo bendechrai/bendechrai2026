@@ -5,7 +5,8 @@
   background: #0a0e1a;
   font-family: 'Exo 2', sans-serif;
   color: #E4EFF0;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 /* ===== Grid Background ===== */
@@ -114,6 +115,23 @@
   font-weight: 300;
   font-size: 0.95rem;
   line-height: 1.6;
+  max-height: 60vh;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 220, 220, 0.3) transparent;
+}
+
+.panelBody::-webkit-scrollbar {
+  width: 4px;
+}
+
+.panelBody::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.panelBody::-webkit-scrollbar-thumb {
+  background: rgba(0, 220, 220, 0.3);
+  border-radius: 2px;
 }
 
 /* ===== Data Lines ===== */
