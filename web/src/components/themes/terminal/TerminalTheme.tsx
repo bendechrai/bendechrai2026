@@ -13,7 +13,6 @@ interface TerminalLine {
   type: "output" | "input" | "header" | "separator" | "menu" | "ascii" | "link" | "image";
   href?: string;
   imageSrc?: string;
-  onClick?: () => void;
 }
 
 const WELCOME_LINES: TerminalLine[] = [
@@ -217,15 +216,7 @@ export default function TerminalTheme() {
           setLines((old) => [
             ...old,
             { id: startId, text: `  [${idx + 1}] ${formatDate(a.date)}`, type: "output" },
-            {
-              id: startId + 1,
-              text: `  ${a.title}`,
-              type: "link" as const,
-              onClick: () => {
-                navigate(`/articles/${a.slug}`);
-                showArticle(a.slug);
-              },
-            },
+            { id: startId + 1, text: `  ${a.title}`, type: "output" },
             { id: startId + 2, text: `  ${a.summary}`, type: "output" },
             { id: startId + 3, text: "", type: "output" },
           ]);
@@ -423,10 +414,6 @@ export default function TerminalTheme() {
                 <a href={line.href} target="_blank" rel="noopener noreferrer" className={styles.termLink}>
                   {line.text}
                 </a>
-              ) : line.onClick ? (
-                <span className={styles.termLink} onClick={line.onClick} style={{ cursor: "pointer" }}>
-                  {line.text}
-                </span>
               ) : (
                 line.text || "\u00A0"
               )}
