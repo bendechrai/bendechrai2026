@@ -165,40 +165,39 @@ test("retro: can open a content window by clicking icon", async ({ page }) => {
 
 // --- FMS Theme: MCDU Navigation ---
 
-test("fms: IDENT page shows operator info", async ({ page }) => {
+test("fms: INIT page shows operator info", async ({ page }) => {
   await page.goto("/?theme=fms");
   await page.waitForTimeout(300);
 
-  await expect(page.getByText("IDENT")).toBeVisible();
+  await expect(page.getByText("INIT")).toBeVisible();
   await expect(page.getByText("BEN DECHRAI")).toBeVisible();
-  await expect(page.getByText("DEVELOPER / SPEAKER")).toBeVisible();
+  await expect(page.getByText("DEV / SPEAKER")).toBeVisible();
 });
 
-test("fms: can navigate pages via buttons", async ({ page }) => {
+test("fms: can navigate pages via page keys", async ({ page }) => {
   await page.goto("/?theme=fms");
   await page.waitForTimeout(300);
 
-  // Navigate to Flight Log (articles)
-  await page.getByRole("button", { name: "F-LOG" }).click();
-  await expect(page.getByText("FLIGHT LOG")).toBeVisible();
+  // Navigate to F-PLN (articles)
+  await page.getByRole("button", { name: "F-PLN" }).first().click();
   await expect(page.getByText("Building Passwordless Auth with WebAuthn")).toBeVisible();
 
-  // Navigate to Departures (events)
-  await page.getByRole("button", { name: "DEPART" }).click();
-  await expect(page.getByText("DEPARTURES")).toBeVisible();
+  // Navigate to PROG (events)
+  await page.getByRole("button", { name: "PROG" }).click();
   await expect(page.getByText("NDC Sydney")).toBeVisible();
 });
 
-test("fms: comms page shows MCDU keyboard", async ({ page }) => {
+test("fms: ATC COMM page shows alphabetical keyboard", async ({ page }) => {
   await page.goto("/?theme=fms");
   await page.waitForTimeout(300);
 
-  await page.getByRole("button", { name: "COMMS" }).click();
-  await expect(page.getByText("FROM:")).toBeVisible();
-  await expect(page.getByText("MSG:")).toBeVisible();
-  // MCDU keyboard keys should be visible
-  await expect(page.getByRole("button", { name: "Q" })).toBeVisible();
-  await expect(page.getByRole("button", { name: "SEND" })).toBeVisible();
+  // Click ATC COMM page key
+  await page.getByRole("button", { name: /ATC\s*COMM/ }).click();
+  await expect(page.getByText("FROM")).toBeVisible();
+  await expect(page.getByText("MESSAGE")).toBeVisible();
+  // Alphabetical keyboard (not QWERTY) - A should be first key
+  await expect(page.getByRole("button", { name: "A", exact: true })).toBeVisible();
+  await expect(page.getByRole("button", { name: "CLR" })).toBeVisible();
 });
 
 // --- Theme Switching via Commands ---

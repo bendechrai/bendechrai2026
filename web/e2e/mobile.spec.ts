@@ -71,7 +71,7 @@ test("fms: navigation buttons work on mobile", async ({ page }) => {
   await page.goto("/?theme=fms");
   await page.waitForTimeout(300);
 
-  await page.getByRole("button", { name: "F-LOG" }).tap();
+  await page.getByRole("button", { name: "F-PLN" }).first().tap();
   await expect(page.getByText("Building Passwordless Auth with WebAuthn")).toBeVisible();
 });
 
