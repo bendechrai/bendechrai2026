@@ -207,7 +207,7 @@ export default function StarshipTheme() {
       else if (["contact", "4", "comms"].includes(trimmed)) navigate("/contact");
       else if (trimmed.startsWith("theme ")) {
         const name = trimmed.slice(6).trim();
-        const valid = ["starship", "cyberpunk", "terminal", "holographic", "retro"];
+        const valid = ["starship", "cyberpunk", "terminal", "holographic", "retro", "fms"];
         if (valid.includes(name)) {
           setTimeout(() => setTheme(name as Parameters<typeof setTheme>[0]), 300);
         }

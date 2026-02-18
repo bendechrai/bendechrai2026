@@ -253,7 +253,7 @@ export default function CyberpunkTheme() {
         setTerminalLines([]);
       } else if (trimmed.startsWith("theme ")) {
         const name = trimmed.slice(6).trim();
-        const valid = ["starship", "cyberpunk", "terminal", "holographic", "retro"];
+        const valid = ["starship", "cyberpunk", "terminal", "holographic", "retro", "fms"];
         if (valid.includes(name)) {
           setTerminalLines((prev) => [...prev, `  Switching to ${name}...`]);
           setTimeout(() => setTheme(name as Parameters<typeof setTheme>[0]), 400);

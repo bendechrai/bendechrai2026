@@ -4,7 +4,7 @@ test.beforeEach(async ({ page }) => {
   await page.addInitScript(() => {
     sessionStorage.setItem(
       "booted-themes",
-      JSON.stringify(["cyberpunk", "terminal", "starship", "holographic", "retro"]),
+      JSON.stringify(["cyberpunk", "terminal", "starship", "holographic", "retro", "fms"]),
     );
   });
 });
@@ -161,6 +161,44 @@ test("retro: can open a content window by clicking icon", async ({ page }) => {
   // Click the Articles icon
   await page.getByRole("button", { name: "Articles" }).click();
   await expect(page.getByText("Building Passwordless Auth with WebAuthn")).toBeVisible();
+});
+
+// --- FMS Theme: MCDU Navigation ---
+
+test("fms: IDENT page shows operator info", async ({ page }) => {
+  await page.goto("/?theme=fms");
+  await page.waitForTimeout(300);
+
+  await expect(page.getByText("IDENT")).toBeVisible();
+  await expect(page.getByText("BEN DECHRAI")).toBeVisible();
+  await expect(page.getByText("DEVELOPER / SPEAKER")).toBeVisible();
+});
+
+test("fms: can navigate pages via buttons", async ({ page }) => {
+  await page.goto("/?theme=fms");
+  await page.waitForTimeout(300);
+
+  // Navigate to Flight Log (articles)
+  await page.getByRole("button", { name: "F-LOG" }).click();
+  await expect(page.getByText("FLIGHT LOG")).toBeVisible();
+  await expect(page.getByText("Building Passwordless Auth with WebAuthn")).toBeVisible();
+
+  // Navigate to Departures (events)
+  await page.getByRole("button", { name: "DEPART" }).click();
+  await expect(page.getByText("DEPARTURES")).toBeVisible();
+  await expect(page.getByText("NDC Sydney")).toBeVisible();
+});
+
+test("fms: comms page shows MCDU keyboard", async ({ page }) => {
+  await page.goto("/?theme=fms");
+  await page.waitForTimeout(300);
+
+  await page.getByRole("button", { name: "COMMS" }).click();
+  await expect(page.getByText("FROM:")).toBeVisible();
+  await expect(page.getByText("MSG:")).toBeVisible();
+  // MCDU keyboard keys should be visible
+  await expect(page.getByRole("button", { name: "Q" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "SEND" })).toBeVisible();
 });
 
 // --- Theme Switching via Commands ---

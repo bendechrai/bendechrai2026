@@ -7,6 +7,7 @@ import CyberpunkTheme from "@/components/themes/cyberpunk/CyberpunkTheme";
 import StarshipTheme from "@/components/themes/starship/StarshipTheme";
 import HolographicTheme from "@/components/themes/holographic/HolographicTheme";
 import RetroTheme from "@/components/themes/retro/RetroTheme";
+import FmsTheme from "@/components/themes/fms/FmsTheme";
 import PlaceholderTheme from "@/components/themes/PlaceholderTheme";
 
 const THEME_COMPONENTS: Record<string, React.ComponentType> = {
@@ -15,6 +16,7 @@ const THEME_COMPONENTS: Record<string, React.ComponentType> = {
   starship: StarshipTheme,
   holographic: HolographicTheme,
   retro: RetroTheme,
+  fms: FmsTheme,
 };
 
 export default function ThemePage() {

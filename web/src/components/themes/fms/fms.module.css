@@ -1,0 +1,448 @@
+/* Airbus MCDU / Flight Management System Theme */
+
+.mcdu {
+  position: fixed;
+  inset: 0;
+  background: #1a1a1a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'B612 Mono', 'Courier New', monospace;
+  overflow: hidden;
+}
+
+/* The physical MCDU unit housing */
+.unit {
+  background: #2a2a2a;
+  border-radius: 12px;
+  padding: 16px;
+  max-width: 520px;
+  width: 100%;
+  max-height: 100vh;
+  overflow-y: auto;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.05),
+    0 8px 32px rgba(0,0,0,0.6);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* The screen area */
+.screen {
+  background: #0a0a0a;
+  border: 2px solid #333;
+  border-radius: 4px;
+  padding: 8px 0;
+  min-height: 320px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+/* Screen scanline overlay */
+.screen::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent 0px,
+    transparent 2px,
+    rgba(0,0,0,0.15) 2px,
+    rgba(0,0,0,0.15) 4px
+  );
+  pointer-events: none;
+  border-radius: 4px;
+}
+
+/* Page title at top center of screen */
+.pageTitle {
+  color: #ffffff;
+  font-size: 14px;
+  text-align: center;
+  letter-spacing: 0.15em;
+  padding: 4px 0 8px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+/* A row on the MCDU screen: left LSK label, content, right LSK label */
+.screenRow {
+  display: grid;
+  grid-template-columns: 28px 1fr 28px;
+  align-items: center;
+  min-height: 28px;
+  padding: 0 2px;
+}
+
+/* LSK indicator arrows on left and right */
+.lskLeft,
+.lskRight {
+  font-size: 11px;
+  color: #666;
+  text-align: center;
+  user-select: none;
+  cursor: pointer;
+  padding: 4px 0;
+  transition: color 0.15s;
+}
+
+.lskLeft:hover,
+.lskRight:hover {
+  color: #00ff00;
+}
+
+.lskLeft.active,
+.lskRight.active {
+  color: #00ff00;
+}
+
+/* Screen row content area */
+.rowContent {
+  padding: 2px 6px;
+}
+
+/* Small label above a field (dimmed) */
+.fieldLabel {
+  color: #888888;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* Green data value */
+.fieldValue {
+  color: #00ff00;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+/* White data value (for titles/headings) */
+.fieldValueWhite {
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+/* Amber/orange value (for warnings, dates) */
+.fieldValueAmber {
+  color: #ffaa00;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+/* Cyan value (for links, interactive items) */
+.fieldValueCyan {
+  color: #00ccff;
+  font-size: 12px;
+  line-height: 1.4;
+  cursor: pointer;
+}
+
+.fieldValueCyan:hover {
+  text-decoration: underline;
+}
+
+/* Clickable row highlight */
+.rowClickable {
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.rowClickable:hover .rowContent {
+  background: rgba(0, 255, 0, 0.05);
+}
+
+/* Scratchpad at bottom of screen */
+.scratchpad {
+  border-top: 1px solid #333;
+  margin-top: auto;
+  padding: 6px 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.scratchpadLabel {
+  color: #888;
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.scratchpadInput {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: #00ff00;
+  font-family: 'B612 Mono', 'Courier New', monospace;
+  font-size: 13px;
+  outline: none;
+  caret-color: #00ff00;
+}
+
+.scratchpadInput::placeholder {
+  color: #444;
+}
+
+/* Page indicator dots */
+.pageIndicator {
+  text-align: center;
+  padding: 4px 0;
+  color: #666;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+}
+
+/* Navigation bar below screen (LSK physical buttons) */
+.lskBar {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 4px;
+  padding: 0 4px;
+}
+
+.lskBtn {
+  background: #3a3a3a;
+  border: 1px solid #4a4a4a;
+  border-radius: 3px;
+  color: #ccc;
+  font-family: 'B612 Mono', 'Courier New', monospace;
+  font-size: 9px;
+  padding: 6px 2px;
+  cursor: pointer;
+  text-align: center;
+  text-transform: uppercase;
+  transition: background 0.1s, color 0.1s;
+  letter-spacing: 0.05em;
+}
+
+.lskBtn:hover {
+  background: #4a4a4a;
+  color: #fff;
+}
+
+.lskBtn.lskBtnActive {
+  background: #444;
+  color: #00ff00;
+  border-color: #00ff00;
+}
+
+/* MCDU Keyboard (for contact page) */
+.keyboard {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 4px;
+}
+
+.keyRow {
+  display: flex;
+  gap: 3px;
+  justify-content: center;
+}
+
+.key {
+  background: #3a3a3a;
+  border: 1px solid #4a4a4a;
+  border-radius: 3px;
+  color: #ccc;
+  font-family: 'B612 Mono', 'Courier New', monospace;
+  font-size: 12px;
+  width: 34px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.08s, color 0.08s, transform 0.08s;
+  user-select: none;
+}
+
+.key:hover {
+  background: #5a5a5a;
+  color: #fff;
+}
+
+.key:active {
+  background: #00aa00;
+  color: #000;
+  transform: scale(0.95);
+}
+
+.keyWide {
+  width: 56px;
+  font-size: 10px;
+  letter-spacing: 0.05em;
+}
+
+.keyExtraWide {
+  flex: 1;
+  max-width: 200px;
+  font-size: 10px;
+}
+
+.keySend {
+  background: #005500;
+  border-color: #00aa00;
+  color: #00ff00;
+  font-weight: 700;
+}
+
+.keySend:hover {
+  background: #007700;
+}
+
+.keySend:active {
+  background: #00ff00;
+  color: #000;
+}
+
+.keyClear {
+  background: #553300;
+  border-color: #aa6600;
+  color: #ffaa00;
+}
+
+.keyClear:hover {
+  background: #774400;
+}
+
+/* Message form fields on screen */
+.msgFieldRow {
+  padding: 2px 36px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.msgLabel {
+  color: #888;
+  font-size: 10px;
+  min-width: 50px;
+  text-transform: uppercase;
+}
+
+.msgValue {
+  color: #00ff00;
+  font-size: 13px;
+  flex: 1;
+  min-height: 1.4em;
+  cursor: text;
+  border-bottom: 1px solid #333;
+  padding: 2px 0;
+}
+
+.msgValueActive {
+  border-bottom-color: #00ff00;
+}
+
+.msgTextarea {
+  color: #00ff00;
+  font-size: 12px;
+  line-height: 1.5;
+  padding: 4px 36px;
+  white-space: pre-wrap;
+  word-break: break-word;
+  min-height: 60px;
+  cursor: text;
+}
+
+.msgSent {
+  padding: 16px 36px;
+  text-align: center;
+}
+
+.msgSentTitle {
+  color: #00ff00;
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.msgSentText {
+  color: #888;
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+/* Article list items */
+.articleItem {
+  cursor: pointer;
+  padding: 4px 6px;
+  transition: background 0.15s;
+}
+
+.articleItem:hover {
+  background: rgba(0, 255, 0, 0.05);
+}
+
+/* Content area for scrollable sections */
+.contentArea {
+  flex: 1;
+  overflow-y: auto;
+  padding: 4px 0;
+}
+
+/* Back button */
+.backBtn {
+  background: none;
+  border: none;
+  color: #00ccff;
+  font-family: 'B612 Mono', 'Courier New', monospace;
+  font-size: 11px;
+  cursor: pointer;
+  padding: 4px 36px;
+  text-align: left;
+}
+
+.backBtn:hover {
+  color: #00ff00;
+}
+
+/* Social link rows */
+.socialRow {
+  text-decoration: none;
+  display: block;
+}
+
+.socialRow:hover .fieldValue {
+  color: #00ffaa;
+}
+
+/* Divider line */
+.divider {
+  border: none;
+  border-top: 1px solid #333;
+  margin: 4px 36px;
+}
+
+/* Mobile adjustments */
+@media (max-width: 540px) {
+  .mcdu {
+    align-items: flex-start;
+  }
+
+  .unit {
+    border-radius: 0;
+    max-width: 100%;
+    padding: 8px;
+    max-height: 100vh;
+  }
+
+  .screen {
+    min-height: 260px;
+  }
+
+  .key {
+    width: 28px;
+    height: 28px;
+    font-size: 11px;
+  }
+
+  .keyWide {
+    width: 46px;
+    font-size: 9px;
+  }
+}

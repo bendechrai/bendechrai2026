@@ -1,13 +1,13 @@
 import { test, expect } from "@playwright/test";
 
-const THEMES = ["cyberpunk", "terminal", "starship", "holographic", "retro"] as const;
+const THEMES = ["cyberpunk", "terminal", "starship", "holographic", "retro", "fms"] as const;
 
 // Skip boot sequence for all tests via sessionStorage seeding
 test.beforeEach(async ({ page }) => {
   await page.addInitScript(() => {
     sessionStorage.setItem(
       "booted-themes",
-      JSON.stringify(["cyberpunk", "terminal", "starship", "holographic", "retro"]),
+      JSON.stringify(["cyberpunk", "terminal", "starship", "holographic", "retro", "fms"]),
     );
   });
 });

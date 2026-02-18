@@ -1,12 +1,12 @@
 import { test, expect } from "@playwright/test";
 
-const THEMES = ["cyberpunk", "terminal", "starship", "holographic", "retro"] as const;
+const THEMES = ["cyberpunk", "terminal", "starship", "holographic", "retro", "fms"] as const;
 
 test.beforeEach(async ({ page }) => {
   await page.addInitScript(() => {
     sessionStorage.setItem(
       "booted-themes",
-      JSON.stringify(["cyberpunk", "terminal", "starship", "holographic", "retro"]),
+      JSON.stringify(["cyberpunk", "terminal", "starship", "holographic", "retro", "fms"]),
     );
   });
 });
@@ -65,6 +65,14 @@ test("starship: pill navigation works on mobile", async ({ page }) => {
 
   await page.getByRole("button", { name: "COMMS" }).tap();
   await expect(page.getByText("github.com/bendechrai")).toBeVisible();
+});
+
+test("fms: navigation buttons work on mobile", async ({ page }) => {
+  await page.goto("/?theme=fms");
+  await page.waitForTimeout(300);
+
+  await page.getByRole("button", { name: "F-LOG" }).tap();
+  await expect(page.getByText("Building Passwordless Auth with WebAuthn")).toBeVisible();
 });
 
 test("retro: desktop icons are tappable on mobile", async ({ page }) => {

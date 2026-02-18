@@ -10,6 +10,7 @@ const BOOT_DURATION: Record<ThemeName, number> = {
   starship: 2000,
   holographic: 3000,
   retro: 2500,
+  fms: 2500,
 };
 
 function TerminalBoot({ onComplete }: { onComplete: () => void }) {
@@ -356,12 +357,92 @@ function RetroBoot({ onComplete }: { onComplete: () => void }) {
   );
 }
 
+function FmsBoot({ onComplete }: { onComplete: () => void }) {
+  const [lines, setLines] = useState<string[]>([]);
+  const bootLines = [
+    "MCDU POWER ON",
+    "SELF TEST........OK",
+    "NAV DATABASE.....CURRENT",
+    "FMS 1...........ACTIVE",
+    "ACARS DATALINK...ONLINE",
+    "",
+    "WELCOME",
+    "BENDECHRAI/FMS",
+  ];
+
+  useEffect(() => {
+    let i = 0;
+    const interval = setInterval(() => {
+      if (i < bootLines.length) {
+        setLines((prev) => [...prev, bootLines[i]]);
+        i++;
+      } else {
+        clearInterval(interval);
+        setTimeout(onComplete, 400);
+      }
+    }, 250);
+    return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  return (
+    <div
+      style={{
+        position: "fixed",
+        inset: 0,
+        background: "#1a1a1a",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
+      <div
+        style={{
+          background: "#0a0a0a",
+          border: "2px solid #333",
+          borderRadius: "4px",
+          padding: "24px 32px",
+          maxWidth: "400px",
+          width: "90%",
+          fontFamily: "'B612 Mono', 'Courier New', monospace",
+        }}
+      >
+        {lines.map((line, i) => (
+          <div
+            key={i}
+            style={{
+              color: i >= 6 ? "#ffffff" : "#00ff00",
+              fontSize: "13px",
+              minHeight: "1.5em",
+              whiteSpace: "pre",
+              letterSpacing: "0.05em",
+            }}
+          >
+            {line || "\u00A0"}
+          </div>
+        ))}
+        <div
+          style={{
+            color: "#444",
+            fontSize: "10px",
+            marginTop: "16px",
+            textAlign: "center",
+          }}
+        >
+          Click or press any key to skip
+        </div>
+      </div>
+    </div>
+  );
+}
+
 const BOOT_COMPONENTS: Record<ThemeName, React.ComponentType<{ onComplete: () => void }>> = {
   terminal: TerminalBoot,
   cyberpunk: CyberpunkBoot,
   starship: StarshipBoot,
   holographic: HolographicBoot,
   retro: RetroBoot,
+  fms: FmsBoot,
 };
 
 function markBooted(t: string) {
