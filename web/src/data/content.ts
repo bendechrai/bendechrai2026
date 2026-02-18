@@ -1,5 +1,6 @@
 export interface Article {
   title: string;
+  slug: string;
   date: string;
   summary: string;
 }
@@ -29,35 +30,44 @@ export const SOCIAL_LINKS = {
 export const ARTICLES: Article[] = [
   {
     title: "Building Passwordless Auth with WebAuthn",
+    slug: "passwordless-webauthn",
     date: "2026-01-15",
     summary:
       "A deep dive into implementing FIDO2 WebAuthn for seamless, passwordless user authentication.",
   },
   {
     title: "The State of Developer Experience in 2026",
+    slug: "dx-2026",
     date: "2025-12-03",
     summary:
       "Reflections on how DX tooling has evolved and where it's heading next.",
   },
   {
     title: "Privacy-First Architecture for Modern Web Apps",
+    slug: "privacy-first-architecture",
     date: "2025-10-18",
     summary:
       "Practical patterns for building applications that respect user privacy by default.",
   },
   {
     title: "Rust for Web Developers: A Practical Guide",
+    slug: "rust-for-web-devs",
     date: "2025-08-22",
     summary:
       "Why Rust is worth learning even if you live in JavaScript-land, with real-world examples.",
   },
   {
     title: "Why Your Smart Lock Needs Better Auth",
+    slug: "smart-lock-auth",
     date: "2025-06-10",
     summary:
       "IoT security is still a mess. Here's what manufacturers keep getting wrong.",
   },
 ];
+
+export function getArticleBySlug(slug: string): Article | undefined {
+  return ARTICLES.find((a) => a.slug === slug);
+}
 
 export const EVENTS: Event[] = [
   {

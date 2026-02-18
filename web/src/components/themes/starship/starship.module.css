@@ -46,7 +46,7 @@
   font-weight: 700;
 }
 
-.stardate {
+.systemTime {
   font-size: 0.85rem;
   letter-spacing: 0.1em;
   color: #000000;
@@ -199,7 +199,7 @@
 }
 
 /* ===== Links ===== */
-.lcarsLink {
+.themeLink {
   font-size: 1rem;
   color: #99ccff;
   letter-spacing: 0.05em;
@@ -207,7 +207,7 @@
   transition: color 0.15s;
 }
 
-.lcarsLink:hover {
+.themeLink:hover {
   color: #ffaa00;
 }
 
@@ -222,8 +222,8 @@
   padding: 1rem 0;
 }
 
-.lcarsInput,
-.lcarsTextarea {
+.themeInput,
+.themeTextarea {
   flex: 1;
   background: #000000;
   border: none;
@@ -237,17 +237,17 @@
   caret-color: #ffaa00;
 }
 
-.lcarsInput::placeholder,
-.lcarsTextarea::placeholder {
+.themeInput::placeholder,
+.themeTextarea::placeholder {
   color: rgba(153, 204, 255, 0.3);
 }
 
-.lcarsTextarea {
+.themeTextarea {
   resize: vertical;
   min-height: 60px;
 }
 
-.lcarsSendBtn {
+.themeSendBtn {
   align-self: flex-start;
   padding: 0.6rem 2rem;
   background: #cc6699;
@@ -264,11 +264,11 @@
   margin-top: 0.75rem;
 }
 
-.lcarsSendBtn:hover:not(:disabled) {
+.themeSendBtn:hover:not(:disabled) {
   filter: brightness(1.15);
 }
 
-.lcarsSendBtn:disabled {
+.themeSendBtn:disabled {
   opacity: 0.3;
   cursor: not-allowed;
 }
@@ -350,7 +350,7 @@
     letter-spacing: 0.08em;
   }
 
-  .stardate {
+  .systemTime {
     font-size: 0.65rem;
     display: none;
   }

@@ -1,4 +1,4 @@
-export const THEME_NAMES = ["lcars", "cyberpunk", "terminal", "holographic", "win31"] as const;
+export const THEME_NAMES = ["starship", "cyberpunk", "terminal", "holographic", "retro"] as const;
 export type ThemeName = (typeof THEME_NAMES)[number];
 
 export const DEFAULT_THEME: ThemeName = "cyberpunk";
@@ -21,9 +21,9 @@ export interface ThemeConfig {
 }
 
 export const THEME_CONFIGS: Record<ThemeName, ThemeConfig> = {
-  lcars: {
-    name: "lcars",
-    label: "LCARS",
+  starship: {
+    name: "starship",
+    label: "Starship",
     fonts: {
       display: "'Antonio', sans-serif",
       body: "'Antonio', sans-serif",
@@ -85,9 +85,9 @@ export const THEME_CONFIGS: Record<ThemeName, ThemeConfig> = {
       surface: "rgba(0, 220, 220, 0.06)",
     },
   },
-  win31: {
-    name: "win31",
-    label: "Windows 3.1",
+  retro: {
+    name: "retro",
+    label: "Retro OS",
     fonts: {
       display: "system-ui, sans-serif",
       body: "system-ui, sans-serif",

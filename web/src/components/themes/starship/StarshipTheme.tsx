@@ -2,22 +2,32 @@
 
 import { useState, useRef, useCallback } from "react";
 import { useTheme } from "@/context/ThemeContext";
-import { ARTICLES, EVENTS, TALKS, SOCIAL_LINKS } from "@/data/content";
+import { ARTICLES, EVENTS, TALKS, SOCIAL_LINKS, getArticleBySlug } from "@/data/content";
 import { sendMessage } from "@/lib/sendMessage";
+import { useSection } from "@/hooks/useSection";
 
-const STARDATE = (() => {
+const SYSTEM_TIME = (() => {
   const now = typeof performance !== "undefined" ? performance.timeOrigin : 0;
-  return `SD ${Math.floor(now / 86400000)}.${Math.floor((now % 86400000) / 8640000)}`;
+  return `T ${Math.floor(now / 86400000)}.${Math.floor((now % 86400000) / 8640000)}`;
 })();
-import styles from "./lcars.module.css";
+import styles from "./starship.module.css";
 
-type Section = "articles" | "events" | "talks" | "contact";
+type StarshipSection = "articles" | "events" | "talks" | "contact";
 
-const NAV_ITEMS: { id: Section; label: string; color: string }[] = [
-  { id: "articles", label: "ARTICLES", color: "#ffaa00" },
-  { id: "events", label: "EVENTS", color: "#cc99ff" },
-  { id: "talks", label: "TALKS", color: "#99ccff" },
-  { id: "contact", label: "COMMS", color: "#cc6699" },
+function sectionFromUrl(section: string): StarshipSection {
+  switch (section) {
+    case "events": return "events";
+    case "talks": return "talks";
+    case "contact": return "contact";
+    default: return "articles";
+  }
+}
+
+const NAV_ITEMS: { id: StarshipSection; label: string; color: string; path: string }[] = [
+  { id: "articles", label: "ARTICLES", color: "#ffaa00", path: "/articles" },
+  { id: "events", label: "EVENTS", color: "#cc99ff", path: "/events" },
+  { id: "talks", label: "TALKS", color: "#99ccff", path: "/talks" },
+  { id: "contact", label: "COMMS", color: "#cc6699", path: "/contact" },
 ];
 
 function formatDate(dateStr: string) {
@@ -25,11 +35,10 @@ function formatDate(dateStr: string) {
   return d.toLocaleDateString("en-AU", { day: "2-digit", month: "short", year: "numeric" });
 }
 
-function SectionContent({ section }: { section: Section }) {
+function SectionContent({ section, articleSlug, navigate }: { section: StarshipSection; articleSlug: string | null; navigate: (p: string) => void }) {
   const [msgHandle, setMsgHandle] = useState("");
   const [msgBody, setMsgBody] = useState("");
   const [msgSent, setMsgSent] = useState(false);
-
   const [sending, setSending] = useState(false);
 
   const handleSend = async () => {
@@ -46,12 +55,27 @@ function SectionContent({ section }: { section: Section }) {
   };
 
   switch (section) {
-    case "articles":
+    case "articles": {
+      if (articleSlug) {
+        const article = getArticleBySlug(articleSlug);
+        if (article) {
+          return (
+            <>
+              <button className={styles.dataLabel} onClick={() => navigate("/articles")} style={{ cursor: "pointer", background: "none", border: "none", padding: 0 }}>
+                &lt; BACK TO ARTICLES
+              </button>
+              <h2 className={styles.contentTitle}>{article.title}</h2>
+              <p className={styles.contentText}>{formatDate(article.date)}</p>
+              <p className={styles.contentText} style={{ lineHeight: 1.6 }}>{article.summary}</p>
+            </>
+          );
+        }
+      }
       return (
         <>
           <h2 className={styles.contentTitle}>PUBLISHED WRITINGS</h2>
           {ARTICLES.map((a) => (
-            <div key={a.title} className={styles.dataRow}>
+            <div key={a.slug} className={styles.dataRow} onClick={() => navigate(`/articles/${a.slug}`)} style={{ cursor: "pointer" }}>
               <span className={styles.dataLabel}>{formatDate(a.date)}</span>
               <div>
                 <span className={styles.dataValue}>{a.title}</span>
@@ -61,6 +85,7 @@ function SectionContent({ section }: { section: Section }) {
           ))}
         </>
       );
+    }
     case "events":
       return (
         <>
@@ -103,19 +128,19 @@ function SectionContent({ section }: { section: Section }) {
           <h2 className={styles.contentTitle}>SUBSPACE COMMUNICATIONS</h2>
           <div className={styles.dataRow}>
             <span className={styles.dataLabel}>CODE ARCHIVE</span>
-            <a href={SOCIAL_LINKS.github} target="_blank" rel="noopener noreferrer" className={styles.lcarsLink}>
+            <a href={SOCIAL_LINKS.github} target="_blank" rel="noopener noreferrer" className={styles.themeLink}>
               github.com/bendechrai
             </a>
           </div>
           <div className={styles.dataRow}>
             <span className={styles.dataLabel}>FEDERATION NET</span>
-            <a href={SOCIAL_LINKS.linkedin} target="_blank" rel="noopener noreferrer" className={styles.lcarsLink}>
+            <a href={SOCIAL_LINKS.linkedin} target="_blank" rel="noopener noreferrer" className={styles.themeLink}>
               linkedin.com/in/bendechrai
             </a>
           </div>
           <div className={styles.dataRow}>
             <span className={styles.dataLabel}>SUBSPACE FREQ</span>
-            <a href={SOCIAL_LINKS.twitter} target="_blank" rel="noopener noreferrer" className={styles.lcarsLink}>
+            <a href={SOCIAL_LINKS.twitter} target="_blank" rel="noopener noreferrer" className={styles.themeLink}>
               twitter.com/bendechrai
             </a>
           </div>
@@ -135,7 +160,7 @@ function SectionContent({ section }: { section: Section }) {
                   type="text"
                   value={msgHandle}
                   onChange={(e) => setMsgHandle(e.target.value)}
-                  className={styles.lcarsInput}
+                  className={styles.themeInput}
                   placeholder="Your designation"
                   spellCheck={false}
                   autoComplete="off"
@@ -146,14 +171,14 @@ function SectionContent({ section }: { section: Section }) {
                 <textarea
                   value={msgBody}
                   onChange={(e) => setMsgBody(e.target.value)}
-                  className={styles.lcarsTextarea}
+                  className={styles.themeTextarea}
                   placeholder="Enter subspace transmission..."
                   rows={4}
                   spellCheck={false}
                 />
               </div>
               <button
-                className={styles.lcarsSendBtn}
+                className={styles.themeSendBtn}
                 onClick={handleSend}
                 disabled={!msgHandle.trim() || !msgBody.trim() || sending}
               >
@@ -166,28 +191,29 @@ function SectionContent({ section }: { section: Section }) {
   }
 }
 
-export default function LcarsTheme() {
+export default function StarshipTheme() {
   const { setTheme } = useTheme();
-  const [activeSection, setActiveSection] = useState<Section>("articles");
+  const { section, articleSlug, navigate } = useSection();
+  const activeSection = sectionFromUrl(section);
   const [commandInput, setCommandInput] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
 
   const handleCommand = useCallback(
     (cmd: string) => {
       const trimmed = cmd.trim().toLowerCase();
-      if (["articles", "1"].includes(trimmed)) setActiveSection("articles");
-      else if (["events", "2"].includes(trimmed)) setActiveSection("events");
-      else if (["talks", "3"].includes(trimmed)) setActiveSection("talks");
-      else if (["contact", "4", "comms"].includes(trimmed)) setActiveSection("contact");
+      if (["articles", "1"].includes(trimmed)) navigate("/articles");
+      else if (["events", "2"].includes(trimmed)) navigate("/events");
+      else if (["talks", "3"].includes(trimmed)) navigate("/talks");
+      else if (["contact", "4", "comms"].includes(trimmed)) navigate("/contact");
       else if (trimmed.startsWith("theme ")) {
         const name = trimmed.slice(6).trim();
-        const valid = ["lcars", "cyberpunk", "terminal", "holographic", "win31"];
+        const valid = ["starship", "cyberpunk", "terminal", "holographic", "retro"];
         if (valid.includes(name)) {
           setTimeout(() => setTheme(name as Parameters<typeof setTheme>[0]), 300);
         }
       }
     },
-    [setTheme],
+    [setTheme, navigate],
   );
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -204,7 +230,7 @@ export default function LcarsTheme() {
         <div className={styles.topBarLeft} />
         <div className={styles.topBarHeader}>
           <span className={styles.headerText}>BEN DECHRAI</span>
-          <span className={styles.stardate}>{STARDATE}</span>
+          <span className={styles.systemTime}>{SYSTEM_TIME}</span>
         </div>
       </div>
 
@@ -222,7 +248,7 @@ export default function LcarsTheme() {
                   "--pill-color": item.color,
                   "--pill-active": activeSection === item.id ? item.color : undefined,
                 } as React.CSSProperties}
-                onClick={() => setActiveSection(item.id)}
+                onClick={() => navigate(item.path)}
               >
                 {item.label}
               </button>
@@ -237,7 +263,7 @@ export default function LcarsTheme() {
 
         {/* Content Area */}
         <div className={styles.content}>
-          <SectionContent section={activeSection} />
+          <SectionContent section={activeSection} articleSlug={articleSlug} navigate={navigate} />
         </div>
       </div>
 
@@ -245,7 +271,7 @@ export default function LcarsTheme() {
       <div className={styles.bottomBar}>
         <div className={styles.bottomBarLeft} />
         <div className={styles.commandArea} onClick={() => inputRef.current?.focus()}>
-          <span className={styles.promptLabel}>LCARS &gt;</span>
+          <span className={styles.promptLabel}>BRIDGE &gt;</span>
           <input
             ref={inputRef}
             type="text"
@@ -255,7 +281,7 @@ export default function LcarsTheme() {
             className={styles.commandInput}
             spellCheck={false}
             autoComplete="off"
-            aria-label="LCARS command input"
+            aria-label="Bridge command input"
           />
         </div>
       </div>

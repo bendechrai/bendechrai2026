@@ -174,8 +174,8 @@
   color: #FF0000;
 }
 
-/* ===== WinMessage ===== */
-.winMsgHeader {
+/* ===== Message App ===== */
+.msgHeader {
   font-weight: bold;
   font-size: 14px;
   margin-bottom: 8px;
@@ -183,41 +183,41 @@
   border-bottom: 1px solid #808080;
 }
 
-.winMsgLinks {
+.msgLinks {
   margin-bottom: 4px;
 }
 
-.winMsgLinks p {
+.msgLinks p {
   margin: 2px 0;
 }
 
-.winMsgDivider {
+.msgDivider {
   border: none;
   border-top: 1px solid #808080;
   margin: 8px 0;
 }
 
-.winMsgForm {
+.msgForm {
   display: flex;
   flex-direction: column;
   gap: 6px;
 }
 
-.winMsgField {
+.msgField {
   display: flex;
   align-items: flex-start;
   gap: 8px;
 }
 
-.winMsgField label {
+.msgField label {
   font-weight: bold;
   font-size: 12px;
   min-width: 55px;
   padding-top: 2px;
 }
 
-.winMsgInput,
-.winMsgTextarea {
+.msgInput,
+.msgTextarea {
   flex: 1;
   background: #FFFFFF;
   border: none;
@@ -231,12 +231,12 @@
   outline: none;
 }
 
-.winMsgTextarea {
+.msgTextarea {
   resize: vertical;
   min-height: 40px;
 }
 
-.winMsgSendBtn {
+.msgSendBtn {
   align-self: flex-end;
   padding: 2px 16px;
   background: #C0C0C0;
@@ -250,18 +250,18 @@
   cursor: pointer;
 }
 
-.winMsgSendBtn:active {
+.msgSendBtn:active {
   box-shadow:
     inset 1px 1px 0 #808080,
     inset -1px -1px 0 #FFFFFF;
 }
 
-.winMsgSendBtn:disabled {
+.msgSendBtn:disabled {
   color: #808080;
   cursor: not-allowed;
 }
 
-.winMsgSent {
+.msgSent {
   padding: 8px 0;
   text-align: center;
 }

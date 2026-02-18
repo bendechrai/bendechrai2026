@@ -2,18 +2,29 @@
 
 import { useState, useRef, useCallback } from "react";
 import { useTheme } from "@/context/ThemeContext";
-import { ARTICLES, EVENTS, TALKS, SOCIAL_LINKS } from "@/data/content";
+import { ARTICLES, EVENTS, TALKS, SOCIAL_LINKS, getArticleBySlug } from "@/data/content";
 import { sendMessage } from "@/lib/sendMessage";
+import { useSection } from "@/hooks/useSection";
 import styles from "./cyberpunk.module.css";
 
 type Tab = "data" | "comms" | "events" | "archives";
 
-const TABS: { id: Tab; label: string }[] = [
-  { id: "data", label: "DATA" },
-  { id: "comms", label: "COMMS" },
-  { id: "events", label: "EVENTS" },
-  { id: "archives", label: "ARCHIVES" },
+const TABS: { id: Tab; label: string; path: string }[] = [
+  { id: "data", label: "DATA", path: "/" },
+  { id: "comms", label: "COMMS", path: "/contact" },
+  { id: "events", label: "EVENTS", path: "/events" },
+  { id: "archives", label: "ARCHIVES", path: "/articles" },
 ];
+
+function sectionToTab(section: string): Tab {
+  switch (section) {
+    case "articles": return "archives";
+    case "events": return "events";
+    case "talks": return "events";
+    case "contact": return "comms";
+    default: return "data";
+  }
+}
 
 function StatusBar() {
   const [time, setTime] = useState(() => new Date().toLocaleTimeString("en-GB"));
@@ -38,11 +49,10 @@ function formatDate(dateStr: string) {
   return d.toLocaleDateString("en-AU", { day: "2-digit", month: "short", year: "numeric" });
 }
 
-function TabContent({ tab }: { tab: Tab }) {
+function TabContent({ tab, articleSlug, navigate }: { tab: Tab; articleSlug: string | null; navigate: (p: string) => void }) {
   const [msgHandle, setMsgHandle] = useState("");
   const [msgBody, setMsgBody] = useState("");
   const [msgSent, setMsgSent] = useState(false);
-
   const [sending, setSending] = useState(false);
 
   const handleSend = async () => {
@@ -182,13 +192,28 @@ function TabContent({ tab }: { tab: Tab }) {
           </div>
         </div>
       );
-    case "archives":
+    case "archives": {
+      if (articleSlug) {
+        const article = getArticleBySlug(articleSlug);
+        if (article) {
+          return (
+            <div className={styles.contentSection}>
+              <button className={styles.commsLabel} onClick={() => navigate("/articles")} style={{ cursor: "pointer", background: "none", border: "none", marginBottom: "1rem" }}>
+                &lt; BACK TO ARCHIVES
+              </button>
+              <h2 className={styles.sectionTitle}>{article.title}</h2>
+              <div className={styles.commsDetail} style={{ marginBottom: "1rem" }}>{formatDate(article.date)}</div>
+              <p style={{ color: "#e0e0ff", lineHeight: 1.6 }}>{article.summary}</p>
+            </div>
+          );
+        }
+      }
       return (
         <div className={styles.contentSection}>
           <h2 className={styles.sectionTitle}>ARCHIVED DATA</h2>
           <div className={styles.commsList}>
             {ARTICLES.map((a) => (
-              <div key={a.title} className={styles.commsItem}>
+              <div key={a.slug} className={styles.commsItem} onClick={() => navigate(`/articles/${a.slug}`)} style={{ cursor: "pointer" }}>
                 <span className={styles.commsLabel}>{formatDate(a.date).replace(/ /g, "\u00A0")}</span>
                 <div>
                   <div className={styles.commsValue}>{a.title}</div>
@@ -199,15 +224,17 @@ function TabContent({ tab }: { tab: Tab }) {
           </div>
         </div>
       );
+    }
   }
 }
 
 export default function CyberpunkTheme() {
   const { setTheme } = useTheme();
-  const [activeTab, setActiveTab] = useState<Tab>("data");
+  const { section, articleSlug, navigate } = useSection();
+  const activeTab = sectionToTab(section);
   const [terminalInput, setTerminalInput] = useState("");
   const [terminalLines, setTerminalLines] = useState<string[]>([
-    "NIGHTCITY OS v4.2.1 — Unauthorized access will be prosecuted.",
+    "DARKNET OS v4.2.1 — Unauthorized access will be prosecuted.",
     'Type "help" for available commands.',
   ]);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -226,7 +253,7 @@ export default function CyberpunkTheme() {
         setTerminalLines([]);
       } else if (trimmed.startsWith("theme ")) {
         const name = trimmed.slice(6).trim();
-        const valid = ["lcars", "cyberpunk", "terminal", "holographic", "win31"];
+        const valid = ["starship", "cyberpunk", "terminal", "holographic", "retro"];
         if (valid.includes(name)) {
           setTerminalLines((prev) => [...prev, `  Switching to ${name}...`]);
           setTimeout(() => setTheme(name as Parameters<typeof setTheme>[0]), 400);
@@ -237,14 +264,20 @@ export default function CyberpunkTheme() {
           ]);
         }
       } else if (["articles", "archives"].includes(trimmed)) {
-        setActiveTab("archives");
+        navigate("/articles");
         setTerminalLines((prev) => [...prev, "  Switching to ARCHIVES..."]);
       } else if (trimmed === "events") {
-        setActiveTab("events");
+        navigate("/events");
         setTerminalLines((prev) => [...prev, "  Switching to EVENTS..."]);
-      } else if (["talks", "contact", "comms"].includes(trimmed)) {
-        setActiveTab("comms");
+      } else if (["talks"].includes(trimmed)) {
+        navigate("/events");
+        setTerminalLines((prev) => [...prev, "  Switching to EVENTS..."]);
+      } else if (["contact", "comms"].includes(trimmed)) {
+        navigate("/contact");
         setTerminalLines((prev) => [...prev, "  Switching to COMMS..."]);
+      } else if (trimmed === "home" || trimmed === "data") {
+        navigate("/");
+        setTerminalLines((prev) => [...prev, "  Switching to DATA..."]);
       } else if (trimmed !== "") {
         setTerminalLines((prev) => [
           ...prev,
@@ -252,7 +285,7 @@ export default function CyberpunkTheme() {
         ]);
       }
     },
-    [setTheme],
+    [setTheme, navigate],
   );
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -274,7 +307,7 @@ export default function CyberpunkTheme() {
               role="tab"
               aria-selected={activeTab === tab.id}
               className={`${styles.tab} ${activeTab === tab.id ? styles.tabActive : ""}`}
-              onClick={() => setActiveTab(tab.id)}
+              onClick={() => navigate(tab.path)}
             >
               {tab.label}
             </button>
@@ -282,7 +315,7 @@ export default function CyberpunkTheme() {
         </nav>
 
         <div className={styles.tabContent} role="tabpanel">
-          <TabContent tab={activeTab} />
+          <TabContent tab={activeTab} articleSlug={articleSlug} navigate={navigate} />
         </div>
       </div>
 

@@ -24,15 +24,38 @@ interface ThemeContextValue {
 
 const ThemeContext = createContext<ThemeContextValue | null>(null);
 
+// Migrate old theme names to new ones
+const THEME_MIGRATIONS: Record<string, string> = {
+  lcars: "starship",
+  win31: "retro",
+};
+
 function getInitialTheme(): ThemeName {
   if (typeof window === "undefined") return DEFAULT_THEME;
 
+  // Check URL query param — save to localStorage and strip from URL
   const params = new URLSearchParams(window.location.search);
-  const queryTheme = params.get("theme") as ThemeName | null;
-  if (queryTheme && THEME_NAMES.includes(queryTheme)) return queryTheme;
+  const queryTheme = params.get("theme");
+  if (queryTheme) {
+    const migrated = (THEME_MIGRATIONS[queryTheme] || queryTheme) as ThemeName;
+    if (THEME_NAMES.includes(migrated)) {
+      localStorage.setItem("theme", migrated);
+      const url = new URL(window.location.href);
+      url.searchParams.delete("theme");
+      window.history.replaceState({}, "", url.toString());
+      return migrated;
+    }
+  }
 
-  const stored = localStorage.getItem("theme") as ThemeName | null;
-  if (stored && THEME_NAMES.includes(stored)) return stored;
+  // Check localStorage (with migration)
+  const stored = localStorage.getItem("theme");
+  if (stored) {
+    const migrated = (THEME_MIGRATIONS[stored] || stored) as ThemeName;
+    if (THEME_NAMES.includes(migrated)) {
+      if (migrated !== stored) localStorage.setItem("theme", migrated);
+      return migrated;
+    }
+  }
 
   return DEFAULT_THEME;
 }
@@ -60,10 +83,6 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     if (!THEME_NAMES.includes(newTheme)) return;
     setThemeState(newTheme);
     localStorage.setItem("theme", newTheme);
-
-    const url = new URL(window.location.href);
-    url.searchParams.set("theme", newTheme);
-    window.history.replaceState({}, "", url.toString());
   }, []);
 
   useEffect(() => {

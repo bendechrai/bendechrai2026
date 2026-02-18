@@ -1,12 +1,12 @@
 import { test, expect } from "@playwright/test";
 
-const THEMES = ["cyberpunk", "terminal", "lcars", "holographic", "win31"] as const;
+const THEMES = ["cyberpunk", "terminal", "starship", "holographic", "retro"] as const;
 
 test.beforeEach(async ({ page }) => {
   await page.addInitScript(() => {
     sessionStorage.setItem(
       "booted-themes",
-      JSON.stringify(["cyberpunk", "terminal", "lcars", "holographic", "win31"]),
+      JSON.stringify(["cyberpunk", "terminal", "starship", "holographic", "retro"]),
     );
   });
 });
@@ -59,18 +59,18 @@ test("holographic: palette trigger button is visible on mobile", async ({ page }
   await expect(page.getByPlaceholder("Type a command...")).toBeVisible();
 });
 
-test("lcars: pill navigation works on mobile", async ({ page }) => {
-  await page.goto("/?theme=lcars");
+test("starship: pill navigation works on mobile", async ({ page }) => {
+  await page.goto("/?theme=starship");
   await page.waitForTimeout(300);
 
-  await page.getByRole("button", { name: "CONTACT" }).tap();
-  await expect(page.getByText("hello@bendechrai.com")).toBeVisible();
+  await page.getByRole("button", { name: "COMMS" }).tap();
+  await expect(page.getByText("github.com/bendechrai")).toBeVisible();
 });
 
-test("win31: desktop icons are tappable on mobile", async ({ page }) => {
-  await page.goto("/?theme=win31");
+test("retro: desktop icons are tappable on mobile", async ({ page }) => {
+  await page.goto("/?theme=retro");
   await page.waitForTimeout(300);
 
-  await page.getByRole("button", { name: "Contact" }).tap();
-  await expect(page.getByText("hello@bendechrai.com")).toBeVisible();
+  await page.getByRole("button", { name: "Message" }).tap();
+  await expect(page.getByText("github.com/bendechrai")).toBeVisible();
 });

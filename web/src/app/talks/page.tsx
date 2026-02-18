@@ -1,5 +1,5 @@
 import ThemePage from "@/components/ThemePage";
 
-export default function Home() {
+export default function TalksPage() {
   return <ThemePage />;
 }

@@ -4,7 +4,7 @@ test.beforeEach(async ({ page }) => {
   await page.addInitScript(() => {
     sessionStorage.setItem(
       "booted-themes",
-      JSON.stringify(["cyberpunk", "terminal", "lcars", "holographic", "win31"]),
+      JSON.stringify(["cyberpunk", "terminal", "starship", "holographic", "retro"]),
     );
   });
 });
@@ -97,10 +97,10 @@ test("cyberpunk: terminal command input works", async ({ page }) => {
   await expect(page.getByText("articles | events | talks | contact")).toBeVisible();
 });
 
-// --- LCARS Theme: Pill Navigation ---
+// --- Starship Theme: Pill Navigation ---
 
-test("lcars: can navigate via sidebar pills", async ({ page }) => {
-  await page.goto("/?theme=lcars");
+test("starship: can navigate via sidebar pills", async ({ page }) => {
+  await page.goto("/?theme=starship");
   await page.waitForTimeout(300);
 
   // Default is articles - should show content
@@ -142,20 +142,20 @@ test("holographic: can dismiss palette with Escape", async ({ page }) => {
   await expect(page.getByPlaceholder("Type a command...")).not.toBeVisible();
 });
 
-// --- Windows 3.1 Theme: Window Management ---
+// --- Retro Theme: Window Management ---
 
-test("win31: Program Manager shows desktop icons", async ({ page }) => {
-  await page.goto("/?theme=win31");
+test("retro: Desktop Manager shows desktop icons", async ({ page }) => {
+  await page.goto("/?theme=retro");
   await page.waitForTimeout(300);
 
   await expect(page.getByText("Articles")).toBeVisible();
   await expect(page.getByText("Events")).toBeVisible();
   await expect(page.getByText("Talks")).toBeVisible();
-  await expect(page.getByText("WinMsg")).toBeVisible();
+  await expect(page.getByText("Message")).toBeVisible();
 });
 
-test("win31: can open a content window by clicking icon", async ({ page }) => {
-  await page.goto("/?theme=win31");
+test("retro: can open a content window by clicking icon", async ({ page }) => {
+  await page.goto("/?theme=retro");
   await page.waitForTimeout(300);
 
   // Click the Articles icon

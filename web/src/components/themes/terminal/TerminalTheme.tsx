@@ -2,8 +2,9 @@
 
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useTheme } from "@/context/ThemeContext";
-import { ARTICLES, EVENTS, TALKS, SOCIAL_LINKS } from "@/data/content";
+import { ARTICLES, EVENTS, TALKS, SOCIAL_LINKS, getArticleBySlug } from "@/data/content";
 import { sendMessage } from "@/lib/sendMessage";
+import { useSection } from "@/hooks/useSection";
 import styles from "./terminal.module.css";
 
 interface TerminalLine {
@@ -37,6 +38,7 @@ type MessageStep = "idle" | "handle" | "body" | "confirm";
 
 export default function TerminalTheme() {
   const { setTheme } = useTheme();
+  const { section, articleSlug, navigate } = useSection();
   const [lines, setLines] = useState<TerminalLine[]>(WELCOME_LINES);
   const [input, setInput] = useState("");
   const nextIdRef = useRef(100);
@@ -165,6 +167,7 @@ export default function TerminalTheme() {
       } else if (trimmed === "clear") {
         setLines([]);
       } else if (trimmed === "articles" || trimmed === "1") {
+        navigate("/articles");
         const articleLines: (string | { text: string; href: string })[] = [
           "",
           "── ARTICLES ──────────────",
@@ -178,6 +181,7 @@ export default function TerminalTheme() {
         });
         addLines(articleLines);
       } else if (trimmed === "events" || trimmed === "2") {
+        navigate("/events");
         const eventLines: (string | { text: string; href: string })[] = [
           "",
           "── EVENTS ────────────────",
@@ -192,6 +196,7 @@ export default function TerminalTheme() {
         });
         addLines(eventLines);
       } else if (trimmed === "talks" || trimmed === "3") {
+        navigate("/talks");
         const talkLines: (string | { text: string; href: string })[] = [
           "",
           "── TALKS & WORKSHOPS ─────",
@@ -206,6 +211,7 @@ export default function TerminalTheme() {
         });
         addLines(talkLines);
       } else if (trimmed === "contact" || trimmed === "4") {
+        navigate("/contact");
         addLines([
           "",
           "── SUBSPACE RELAY ────────",
@@ -228,14 +234,14 @@ export default function TerminalTheme() {
         setMsgStep("handle");
       } else if (trimmed.startsWith("theme ") || trimmed === "6") {
         const themeName = trimmed === "6" ? "" : trimmed.slice(6).trim();
-        const validThemes = ["lcars", "cyberpunk", "terminal", "holographic", "win31"];
+        const validThemes = ["starship", "cyberpunk", "terminal", "holographic", "retro"];
         if (validThemes.includes(themeName)) {
           addLines([``, `  Switching to ${themeName} theme...`, ``]);
           setTimeout(() => setTheme(themeName as Parameters<typeof setTheme>[0]), 500);
         } else {
           addLines([
             "",
-            "  Available themes: lcars, cyberpunk, terminal, holographic, win31",
+            "  Available themes: starship, cyberpunk, terminal, holographic, retro",
             "  Usage: theme <name>",
             "",
           ]);
@@ -249,8 +255,43 @@ export default function TerminalTheme() {
         ]);
       }
     },
-    [addLines, setTheme, msgStep, msgHandle, msgBody],
+    [addLines, setTheme, msgStep, msgHandle, msgBody, navigate],
   );
+
+  // Auto-display content based on URL section on mount
+  const initializedRef = useRef(false);
+  useEffect(() => {
+    if (!initializedRef.current) {
+      initializedRef.current = true;
+      if (articleSlug) {
+        const article = getArticleBySlug(articleSlug);
+        if (article) {
+          addLines([
+            "",
+            "── ARTICLE ───────────────",
+            "",
+            `  ${article.title}`,
+            `  ${formatDate(article.date)}`,
+            "",
+            `  ${article.summary}`,
+            "",
+          ]);
+        }
+      } else if (section !== "home") {
+        const sectionCommands: Record<string, string> = {
+          articles: "articles",
+          events: "events",
+          talks: "talks",
+          contact: "contact",
+        };
+        const cmd = sectionCommands[section];
+        if (cmd) {
+          handleCommand(cmd);
+        }
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") {

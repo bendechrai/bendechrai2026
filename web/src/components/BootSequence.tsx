@@ -7,9 +7,9 @@ import type { ThemeName } from "@/types/theme";
 const BOOT_DURATION: Record<ThemeName, number> = {
   terminal: 4000,
   cyberpunk: 3000,
-  lcars: 2000,
+  starship: 2000,
   holographic: 3000,
-  win31: 2500,
+  retro: 2500,
 };
 
 function TerminalBoot({ onComplete }: { onComplete: () => void }) {
@@ -100,7 +100,6 @@ function CyberpunkBoot({ onComplete }: { onComplete: () => void }) {
         overflow: "hidden",
       }}
     >
-      {/* Scanlines */}
       <div
         style={{
           position: "absolute",
@@ -122,7 +121,7 @@ function CyberpunkBoot({ onComplete }: { onComplete: () => void }) {
             fontFamily: "'Share Tech Mono', monospace",
           }}
         >
-          &gt; SYS://NIGHTCITY.NET — INITIALIZING...
+          &gt; SYS://DARKNET.INIT — INITIALIZING...
         </div>
       )}
       {phase >= 3 && (
@@ -154,7 +153,7 @@ function CyberpunkBoot({ onComplete }: { onComplete: () => void }) {
   );
 }
 
-function LcarsBoot({ onComplete }: { onComplete: () => void }) {
+function StarshipBoot({ onComplete }: { onComplete: () => void }) {
   const [phase, setPhase] = useState(0);
 
   useEffect(() => {
@@ -188,7 +187,6 @@ function LcarsBoot({ onComplete }: { onComplete: () => void }) {
             height: "8px",
             background: "#ffaa00",
             borderRadius: "4px",
-            animation: "fadeIn 0.3s ease",
           }}
         />
       )}
@@ -201,7 +199,7 @@ function LcarsBoot({ onComplete }: { onComplete: () => void }) {
             textTransform: "uppercase",
           }}
         >
-          LCARS INTERFACE ACTIVE
+          STARSHIP INTERFACE ACTIVE
         </div>
       )}
       {phase >= 3 && (
@@ -256,7 +254,6 @@ function HolographicBoot({ onComplete }: { onComplete: () => void }) {
         fontFamily: "'Exo 2', sans-serif",
       }}
     >
-      {/* Reticle ring */}
       {phase >= 1 && (
         <svg width="120" height="120" viewBox="0 0 120 120" style={{ opacity: phase >= 3 ? 0.3 : 1, transition: "opacity 0.5s" }}>
           <circle
@@ -303,7 +300,7 @@ function HolographicBoot({ onComplete }: { onComplete: () => void }) {
   );
 }
 
-function Win31Boot({ onComplete }: { onComplete: () => void }) {
+function RetroBoot({ onComplete }: { onComplete: () => void }) {
   const [phase, setPhase] = useState(0);
 
   useEffect(() => {
@@ -331,7 +328,6 @@ function Win31Boot({ onComplete }: { onComplete: () => void }) {
     >
       {phase < 2 && (
         <>
-          {/* Windows logo - colored blocks */}
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "3px", marginBottom: "1rem" }}>
             <div style={{ width: "24px", height: "24px", background: "#FF0000" }} />
             <div style={{ width: "24px", height: "24px", background: "#00FF00" }} />
@@ -339,7 +335,7 @@ function Win31Boot({ onComplete }: { onComplete: () => void }) {
             <div style={{ width: "24px", height: "24px", background: "#FFFF00" }} />
           </div>
           <div style={{ color: "#FFFFFF", fontSize: "18px", fontWeight: "bold" }}>
-            Microsoft Windows
+            RetroOS
           </div>
           <div style={{ color: "#FFFFFF", fontSize: "12px" }}>
             Version 3.1
@@ -363,9 +359,9 @@ function Win31Boot({ onComplete }: { onComplete: () => void }) {
 const BOOT_COMPONENTS: Record<ThemeName, React.ComponentType<{ onComplete: () => void }>> = {
   terminal: TerminalBoot,
   cyberpunk: CyberpunkBoot,
-  lcars: LcarsBoot,
+  starship: StarshipBoot,
   holographic: HolographicBoot,
-  win31: Win31Boot,
+  retro: RetroBoot,
 };
 
 function markBooted(t: string) {
@@ -399,7 +395,6 @@ function BootSequenceInner({ theme, children }: { theme: ThemeName; children: Re
     markBooted(theme);
   }, [theme]);
 
-  // Skip handler
   useEffect(() => {
     if (booted) return;
     const handleSkip = () => handleComplete();
@@ -421,6 +416,5 @@ function BootSequenceInner({ theme, children }: { theme: ThemeName; children: Re
 
 export default function BootSequence({ children }: { children: React.ReactNode }) {
   const { theme } = useTheme();
-  // Key on theme so the inner component re-mounts (fresh state) on theme change
   return <BootSequenceInner key={theme} theme={theme}>{children}</BootSequenceInner>;
 }

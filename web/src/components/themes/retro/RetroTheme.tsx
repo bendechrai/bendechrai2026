@@ -2,9 +2,10 @@
 
 import { useState, useCallback, useRef, useEffect } from "react";
 import { useTheme } from "@/context/ThemeContext";
-import { ARTICLES, EVENTS, TALKS, SOCIAL_LINKS } from "@/data/content";
+import { ARTICLES, EVENTS, TALKS, SOCIAL_LINKS, getArticleBySlug } from "@/data/content";
 import { sendMessage } from "@/lib/sendMessage";
-import styles from "./win31.module.css";
+import { useSection } from "@/hooks/useSection";
+import styles from "./retro.module.css";
 
 interface WindowState {
   id: string;
@@ -20,11 +21,11 @@ interface WindowState {
 
 type ContentId = "articles" | "events" | "talks" | "contact" | "dos";
 
-const DESKTOP_ICONS: { id: ContentId; label: string }[] = [
-  { id: "articles", label: "Articles" },
-  { id: "events", label: "Events" },
-  { id: "talks", label: "Talks" },
-  { id: "contact", label: "WinMsg" },
+const DESKTOP_ICONS: { id: ContentId; label: string; path: string }[] = [
+  { id: "articles", label: "Articles", path: "/articles" },
+  { id: "events", label: "Events", path: "/events" },
+  { id: "talks", label: "Talks", path: "/talks" },
+  { id: "contact", label: "Message", path: "/contact" },
 ];
 
 function formatDate(dateStr: string) {
@@ -40,7 +41,7 @@ function getInitialWindows(): WindowState[] {
   return [
     {
       id: "program-manager",
-      title: "Program Manager",
+      title: "Desktop Manager",
       x: isMobile ? 4 : 40,
       y: isMobile ? 4 : 30,
       width: isMobile ? vw - 8 : Math.min(460, vw - 80),
@@ -51,7 +52,7 @@ function getInitialWindows(): WindowState[] {
     },
     {
       id: "dos",
-      title: "DOS Prompt",
+      title: "Command Prompt",
       x: isMobile ? 4 : 80,
       y: isMobile ? vh * 0.5 : 200,
       width: isMobile ? vw - 8 : Math.min(500, vw - 80),
@@ -63,12 +64,11 @@ function getInitialWindows(): WindowState[] {
   ];
 }
 
-function WindowContent({ windowId, onOpenWindow }: { windowId: string; onOpenWindow: (id: ContentId) => void }) {
+function WindowContent({ windowId, articleSlug, navigate, onOpenWindow }: { windowId: string; articleSlug: string | null; navigate: (p: string) => void; onOpenWindow: (id: ContentId) => void }) {
   const { setTheme } = useTheme();
   const [dosInput, setDosInput] = useState("");
   const [dosLines, setDosLines] = useState<string[]>([
-    "Microsoft(R) MS-DOS(R) Version 6.22",
-    "(C)Copyright Microsoft Corp 1981-1994.",
+    "RetroOS Command Line v1.0",
     "",
   ]);
   const dosInputRef = useRef<HTMLInputElement>(null);
@@ -76,7 +76,6 @@ function WindowContent({ windowId, onOpenWindow }: { windowId: string; onOpenWin
   const [msgName, setMsgName] = useState("");
   const [msgBody, setMsgBody] = useState("");
   const [msgSent, setMsgSent] = useState(false);
-
   const [sending, setSending] = useState(false);
 
   const handleMsgSend = async () => {
@@ -105,7 +104,7 @@ function WindowContent({ windowId, onOpenWindow }: { windowId: string; onOpenWin
         setDosLines([]);
       } else if (trimmed.startsWith("theme ")) {
         const name = trimmed.slice(6).trim();
-        const valid = ["lcars", "cyberpunk", "terminal", "holographic", "win31"];
+        const valid = ["starship", "cyberpunk", "terminal", "holographic", "retro"];
         if (valid.includes(name)) {
           setDosLines((prev) => [...prev, `Switching to ${name}...`]);
           setTimeout(() => setTheme(name as Parameters<typeof setTheme>[0]), 400);
@@ -113,12 +112,19 @@ function WindowContent({ windowId, onOpenWindow }: { windowId: string; onOpenWin
           setDosLines((prev) => [...prev, `Bad command or theme name. Valid: ${valid.join(", ")}`]);
         }
       } else if (["articles", "events", "talks", "contact"].includes(trimmed)) {
+        const pathMap: Record<string, string> = {
+          articles: "/articles",
+          events: "/events",
+          talks: "/talks",
+          contact: "/contact",
+        };
+        navigate(pathMap[trimmed]);
         onOpenWindow(trimmed as ContentId);
       } else if (trimmed !== "") {
         setDosLines((prev) => [...prev, `Bad command or file name`]);
       }
     },
-    [setTheme, onOpenWindow],
+    [setTheme, onOpenWindow, navigate],
   );
 
   if (windowId === "program-manager") {
@@ -135,8 +141,8 @@ function WindowContent({ windowId, onOpenWindow }: { windowId: string; onOpenWin
             <button
               key={icon.id}
               className={styles.desktopIcon}
-              onDoubleClick={() => onOpenWindow(icon.id)}
-              onClick={() => onOpenWindow(icon.id)}
+              onDoubleClick={() => { navigate(icon.path); onOpenWindow(icon.id); }}
+              onClick={() => { navigate(icon.path); onOpenWindow(icon.id); }}
             >
               <div className={styles.iconImage}>
                 {icon.id === "articles" && "\u{1F4C4}"}
@@ -176,7 +182,7 @@ function WindowContent({ windowId, onOpenWindow }: { windowId: string; onOpenWin
             className={styles.dosInput}
             spellCheck={false}
             autoComplete="off"
-            aria-label="DOS command input"
+            aria-label="Command prompt input"
           />
         </div>
       </div>
@@ -186,42 +192,42 @@ function WindowContent({ windowId, onOpenWindow }: { windowId: string; onOpenWin
   if (windowId === "contact") {
     return (
       <div className={styles.notepadContent}>
-        <div className={styles.winMsgHeader}>WinMessage 1.0</div>
-        <div className={styles.winMsgLinks}>
+        <div className={styles.msgHeader}>Message 1.0</div>
+        <div className={styles.msgLinks}>
           <p><a href={SOCIAL_LINKS.github} target="_blank" rel="noopener noreferrer">GitHub: github.com/bendechrai</a></p>
           <p><a href={SOCIAL_LINKS.linkedin} target="_blank" rel="noopener noreferrer">LinkedIn: linkedin.com/in/bendechrai</a></p>
           <p><a href={SOCIAL_LINKS.twitter} target="_blank" rel="noopener noreferrer">Twitter: twitter.com/bendechrai</a></p>
         </div>
-        <hr className={styles.winMsgDivider} />
+        <hr className={styles.msgDivider} />
         {msgSent ? (
-          <div className={styles.winMsgSent}>
+          <div className={styles.msgSent}>
             <p><b>Message Sent!</b></p>
             <p>Your message has been delivered to Ben&apos;s inbox.</p>
           </div>
         ) : (
-          <div className={styles.winMsgForm}>
-            <div className={styles.winMsgField}>
+          <div className={styles.msgForm}>
+            <div className={styles.msgField}>
               <label>From:</label>
               <input
                 type="text"
                 value={msgName}
                 onChange={(e) => setMsgName(e.target.value)}
-                className={styles.winMsgInput}
+                className={styles.msgInput}
                 placeholder="Your name"
               />
             </div>
-            <div className={styles.winMsgField}>
+            <div className={styles.msgField}>
               <label>Message:</label>
               <textarea
                 value={msgBody}
                 onChange={(e) => setMsgBody(e.target.value)}
-                className={styles.winMsgTextarea}
+                className={styles.msgTextarea}
                 placeholder="Type your message here..."
                 rows={4}
               />
             </div>
             <button
-              className={styles.winMsgSendBtn}
+              className={styles.msgSendBtn}
               onClick={handleMsgSend}
               disabled={!msgName.trim() || !msgBody.trim() || sending}
             >
@@ -233,18 +239,36 @@ function WindowContent({ windowId, onOpenWindow }: { windowId: string; onOpenWin
     );
   }
 
-  const contentMap: Record<string, React.ReactNode> = {
-    articles: (
+  if (windowId === "articles") {
+    if (articleSlug) {
+      const article = getArticleBySlug(articleSlug);
+      if (article) {
+        return (
+          <div className={styles.notepadContent}>
+            <p><a href="#" onClick={(e) => { e.preventDefault(); navigate("/articles"); }} style={{ cursor: "pointer" }}>&lt; Back to Articles</a></p>
+            <div style={{ marginBottom: "12px" }}>
+              <p><b>{article.title}</b></p>
+              <p><i>{formatDate(article.date)}</i></p>
+              <p>{article.summary}</p>
+            </div>
+          </div>
+        );
+      }
+    }
+    return (
       <div className={styles.notepadContent}>
         {ARTICLES.map((a) => (
-          <div key={a.title} style={{ marginBottom: "12px" }}>
+          <div key={a.slug} style={{ marginBottom: "12px", cursor: "pointer" }} onClick={() => navigate(`/articles/${a.slug}`)}>
             <p><b>{a.title}</b></p>
             <p><i>{formatDate(a.date)}</i></p>
             <p>{a.summary}</p>
           </div>
         ))}
       </div>
-    ),
+    );
+  }
+
+  const contentMap: Record<string, React.ReactNode> = {
     events: (
       <div className={styles.notepadContent}>
         {EVENTS.map((ev) => (
@@ -281,7 +305,8 @@ function WindowContent({ windowId, onOpenWindow }: { windowId: string; onOpenWin
   return contentMap[windowId] || <div className={styles.notepadContent}><p>Unknown window.</p></div>;
 }
 
-export default function Win31Theme() {
+export default function RetroTheme() {
+  const { section, articleSlug, navigate } = useSection();
   const [windows, setWindows] = useState<WindowState[]>(() => getInitialWindows());
   const [topZ, setTopZ] = useState(2);
   const dragRef = useRef<{ winId: string; offsetX: number; offsetY: number } | null>(null);
@@ -312,8 +337,8 @@ export default function Win31Theme() {
           articles: "Articles - Notepad",
           events: "Events - Notepad",
           talks: "Talks - Notepad",
-          contact: "WinMessage 1.0",
-          dos: "DOS Prompt",
+          contact: "Message 1.0",
+          dos: "Command Prompt",
         };
         const vw = window.innerWidth;
         const vh = window.innerHeight;
@@ -336,6 +361,24 @@ export default function Win31Theme() {
     },
     [topZ, bringToFront],
   );
+
+  // Auto-open window based on URL section on mount
+  const initializedRef = useRef(false);
+  useEffect(() => {
+    if (!initializedRef.current && section !== "home") {
+      initializedRef.current = true;
+      const sectionToContentId: Record<string, ContentId> = {
+        articles: "articles",
+        events: "events",
+        talks: "talks",
+        contact: "contact",
+      };
+      const contentId = sectionToContentId[section];
+      if (contentId) {
+        openWindow(contentId);
+      }
+    }
+  }, [section, openWindow]);
 
   const toggleMinimize = useCallback(
     (id: string) => {
@@ -457,7 +500,7 @@ export default function Win31Theme() {
                 </div>
               </div>
               <div className={styles.windowBody}>
-                <WindowContent windowId={win.id} onOpenWindow={openWindow} />
+                <WindowContent windowId={win.id} articleSlug={articleSlug} navigate={navigate} onOpenWindow={openWindow} />
               </div>
             </div>
           ),

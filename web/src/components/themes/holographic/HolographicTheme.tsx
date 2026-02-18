@@ -2,8 +2,9 @@
 
 import { useState, useRef, useCallback, useEffect } from "react";
 import { useTheme } from "@/context/ThemeContext";
-import { ARTICLES, EVENTS, TALKS, SOCIAL_LINKS } from "@/data/content";
+import { ARTICLES, EVENTS, TALKS, SOCIAL_LINKS, getArticleBySlug } from "@/data/content";
 import { sendMessage } from "@/lib/sendMessage";
+import { useSection } from "@/hooks/useSection";
 import styles from "./holographic.module.css";
 
 type PanelId = "about" | "articles" | "events" | "talks" | "contact";
@@ -11,26 +12,36 @@ type PanelId = "about" | "articles" | "events" | "talks" | "contact";
 interface PanelConfig {
   id: PanelId;
   title: string;
+  path: string;
 }
 
 const PANELS: PanelConfig[] = [
-  { id: "about", title: "SYSTEM PROFILE" },
-  { id: "articles", title: "ARTICLES" },
-  { id: "events", title: "EVENTS" },
-  { id: "talks", title: "TALKS" },
-  { id: "contact", title: "QUANTUM RELAY" },
+  { id: "about", title: "SYSTEM PROFILE", path: "/" },
+  { id: "articles", title: "ARTICLES", path: "/articles" },
+  { id: "events", title: "EVENTS", path: "/events" },
+  { id: "talks", title: "TALKS", path: "/talks" },
+  { id: "contact", title: "QUANTUM RELAY", path: "/contact" },
 ];
+
+function sectionToPanelId(section: string): PanelId {
+  switch (section) {
+    case "articles": return "articles";
+    case "events": return "events";
+    case "talks": return "talks";
+    case "contact": return "contact";
+    default: return "about";
+  }
+}
 
 function formatDate(dateStr: string) {
   const d = new Date(dateStr + "T00:00:00");
   return d.toLocaleDateString("en-AU", { day: "2-digit", month: "short", year: "numeric" });
 }
 
-function PanelContent({ id }: { id: PanelId }) {
+function PanelContent({ id, articleSlug, navigate }: { id: PanelId; articleSlug: string | null; navigate: (p: string) => void }) {
   const [msgHandle, setMsgHandle] = useState("");
   const [msgBody, setMsgBody] = useState("");
   const [msgSent, setMsgSent] = useState(false);
-
   const [sending, setSending] = useState(false);
 
   const handleSend = async () => {
@@ -82,11 +93,28 @@ function PanelContent({ id }: { id: PanelId }) {
           </div>
         </>
       );
-    case "articles":
+    case "articles": {
+      if (articleSlug) {
+        const article = getArticleBySlug(articleSlug);
+        if (article) {
+          return (
+            <>
+              <button className={styles.label} onClick={() => navigate("/articles")} style={{ cursor: "pointer", background: "none", border: "none", padding: 0 }}>
+                &lt; BACK TO ARTICLES
+              </button>
+              <div className={styles.dataLine} style={{ flexDirection: "column", gap: "0.25rem" }}>
+                <span>{article.title}</span>
+                <span className={styles.holoDetail}>{formatDate(article.date)}</span>
+                <span className={styles.holoDetail} style={{ lineHeight: 1.6 }}>{article.summary}</span>
+              </div>
+            </>
+          );
+        }
+      }
       return (
         <>
           {ARTICLES.map((a) => (
-            <div key={a.title} className={styles.dataLine} style={{ flexDirection: "column", gap: "0.25rem" }}>
+            <div key={a.slug} className={styles.dataLine} style={{ flexDirection: "column", gap: "0.25rem", cursor: "pointer" }} onClick={() => navigate(`/articles/${a.slug}`)}>
               <span className={styles.label}>{formatDate(a.date)}</span>
               <span>{a.title}</span>
               <span className={styles.holoDetail}>{a.summary}</span>
@@ -94,6 +122,7 @@ function PanelContent({ id }: { id: PanelId }) {
           ))}
         </>
       );
+    }
     case "events":
       return (
         <>
@@ -175,10 +204,14 @@ function HoloPanel({
   config,
   visible,
   onDismiss,
+  articleSlug,
+  navigate,
 }: {
   config: PanelConfig;
   visible: boolean;
   onDismiss: () => void;
+  articleSlug: string | null;
+  navigate: (p: string) => void;
 }) {
   if (!visible) return null;
 
@@ -191,7 +224,7 @@ function HoloPanel({
         </button>
       </div>
       <div className={styles.panelBody}>
-        <PanelContent id={config.id} />
+        <PanelContent id={config.id} articleSlug={articleSlug} navigate={navigate} />
       </div>
     </div>
   );
@@ -199,7 +232,9 @@ function HoloPanel({
 
 export default function HolographicTheme() {
   const { setTheme } = useTheme();
-  const [visiblePanels, setVisiblePanels] = useState<Set<PanelId>>(new Set(["about"]));
+  const { section, articleSlug, navigate } = useSection();
+  const initialPanelId = sectionToPanelId(section);
+  const [visiblePanels, setVisiblePanels] = useState<Set<PanelId>>(() => new Set([initialPanelId]));
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [paletteQuery, setPaletteQuery] = useState("");
   const paletteRef = useRef<HTMLInputElement>(null);
@@ -212,6 +247,20 @@ export default function HolographicTheme() {
       return next;
     });
   }, []);
+
+  const togglePanelAndNavigate = useCallback((id: PanelId) => {
+    const panel = PANELS.find((p) => p.id === id);
+    setVisiblePanels((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+        if (panel) navigate(panel.path);
+      }
+      return next;
+    });
+  }, [navigate]);
 
   const openPalette = useCallback(() => {
     setPaletteOpen(true);
@@ -243,13 +292,13 @@ export default function HolographicTheme() {
     const commands = [
       ...PANELS.map((p) => ({
         label: p.title,
-        action: () => { togglePanel(p.id); setPaletteOpen(false); },
+        action: () => { togglePanelAndNavigate(p.id); setPaletteOpen(false); },
       })),
-      { label: "THEME LCARS", action: () => { setTheme("lcars"); setPaletteOpen(false); } },
+      { label: "THEME STARSHIP", action: () => { setTheme("starship"); setPaletteOpen(false); } },
       { label: "THEME CYBERPUNK", action: () => { setTheme("cyberpunk"); setPaletteOpen(false); } },
       { label: "THEME TERMINAL", action: () => { setTheme("terminal"); setPaletteOpen(false); } },
       { label: "THEME HOLOGRAPHIC", action: () => { setTheme("holographic"); setPaletteOpen(false); } },
-      { label: "THEME WIN31", action: () => { setTheme("win31"); setPaletteOpen(false); } },
+      { label: "THEME RETRO", action: () => { setTheme("retro"); setPaletteOpen(false); } },
     ];
     if (!q) return commands;
     return commands.filter((c) => c.label.toLowerCase().includes(q));
@@ -281,6 +330,8 @@ export default function HolographicTheme() {
             config={p}
             visible={visiblePanels.has(p.id)}
             onDismiss={() => togglePanel(p.id)}
+            articleSlug={articleSlug}
+            navigate={navigate}
           />
         ))}
 

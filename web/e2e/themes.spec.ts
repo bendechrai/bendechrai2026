@@ -1,13 +1,13 @@
 import { test, expect } from "@playwright/test";
 
-const THEMES = ["cyberpunk", "terminal", "lcars", "holographic", "win31"] as const;
+const THEMES = ["cyberpunk", "terminal", "starship", "holographic", "retro"] as const;
 
 // Skip boot sequence for all tests via sessionStorage seeding
 test.beforeEach(async ({ page }) => {
   await page.addInitScript(() => {
     sessionStorage.setItem(
       "booted-themes",
-      JSON.stringify(["cyberpunk", "terminal", "lcars", "holographic", "win31"]),
+      JSON.stringify(["cyberpunk", "terminal", "starship", "holographic", "retro"]),
     );
   });
 });
@@ -35,8 +35,8 @@ test("can switch themes via URL query parameter", async ({ page }) => {
   const body = page.locator("body");
   await expect(body).toBeVisible();
 
-  // Switch to LCARS
-  await page.goto("/?theme=lcars");
+  // Switch to starship
+  await page.goto("/?theme=starship");
   await page.waitForTimeout(300);
   await expect(body).toBeVisible();
 });
