@@ -203,7 +203,15 @@ function TabContent({ tab, articleSlug, navigate }: { tab: Tab; articleSlug: str
               </button>
               <h2 className={styles.sectionTitle}>{article.title}</h2>
               <div className={styles.commsDetail} style={{ marginBottom: "1rem" }}>{formatDate(article.date)}</div>
-              <p style={{ color: "#e0e0ff", lineHeight: 1.6 }}>{article.summary}</p>
+              {article.image && <img src={article.image} alt="" className={styles.articleImage} />}
+              <p style={{ color: "#e0e0ff", lineHeight: 1.6, marginBottom: "1rem" }}>{article.summary}</p>
+              {article.body && (
+                <div className={styles.articleBody}>
+                  {article.body.split("\n\n").map((para, i) => (
+                    <p key={i}>{para}</p>
+                  ))}
+                </div>
+              )}
             </div>
           );
         }

@@ -249,7 +249,11 @@ function WindowContent({ windowId, articleSlug, navigate, onOpenWindow }: { wind
             <div style={{ marginBottom: "12px" }}>
               <p><b>{article.title}</b></p>
               <p><i>{formatDate(article.date)}</i></p>
+              {article.image && <img src={article.image} alt="" className={styles.articleImage} />}
               <p>{article.summary}</p>
+              {article.body && article.body.split("\n\n").map((para, i) => (
+                <p key={i} style={{ marginTop: "6px" }}>{para}</p>
+              ))}
             </div>
           </div>
         );

@@ -266,6 +266,21 @@
   text-align: center;
 }
 
+/* ===== Article Image ===== */
+.articleImage {
+  width: 100%;
+  max-height: 180px;
+  object-fit: cover;
+  filter: grayscale(0.5) contrast(1.4) brightness(0.95);
+  display: block;
+  margin: 4px 0 8px;
+  box-shadow:
+    inset 1px 1px 0 #808080,
+    inset -1px -1px 0 #FFFFFF,
+    inset 2px 2px 0 #000000;
+  image-rendering: auto;
+}
+
 /* ===== DOS Window ===== */
 .dosWindow {
   background: #000000;

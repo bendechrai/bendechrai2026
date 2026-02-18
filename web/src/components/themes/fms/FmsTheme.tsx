@@ -37,265 +37,317 @@ function formatDate(dateStr: string) {
   return d.toLocaleDateString("en-AU", { day: "2-digit", month: "short", year: "numeric" }).toUpperCase();
 }
 
-// ============ MCDU Screen Pages ============
+// ============ Row type for 6-row screen layout ============
 
-// INIT page - like aircraft initialization
-function InitPage({ onLsk }: { onLsk: (side: "left" | "right", row: number) => void }) {
+interface ScreenRowData {
+  leftLabel?: string;
+  rightLabel?: string;
+  leftData?: string;
+  rightData?: string;
+  leftColor?: "green" | "white" | "cyan" | "amber" | "magenta";
+  rightColor?: "green" | "white" | "cyan" | "amber" | "magenta";
+  leftSmall?: boolean;
+  rightSmall?: boolean;
+  onLeftClick?: () => void;
+  onRightClick?: () => void;
+  leftHref?: string;
+}
+
+const colorClass = (c?: string) => {
+  switch (c) {
+    case "green": return styles.dataGreen;
+    case "white": return styles.dataWhite;
+    case "cyan": return styles.dataCyan;
+    case "amber": return styles.dataAmber;
+    case "magenta": return styles.dataMagenta;
+    default: return styles.dataGreen;
+  }
+};
+
+// Render exactly 6 rows with label+data pairs aligned to LSKs
+function SixRowScreen({ title, rows, pageNum, totalPages }: {
+  title: string;
+  rows: ScreenRowData[];
+  pageNum?: number;
+  totalPages?: number;
+}) {
+  // Pad to exactly 6
+  const padded = [...rows];
+  while (padded.length < 6) padded.push({});
+
   return (
     <>
-      <div className={styles.pageTitle}>INIT</div>
-      {/* Row 1: Operator / Status */}
-      <div className={styles.labelRow}>
-        <span className={styles.label}>OPERATOR</span>
-        <span className={styles.label}>STATUS</span>
+      <div className={styles.pageTitle}>
+        {title}
+        {totalPages && totalPages > 1 && (
+          <span className={styles.pageArrow}>{pageNum}/{totalPages}</span>
+        )}
       </div>
-      <div className={styles.screenRow}>
-        <span className={`${styles.dataGreen} ${styles.lskData}`} onClick={() => onLsk("left", 1)}>BEN DECHRAI</span>
-        <span className={styles.dataGreen}>ACTIVE</span>
-      </div>
-      {/* Row 2: Role / Base */}
-      <div className={styles.labelRow}>
-        <span className={styles.label}>ROLE</span>
-        <span className={styles.label}>BASE</span>
-      </div>
-      <div className={styles.screenRow}>
-        <span className={styles.dataGreen}>DEV / SPEAKER</span>
-        <span className={styles.dataGreen}>YMML</span>
-      </div>
-      {/* Row 3: Code repo */}
-      <div className={styles.labelRow}>
-        <span className={styles.label}>CODE ARCHIVE</span>
-      </div>
-      <div className={styles.screenRow}>
-        <a href={SOCIAL_LINKS.github} target="_blank" rel="noopener noreferrer" className={styles.socialLink}>
-          <span className={styles.dataCyan}>github.com/bendechrai</span>
-        </a>
-      </div>
-      {/* Row 4: Network */}
-      <div className={styles.labelRow}>
-        <span className={styles.label}>NETWORK</span>
-      </div>
-      <div className={styles.screenRow}>
-        <a href={SOCIAL_LINKS.linkedin} target="_blank" rel="noopener noreferrer" className={styles.socialLink}>
-          <span className={styles.dataCyan}>linkedin.com/in/bendechrai</span>
-        </a>
-      </div>
-      {/* Row 5: Signal */}
-      <div className={styles.labelRow}>
-        <span className={styles.label}>SIGNAL</span>
-      </div>
-      <div className={styles.screenRow}>
-        <a href={SOCIAL_LINKS.twitter} target="_blank" rel="noopener noreferrer" className={styles.socialLink}>
-          <span className={styles.dataCyan}>twitter.com/bendechrai</span>
-        </a>
-      </div>
-      {/* Row 6: Nav to other pages */}
-      <div className={styles.labelRow}>
-        <span className={styles.label}> </span>
-        <span className={`${styles.label} ${styles.labelAmber}`}>ATC COMM &gt;</span>
-      </div>
-      <div className={styles.screenRow}>
-        <span> </span>
-        <span className={`${styles.dataAmber} ${styles.lskData}`} onClick={() => onLsk("right", 6)}>SEND MSG</span>
-      </div>
+      {padded.slice(0, 6).map((row, i) => (
+        <div key={i}>
+          {/* Label line */}
+          <div className={styles.labelRow}>
+            <span className={`${styles.label} ${row.onLeftClick ? styles.labelAmber : ""}`}>
+              {row.leftLabel || "\u00A0"}
+            </span>
+            <span className={`${styles.label} ${row.onRightClick ? styles.labelAmber : ""}`}>
+              {row.rightLabel || "\u00A0"}
+            </span>
+          </div>
+          {/* Data line */}
+          <div className={styles.screenRow}>
+            {row.leftHref ? (
+              <a href={row.leftHref} target="_blank" rel="noopener noreferrer" className={styles.socialLink}>
+                <span className={`${colorClass(row.leftColor)} ${row.leftSmall ? styles.dataSmall : ""}`}>
+                  {row.leftData || "\u00A0"}
+                </span>
+              </a>
+            ) : (
+              <span
+                className={`${colorClass(row.leftColor)} ${row.leftSmall ? styles.dataSmall : ""} ${row.onLeftClick ? styles.lskData : ""}`}
+                onClick={row.onLeftClick}
+              >
+                {row.leftData || "\u00A0"}
+              </span>
+            )}
+            <span
+              className={`${colorClass(row.rightColor)} ${row.rightSmall ? styles.dataSmall : ""} ${row.onRightClick ? styles.lskData : ""}`}
+              onClick={row.onRightClick}
+            >
+              {row.rightData || "\u00A0"}
+            </span>
+          </div>
+        </div>
+      ))}
     </>
   );
 }
 
-// F-PLN page - Flight Plan = Articles
-function FPlnPage({ articleSlug, navigate, onLsk }: { articleSlug: string | null; navigate: (p: string) => void; onLsk: (side: "left" | "right", row: number) => void }) {
-  if (articleSlug) {
-    const article = getArticleBySlug(articleSlug);
-    if (article) {
-      return (
-        <>
-          <div className={styles.pageTitle}>F-PLN DETAIL</div>
-          <div className={styles.labelRow}>
-            <span className={`${styles.label} ${styles.labelAmber}`}>&lt; RETURN</span>
-          </div>
-          <div className={styles.screenRow}>
-            <span className={`${styles.dataAmber} ${styles.lskData}`} onClick={() => navigate("/articles")}>F-PLN LIST</span>
-          </div>
-          <div className={styles.labelRow}>
-            <span className={styles.label}>TITLE</span>
-          </div>
-          <div className={styles.screenRow}>
-            <span className={styles.dataWhite}>{article.title}</span>
-          </div>
-          <div className={styles.labelRow}>
-            <span className={styles.label}>DATE</span>
-          </div>
-          <div className={styles.screenRow}>
-            <span className={styles.dataGreen}>{formatDate(article.date)}</span>
-          </div>
-          <div className={styles.labelRow}>
-            <span className={styles.label}>SUMMARY</span>
-          </div>
-          <div className={styles.screenRow}>
-            <span className={`${styles.dataGreen} ${styles.dataSmall}`}>{article.summary}</span>
-          </div>
-        </>
-      );
-    }
+// ============ Page builders ============
+
+function buildInitRows(navigate: (p: string) => void): ScreenRowData[] {
+  return [
+    { leftLabel: "OPERATOR", rightLabel: "STATUS", leftData: "BEN DECHRAI", leftColor: "green", rightData: "ACTIVE", rightColor: "green" },
+    { leftLabel: "ROLE", rightLabel: "BASE", leftData: "DEV / SPEAKER", leftColor: "green", rightData: "YMML", rightColor: "green" },
+    { leftLabel: "CODE ARCHIVE", leftData: "github.com/bendechrai", leftColor: "cyan", leftHref: SOCIAL_LINKS.github },
+    { leftLabel: "NETWORK", leftData: "linkedin.com/in/bendechrai", leftColor: "cyan", leftHref: SOCIAL_LINKS.linkedin },
+    { leftLabel: "SIGNAL", leftData: "twitter.com/bendechrai", leftColor: "cyan", leftHref: SOCIAL_LINKS.twitter },
+    { rightLabel: "ATC COMM >", rightData: "SEND MSG", rightColor: "amber", onRightClick: () => navigate("/contact") },
+  ];
+}
+
+function buildFPlnListRows(page: number, navigate: (p: string) => void): { rows: ScreenRowData[]; totalPages: number } {
+  const perPage = 6;
+  const totalPages = Math.ceil(ARTICLES.length / perPage);
+  const start = page * perPage;
+  const slice = ARTICLES.slice(start, start + perPage);
+  const rows: ScreenRowData[] = slice.map((a) => ({
+    leftLabel: formatDate(a.date),
+    leftData: a.title,
+    leftColor: "green" as const,
+    onLeftClick: () => navigate(`/articles/${a.slug}`),
+  }));
+  return { rows, totalPages };
+}
+
+function buildArticleDetailRows(slug: string, navigate: (p: string) => void, bodyPage: number): { rows: ScreenRowData[]; totalPages: number } {
+  const article = getArticleBySlug(slug);
+  if (!article) return { rows: [], totalPages: 1 };
+
+  if (bodyPage === 0) {
+    // First page: metadata
+    return {
+      rows: [
+        { leftLabel: "< RETURN", leftData: "F-PLN LIST", leftColor: "amber", onLeftClick: () => navigate("/articles") },
+        { leftLabel: "TITLE", leftData: article.title, leftColor: "white" },
+        { leftLabel: "DATE", leftData: formatDate(article.date), leftColor: "green" },
+        { leftLabel: "SUMMARY", leftData: article.summary, leftColor: "green", leftSmall: true },
+        {},
+        { rightLabel: "FULL TEXT >", rightData: "NEXT", rightColor: "amber" },
+      ],
+      totalPages: 1 + Math.ceil((article.body || "").split("\n\n").length / 3),
+    };
   }
 
-  return (
-    <>
-      <div className={styles.pageTitle}>F-PLN</div>
-      <div className={styles.contentArea}>
-        {ARTICLES.map((a, i) => (
-          <div key={a.slug}>
-            <div className={styles.labelRow}>
-              <span className={styles.label}>{formatDate(a.date)}</span>
-            </div>
-            <div className={styles.screenRow}>
-              <span
-                className={`${styles.dataGreen} ${styles.lskData}`}
-                onClick={() => navigate(`/articles/${a.slug}`)}
-              >
-                {a.title}
-              </span>
-            </div>
-          </div>
-        ))}
-      </div>
-    </>
-  );
+  // Body pages: 3 paragraphs per page in rows 1-3, back on L1, prev/next on row 6
+  const paragraphs = (article.body || "").split("\n\n").filter(Boolean);
+  const perPage = 3;
+  const totalBodyPages = Math.ceil(paragraphs.length / perPage);
+  const totalPages = 1 + totalBodyPages;
+  const bodyIdx = bodyPage - 1;
+  const slice = paragraphs.slice(bodyIdx * perPage, bodyIdx * perPage + perPage);
+
+  const rows: ScreenRowData[] = slice.map((p, i) => ({
+    leftData: p,
+    leftColor: "green" as const,
+    leftSmall: true,
+  }));
+
+  // Pad to 5 then add navigation row at 6
+  while (rows.length < 5) rows.push({});
+  rows.push({
+    leftLabel: bodyPage > 1 ? "< PREV" : "< RETURN",
+    leftColor: "amber",
+    leftData: bodyPage > 1 ? "PREV PAGE" : "F-PLN LIST",
+    onLeftClick: () => {}, // handled via LSK in parent
+    rightLabel: bodyIdx < totalBodyPages - 1 ? "NEXT >" : undefined,
+    rightData: bodyIdx < totalBodyPages - 1 ? "NEXT PAGE" : undefined,
+    rightColor: "amber",
+    onRightClick: bodyIdx < totalBodyPages - 1 ? () => {} : undefined, // handled via LSK
+  });
+
+  return { rows, totalPages };
 }
 
-// PROG page - Progress = Events
-function ProgPage() {
-  return (
-    <>
-      <div className={styles.pageTitle}>PROG</div>
-      <div className={styles.contentArea}>
-        {EVENTS.map((ev) => (
-          <div key={ev.name}>
-            <div className={styles.labelRow}>
-              <span className={styles.label}>
-                {ev.role === "workshop" ? "WKSHP" : ev.role === "speaking" ? "SPEAK" : "ATND"}
-              </span>
-              <span className={styles.label}>{ev.location}</span>
-            </div>
-            <div className={styles.screenRow}>
-              <span className={styles.dataGreen}>{ev.name}</span>
-              <span className={styles.dataMagenta}>{formatDate(ev.date)}</span>
-            </div>
-            {ev.talk && (
-              <div className={styles.screenRow}>
-                <span className={`${styles.dataWhite} ${styles.dataSmall}`}>{ev.talk}</span>
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
-    </>
-  );
+function buildProgRows(page: number): { rows: ScreenRowData[]; totalPages: number } {
+  const perPage = 3; // 2 rows per event (name+date, talk)
+  const totalPages = Math.ceil(EVENTS.length / perPage);
+  const start = page * perPage;
+  const slice = EVENTS.slice(start, start + perPage);
+  const rows: ScreenRowData[] = [];
+  for (const ev of slice) {
+    rows.push({
+      leftLabel: ev.role === "workshop" ? "WKSHP" : ev.role === "speaking" ? "SPEAK" : "ATND",
+      rightLabel: ev.location,
+      leftData: ev.name,
+      leftColor: "green",
+      rightData: formatDate(ev.date),
+      rightColor: "magenta",
+    });
+    if (ev.talk) {
+      rows.push({
+        leftData: ev.talk,
+        leftColor: "white",
+        leftSmall: true,
+      });
+    }
+  }
+  return { rows: rows.slice(0, 6), totalPages };
 }
 
-// DATA page - Navigation Data = Talks
-function DataPage() {
-  return (
-    <>
-      <div className={styles.pageTitle}>DATA</div>
-      <div className={styles.contentArea}>
-        {TALKS.map((t) => (
-          <div key={t.title}>
-            <div className={styles.labelRow}>
-              <span className={styles.label}>{t.type === "workshop" ? "WORKSHOP" : "TALK"}</span>
-              <span className={styles.label}>{formatDate(t.date)}</span>
-            </div>
-            <div className={styles.screenRow}>
-              <span className={styles.dataGreen}>{t.title}</span>
-            </div>
-            <div className={styles.screenRow}>
-              <span className={`${styles.dataWhite} ${styles.dataSmall}`}>{t.event}</span>
-            </div>
-            <div className={styles.screenRow}>
-              <span className={`${styles.dataGreen} ${styles.dataSmall}`} style={{ opacity: 0.7 }}>{t.description}</span>
-            </div>
-          </div>
-        ))}
-      </div>
-    </>
-  );
+function buildDataRows(page: number): { rows: ScreenRowData[]; totalPages: number } {
+  const perPage = 3; // ~2 rows per talk
+  const totalPages = Math.ceil(TALKS.length / perPage);
+  const start = page * perPage;
+  const slice = TALKS.slice(start, start + perPage);
+  const rows: ScreenRowData[] = [];
+  for (const t of slice) {
+    rows.push({
+      leftLabel: t.type === "workshop" ? "WORKSHOP" : "TALK",
+      rightLabel: formatDate(t.date),
+      leftData: t.title,
+      leftColor: "green",
+    });
+    rows.push({
+      leftData: `${t.event} - ${t.description}`,
+      leftColor: "green",
+      leftSmall: true,
+    });
+  }
+  return { rows: rows.slice(0, 6), totalPages };
 }
 
-// ATC COMM page - Contact / messaging with on-screen keyboard
-function AtcCommPage({
-  scratchpad,
-  onScratchpadChange,
+// ============ ATC COMM page (special - has message form) ============
+
+function AtcCommScreen({
   activeField,
   setActiveField,
   name,
-  setName,
   message,
-  setMessage,
   msgSent,
   onSend,
   sending,
 }: {
-  scratchpad: string;
-  onScratchpadChange: (v: string) => void;
   activeField: "name" | "message";
   setActiveField: (f: "name" | "message") => void;
   name: string;
-  setName: (v: string) => void;
   message: string;
-  setMessage: (v: string) => void;
   msgSent: boolean;
   onSend: () => void;
   sending: boolean;
 }) {
   if (msgSent) {
     return (
-      <>
-        <div className={styles.pageTitle}>ATC COMM</div>
-        <div className={styles.msgSent}>
-          <div className={styles.msgSentTitle}>UPLINK SENT</div>
-          <div className={styles.msgSentText}>MESSAGE TRANSMITTED VIA ACARS</div>
-          <div className={styles.msgSentText}>DELIVERY CONFIRMED</div>
-        </div>
-      </>
+      <SixRowScreen title="ATC COMM" rows={[
+        {},
+        { leftData: "UPLINK SENT", leftColor: "green" },
+        { leftData: "MESSAGE TRANSMITTED VIA ACARS", leftColor: "white", leftSmall: true },
+        { leftData: "DELIVERY CONFIRMED", leftColor: "white", leftSmall: true },
+        {},
+        {},
+      ]} />
     );
   }
 
   return (
     <>
       <div className={styles.pageTitle}>ATC COMM</div>
-      {/* Row 1: From field */}
+      {/* Row 1: From label/field */}
       <div className={styles.labelRow}>
         <span className={styles.label}>FROM</span>
+        <span className={styles.label}>{activeField === "name" ? "EDITING" : "\u00A0"}</span>
       </div>
-      <div
-        className={styles.msgFieldRow}
-        onClick={() => setActiveField("name")}
-      >
-        <span className={`${styles.dataCyan} ${activeField === "name" ? styles.msgValueActive : ""}`}>
-          {name || "[ ]"}<span style={{ opacity: activeField === "name" ? 1 : 0 }}>_</span>
+      <div className={styles.screenRow}>
+        <span
+          className={`${activeField === "name" ? styles.dataGreen : styles.dataCyan} ${styles.lskData}`}
+          onClick={() => setActiveField("name")}
+        >
+          {name || "[ ]"}{activeField === "name" ? "_" : ""}
+        </span>
+        <span
+          className={`${styles.dataCyan} ${styles.lskData}`}
+          onClick={() => setActiveField("name")}
+        >
+          {activeField !== "name" ? "SELECT" : "\u00A0"}
         </span>
       </div>
-      {/* Row 2-4: Message field */}
+      {/* Row 2: Message label/field */}
       <div className={styles.labelRow}>
         <span className={styles.label}>MESSAGE</span>
+        <span className={styles.label}>{activeField === "message" ? "EDITING" : "\u00A0"}</span>
       </div>
-      <div
-        className={`${styles.msgTextValue} ${activeField === "message" ? styles.msgTextValueActive : ""}`}
-        onClick={() => setActiveField("message")}
-      >
-        {message || "[ ]"}<span style={{ opacity: activeField === "message" ? 1 : 0 }}>_</span>
+      <div className={styles.screenRow}>
+        <span
+          className={`${activeField === "message" ? styles.dataGreen : styles.dataCyan} ${styles.lskData}`}
+          onClick={() => setActiveField("message")}
+        >
+          {(message || "[ ]").slice(0, 30)}{message.length > 30 ? "..." : ""}{activeField === "message" ? "_" : ""}
+        </span>
+        <span
+          className={`${styles.dataCyan} ${styles.lskData}`}
+          onClick={() => setActiveField("message")}
+        >
+          {activeField !== "message" ? "SELECT" : "\u00A0"}
+        </span>
       </div>
-      {/* Row 6: Send indicator */}
-      <div className={styles.labelRow} style={{ marginTop: "auto" }}>
-        <span> </span>
+      {/* Row 3: Message continued */}
+      <div className={styles.labelRow}>
+        <span className={styles.label}>{message.length > 30 ? "MSG CONT" : "\u00A0"}</span>
+      </div>
+      <div className={styles.screenRow}>
+        <span className={`${styles.dataGreen} ${styles.dataSmall}`}>
+          {message.length > 30 ? message.slice(30, 80) + (message.length > 80 ? "..." : "") : "\u00A0"}
+        </span>
+      </div>
+      {/* Row 4: empty */}
+      <div className={styles.labelRow}><span className={styles.label}>{"\u00A0"}</span></div>
+      <div className={styles.screenRow}><span>{"\u00A0"}</span></div>
+      {/* Row 5: empty */}
+      <div className={styles.labelRow}><span className={styles.label}>{"\u00A0"}</span></div>
+      <div className={styles.screenRow}><span>{"\u00A0"}</span></div>
+      {/* Row 6: Send */}
+      <div className={styles.labelRow}>
+        <span className={styles.label}>{"\u00A0"}</span>
         <span className={`${styles.label} ${name.trim() && message.trim() ? styles.labelAmber : ""}`}>
-          {sending ? "TRANSMITTING" : name.trim() && message.trim() ? "SEND *" : ""}
+          {sending ? "TRANSMITTING" : name.trim() && message.trim() ? "SEND *" : "\u00A0"}
         </span>
       </div>
       <div className={styles.screenRow}>
-        <span> </span>
-        {name.trim() && message.trim() && !sending && (
+        <span>{"\u00A0"}</span>
+        {name.trim() && message.trim() && !sending ? (
           <span className={`${styles.dataAmber} ${styles.lskData}`} onClick={onSend}>TRANSMIT</span>
+        ) : (
+          <span>{"\u00A0"}</span>
         )}
       </div>
     </>
@@ -309,7 +361,6 @@ function MCDUKeyboard({ onKey, onClear, onSpace }: {
   onClear: () => void;
   onSpace: () => void;
 }) {
-  // 5x6 alphabetical grid (reading left-to-right, top-to-bottom)
   const alphaRows = [
     ["A", "B", "C", "D", "E"],
     ["F", "G", "H", "I", "J"],
@@ -318,7 +369,6 @@ function MCDUKeyboard({ onKey, onClear, onSpace }: {
     ["U", "V", "W", "X", "Y"],
     ["Z", "SP", "/", "CLR", "OVFY"],
   ];
-  // E, N, S, W are compass keys (boxed on real MCDU)
   const compassKeys = new Set(["E", "N", "S", "W"]);
 
   const numRows = [
@@ -338,7 +388,6 @@ function MCDUKeyboard({ onKey, onClear, onSpace }: {
 
   return (
     <div className={styles.inputArea}>
-      {/* Left: Numeric keypad */}
       <div className={styles.numericArea}>
         {numRows.map((row, ri) => (
           <div key={ri} className={styles.numRow}>
@@ -354,8 +403,6 @@ function MCDUKeyboard({ onKey, onClear, onSpace }: {
           </div>
         ))}
       </div>
-
-      {/* Right: 5x6 Alphabetical grid */}
       <div className={styles.alphaKeys}>
         {alphaRows.map((row, ri) => (
           <div key={ri} className={styles.alphaRow}>
@@ -385,6 +432,16 @@ export default function FmsTheme() {
   const scratchRef = useRef<HTMLInputElement>(null);
   const initializedRef = useRef(false);
 
+  // Pagination per page type
+  const [listPage, setListPage] = useState(0);
+  const [detailPage, setDetailPage] = useState(0);
+
+  // Reset pagination when page changes
+  useEffect(() => {
+    setListPage(0);
+    setDetailPage(0);
+  }, [activePage, articleSlug]);
+
   // COMMS page state
   const [activeField, setActiveField] = useState<"name" | "message">("name");
   const [msgName, setMsgName] = useState("");
@@ -398,7 +455,7 @@ export default function FmsTheme() {
     }
   }, [section]);
 
-  // Handle scratchpad commands (Enter on scratchpad)
+  // Handle scratchpad commands
   const handleScratchCommand = useCallback(
     (cmd: string) => {
       const trimmed = cmd.trim().toLowerCase();
@@ -425,7 +482,7 @@ export default function FmsTheme() {
     }
   };
 
-  // Handle keyboard key press (routes to scratchpad or COMMS fields)
+  // Keyboard key press routing
   const handleKeyPress = useCallback(
     (key: string) => {
       if (activePage === "atcComm") {
@@ -471,17 +528,104 @@ export default function FmsTheme() {
     }, 4000);
   }, [msgName, msgBody, sending]);
 
-  // Handle LSK presses (mapped per page)
+  // Build current page content
+  let screenRows: ScreenRowData[] = [];
+  let screenTitle = "";
+  let pageNum = 1;
+  let totalPages = 1;
+
+  if (activePage === "init") {
+    screenTitle = "INIT";
+    screenRows = buildInitRows(navigate);
+  } else if (activePage === "fPln" && articleSlug) {
+    const result = buildArticleDetailRows(articleSlug, navigate, detailPage);
+    screenTitle = detailPage === 0 ? "F-PLN DETAIL" : `F-PLN DETAIL`;
+    screenRows = result.rows;
+    totalPages = result.totalPages;
+    pageNum = detailPage + 1;
+  } else if (activePage === "fPln") {
+    const result = buildFPlnListRows(listPage, navigate);
+    screenTitle = "F-PLN";
+    screenRows = result.rows;
+    totalPages = result.totalPages;
+    pageNum = listPage + 1;
+  } else if (activePage === "prog") {
+    const result = buildProgRows(listPage);
+    screenTitle = "PROG";
+    screenRows = result.rows;
+    totalPages = result.totalPages;
+    pageNum = listPage + 1;
+  } else if (activePage === "data" || activePage === "perf") {
+    const result = buildDataRows(listPage);
+    screenTitle = "DATA";
+    screenRows = result.rows;
+    totalPages = result.totalPages;
+    pageNum = listPage + 1;
+  }
+
+  // Handle LSK presses - delegates to the row's onClick
   const handleLsk = useCallback(
     (side: "left" | "right", row: number) => {
-      if (activePage === "init" && side === "right" && row === 6) {
-        navigate("/contact");
+      if (activePage === "atcComm") {
+        if (side === "left" && row === 1) setActiveField("name");
+        else if (side === "left" && row === 2) setActiveField("message");
+        else if (side === "right" && row === 1) setActiveField("name");
+        else if (side === "right" && row === 2) setActiveField("message");
+        else if (side === "right" && row === 6) handleSendMessage();
+        return;
+      }
+
+      // For article detail body pages, handle prev/next on row 6
+      if (activePage === "fPln" && articleSlug && detailPage > 0) {
+        if (row === 6 && side === "left") {
+          // Prev page or return
+          if (detailPage > 1) setDetailPage((p) => p - 1);
+          else setDetailPage(0);
+          return;
+        }
+        if (row === 6 && side === "right") {
+          // Next page
+          const paragraphs = (getArticleBySlug(articleSlug)?.body || "").split("\n\n").filter(Boolean);
+          const totalBodyPages = Math.ceil(paragraphs.length / 3);
+          if (detailPage - 1 < totalBodyPages - 1) setDetailPage((p) => p + 1);
+          return;
+        }
+        return;
+      }
+
+      // For article detail page 0, row 6 right = go to body
+      if (activePage === "fPln" && articleSlug && detailPage === 0 && row === 6 && side === "right") {
+        setDetailPage(1);
+        return;
+      }
+
+      const idx = row - 1;
+      if (idx >= 0 && idx < screenRows.length) {
+        const r = screenRows[idx];
+        if (side === "left" && r.onLeftClick) r.onLeftClick();
+        else if (side === "right" && r.onRightClick) r.onRightClick();
       }
     },
-    [activePage, navigate],
+    [activePage, articleSlug, detailPage, screenRows, handleSendMessage],
   );
 
-  // Navigate via page key
+  // Slew keys for pagination
+  const handleSlewUp = useCallback(() => {
+    if (articleSlug) {
+      setDetailPage((p) => Math.max(0, p - 1));
+    } else {
+      setListPage((p) => Math.max(0, p - 1));
+    }
+  }, [articleSlug]);
+
+  const handleSlewDown = useCallback(() => {
+    if (articleSlug) {
+      setDetailPage((p) => p < totalPages - 1 ? p + 1 : p);
+    } else {
+      setListPage((p) => p < totalPages - 1 ? p + 1 : p);
+    }
+  }, [articleSlug, totalPages]);
+
   const handlePageKey = useCallback(
     (page: McduPage) => {
       navigate(pageToPath(page));
@@ -489,7 +633,6 @@ export default function FmsTheme() {
     [navigate],
   );
 
-  // Page function keys - row 1 and row 2, matching real MCDU layout
   const pageKeysRow1 = [
     { id: "dir" as const, label: "DIR", page: "init" as McduPage },
     { id: "prog" as const, label: "PROG", page: "prog" as McduPage },
@@ -506,36 +649,6 @@ export default function FmsTheme() {
     { id: "mcdumenu" as const, label: "MCDU\nMENU", page: "init" as McduPage },
     { id: "airport" as const, label: "AIRPORT", page: "prog" as McduPage },
   ];
-
-  const renderPage = () => {
-    switch (activePage) {
-      case "init":
-        return <InitPage onLsk={handleLsk} />;
-      case "fPln":
-        return <FPlnPage articleSlug={articleSlug} navigate={navigate} onLsk={handleLsk} />;
-      case "prog":
-        return <ProgPage />;
-      case "data":
-      case "perf":
-        return <DataPage />;
-      case "atcComm":
-        return (
-          <AtcCommPage
-            scratchpad={scratchpad}
-            onScratchpadChange={setScratchpad}
-            activeField={activeField}
-            setActiveField={setActiveField}
-            name={msgName}
-            setName={setMsgName}
-            message={msgBody}
-            setMessage={setMsgBody}
-            msgSent={msgSent}
-            onSend={handleSendMessage}
-            sending={sending}
-          />
-        );
-    }
-  };
 
   return (
     <div className={styles.mcdu}>
@@ -561,7 +674,24 @@ export default function FmsTheme() {
 
           {/* Screen */}
           <div className={styles.screen}>
-            {renderPage()}
+            {activePage === "atcComm" ? (
+              <AtcCommScreen
+                activeField={activeField}
+                setActiveField={setActiveField}
+                name={msgName}
+                message={msgBody}
+                msgSent={msgSent}
+                onSend={handleSendMessage}
+                sending={sending}
+              />
+            ) : (
+              <SixRowScreen
+                title={screenTitle}
+                rows={screenRows}
+                pageNum={pageNum}
+                totalPages={totalPages}
+              />
+            )}
             {/* Scratchpad */}
             <div className={styles.scratchpad} onClick={() => scratchRef.current?.focus()}>
               <div className={styles.scratchpadBox}>
@@ -591,7 +721,7 @@ export default function FmsTheme() {
           </div>
         </div>
 
-        {/* Page keys - Row 1: DIR, PROG, PERF, INIT, DATA, F-PLN */}
+        {/* Page keys - Row 1 */}
         <nav className={styles.pageKeys} role="navigation" aria-label="FMS page navigation">
           {pageKeysRow1.map((pk) => (
             <button
@@ -605,7 +735,7 @@ export default function FmsTheme() {
           ))}
         </nav>
 
-        {/* Page keys - Row 2: RAD NAV, FUEL PRED, SEC F-PLN, ATC COMM, MCDU MENU, AIRPORT */}
+        {/* Page keys - Row 2 */}
         <div className={styles.pageKeys}>
           {pageKeysRow2.map((pk) => (
             <button
@@ -622,12 +752,12 @@ export default function FmsTheme() {
         {/* Slew keys */}
         <div className={styles.slewKeys}>
           <button className={styles.slewKey} aria-label="Slew left">&larr;</button>
-          <button className={styles.slewKey} aria-label="Slew up">&uarr;</button>
-          <button className={styles.slewKey} aria-label="Slew down">&darr;</button>
+          <button className={styles.slewKey} onClick={handleSlewUp} aria-label="Slew up">&uarr;</button>
+          <button className={styles.slewKey} onClick={handleSlewDown} aria-label="Slew down">&darr;</button>
           <button className={styles.slewKey} aria-label="Slew right">&rarr;</button>
         </div>
 
-        {/* Alphabetical keyboard + Numeric keypad */}
+        {/* Keyboard */}
         <MCDUKeyboard
           onKey={handleKeyPress}
           onClear={handleKeyClear}

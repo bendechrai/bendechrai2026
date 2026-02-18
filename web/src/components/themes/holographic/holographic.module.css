@@ -236,6 +236,47 @@
   color: #00DCDC;
 }
 
+/* ===== Article Image ===== */
+.articleImageWrap {
+  position: relative;
+  margin: 0.75rem 0;
+  overflow: hidden;
+}
+
+.articleImageWrap::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(0, 220, 220, 0.2) 0%,
+    rgba(220, 0, 220, 0.12) 50%,
+    rgba(0, 220, 220, 0.2) 100%
+  );
+  mix-blend-mode: overlay;
+  pointer-events: none;
+}
+
+.articleImage {
+  width: 100%;
+  max-height: 220px;
+  object-fit: cover;
+  filter: brightness(0.8) contrast(1.1) saturate(0.7);
+  border: 1px solid rgba(0, 220, 220, 0.2);
+  display: block;
+}
+
+.articleBody {
+  font-weight: 300;
+  font-size: 0.85rem;
+  line-height: 1.7;
+  color: rgba(228, 239, 240, 0.75);
+}
+
+.articleBody p {
+  margin: 0 0 0.5rem 0;
+}
+
 /* ===== Empty Hint ===== */
 .emptyHint {
   text-align: center;

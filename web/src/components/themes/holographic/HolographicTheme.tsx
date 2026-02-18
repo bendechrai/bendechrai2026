@@ -105,7 +105,19 @@ function PanelContent({ id, articleSlug, navigate }: { id: PanelId; articleSlug:
               <div className={styles.dataLine} style={{ flexDirection: "column", gap: "0.25rem" }}>
                 <span>{article.title}</span>
                 <span className={styles.holoDetail}>{formatDate(article.date)}</span>
+                {article.image && (
+                  <div className={styles.articleImageWrap}>
+                    <img src={article.image} alt="" className={styles.articleImage} />
+                  </div>
+                )}
                 <span className={styles.holoDetail} style={{ lineHeight: 1.6 }}>{article.summary}</span>
+                {article.body && (
+                  <div className={styles.articleBody}>
+                    {article.body.split("\n\n").map((para, i) => (
+                      <p key={i}>{para}</p>
+                    ))}
+                  </div>
+                )}
               </div>
             </>
           );

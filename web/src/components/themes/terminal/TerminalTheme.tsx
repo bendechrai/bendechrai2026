@@ -10,8 +10,9 @@ import styles from "./terminal.module.css";
 interface TerminalLine {
   id: number;
   text: string;
-  type: "output" | "input" | "header" | "separator" | "menu" | "ascii" | "link";
+  type: "output" | "input" | "header" | "separator" | "menu" | "ascii" | "link" | "image";
   href?: string;
+  imageSrc?: string;
 }
 
 const WELCOME_LINES: TerminalLine[] = [
@@ -266,7 +267,7 @@ export default function TerminalTheme() {
       if (articleSlug) {
         const article = getArticleBySlug(articleSlug);
         if (article) {
-          addLines([
+          const articleLines: (string | { text: string; href: string })[] = [
             "",
             "── ARTICLE ───────────────",
             "",
@@ -275,7 +276,24 @@ export default function TerminalTheme() {
             "",
             `  ${article.summary}`,
             "",
+          ];
+          // Add body paragraphs
+          if (article.body) {
+            articleLines.push("  ──────────────────────────");
+            articleLines.push("");
+            for (const para of article.body.split("\n\n")) {
+              articleLines.push(`  ${para}`);
+              articleLines.push("");
+            }
+          }
+          // Add image as a special line
+          const startId = nextIdRef.current;
+          nextIdRef.current += 1;
+          setLines((old) => [
+            ...old,
+            { id: startId, text: "", type: "image" as const, imageSrc: article.image },
           ]);
+          addLines(articleLines);
         }
       } else if (section !== "home") {
         const sectionCommands: Record<string, string> = {
@@ -334,7 +352,9 @@ export default function TerminalTheme() {
                           : ""
               }`}
             >
-              {line.href ? (
+              {line.type === "image" && line.imageSrc ? (
+                <img src={line.imageSrc} alt="" className={styles.articleImage} />
+              ) : line.href ? (
                 <a href={line.href} target="_blank" rel="noopener noreferrer" className={styles.termLink}>
                   {line.text}
                 </a>

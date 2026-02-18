@@ -66,7 +66,15 @@ function SectionContent({ section, articleSlug, navigate }: { section: StarshipS
               </button>
               <h2 className={styles.contentTitle}>{article.title}</h2>
               <p className={styles.contentText}>{formatDate(article.date)}</p>
+              {article.image && <img src={article.image} alt="" className={styles.articleImage} />}
               <p className={styles.contentText} style={{ lineHeight: 1.6 }}>{article.summary}</p>
+              {article.body && (
+                <div className={styles.articleBody}>
+                  {article.body.split("\n\n").map((para, i) => (
+                    <p key={i}>{para}</p>
+                  ))}
+                </div>
+              )}
             </>
           );
         }
