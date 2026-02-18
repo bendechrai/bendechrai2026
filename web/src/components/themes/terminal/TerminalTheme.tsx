@@ -13,6 +13,7 @@ interface TerminalLine {
   type: "output" | "input" | "header" | "separator" | "menu" | "ascii" | "link" | "image";
   href?: string;
   imageSrc?: string;
+  onClick?: () => void;
 }
 
 const WELCOME_LINES: TerminalLine[] = [
@@ -24,15 +25,16 @@ const WELCOME_LINES: TerminalLine[] = [
   { id: 6, text: "", type: "output" },
   { id: 7, text: "Available commands:", type: "output" },
   { id: 8, text: "", type: "output" },
-  { id: 9, text: "  1) articles  - Published writings", type: "menu" },
-  { id: 10, text: "  2) events    - Upcoming appearances", type: "menu" },
-  { id: 11, text: "  3) talks     - Talks & workshops", type: "menu" },
-  { id: 12, text: "  4) contact   - Subspace relay", type: "menu" },
-  { id: 13, text: "  5) help      - Show this menu", type: "menu" },
-  { id: 14, text: "  6) theme <n> - Change visual theme", type: "menu" },
-  { id: 15, text: "", type: "output" },
-  { id: 16, text: "Type a command or number to continue.", type: "output" },
-  { id: 17, text: "", type: "output" },
+  { id: 9, text: "  1) articles    - Published writings", type: "menu" },
+  { id: 10, text: "  2) events      - Upcoming appearances", type: "menu" },
+  { id: 11, text: "  3) talks       - Talks & workshops", type: "menu" },
+  { id: 12, text: "  4) contact     - Subspace relay", type: "menu" },
+  { id: 13, text: "  5) help        - Show this menu", type: "menu" },
+  { id: 14, text: "  6) theme <n>   - Change visual theme", type: "menu" },
+  { id: 15, text: "     read <n>    - Open article by number", type: "menu" },
+  { id: 16, text: "", type: "output" },
+  { id: 17, text: "Type a command or number to continue.", type: "output" },
+  { id: 18, text: "", type: "output" },
 ];
 
 type MessageStep = "idle" | "handle" | "body" | "confirm";
@@ -85,6 +87,44 @@ export default function TerminalTheme() {
     const d = new Date(dateStr + "T00:00:00");
     return d.toLocaleDateString("en-AU", { day: "2-digit", month: "short", year: "numeric" });
   };
+
+  const showArticle = useCallback(
+    (slug: string) => {
+      const article = getArticleBySlug(slug);
+      if (!article) {
+        addLines(["", `  Article not found: ${slug}`, ""]);
+        return;
+      }
+      const articleLines: string[] = [
+        "",
+        "── ARTICLE ───────────────",
+        "",
+        `  ${article.title}`,
+        `  ${formatDate(article.date)}`,
+        "",
+        `  ${article.summary}`,
+        "",
+      ];
+      if (article.body) {
+        articleLines.push("  ──────────────────────────");
+        articleLines.push("");
+        for (const para of article.body.split("\n\n")) {
+          articleLines.push(`  ${para}`);
+          articleLines.push("");
+        }
+      }
+      if (article.image) {
+        const imgId = nextIdRef.current;
+        nextIdRef.current += 1;
+        setLines((old) => [
+          ...old,
+          { id: imgId, text: "", type: "image" as const, imageSrc: article.image },
+        ]);
+      }
+      addLines(articleLines);
+    },
+    [addLines],
+  );
 
   const handleCommand = useCallback(
     (cmd: string) => {
@@ -161,6 +201,7 @@ export default function TerminalTheme() {
             "    4) contact     - Subspace relay",
             "    5) help        - Show this menu",
             "    6) theme <n>   - Change visual theme",
+            "       read <n>    - Open article by number",
             "",
           ],
           "menu",
@@ -169,18 +210,27 @@ export default function TerminalTheme() {
         setLines([]);
       } else if (trimmed === "articles" || trimmed === "1") {
         navigate("/articles");
-        const articleLines: (string | { text: string; href: string })[] = [
-          "",
-          "── ARTICLES ──────────────",
-          "",
-        ];
-        ARTICLES.forEach((a) => {
-          articleLines.push(`  [${formatDate(a.date)}]`);
-          articleLines.push(`  ${a.title}`);
-          articleLines.push(`  ${a.summary}`);
-          articleLines.push("");
+        addLines(["", "── ARTICLES ──────────────", ""]);
+        ARTICLES.forEach((a, idx) => {
+          const startId = nextIdRef.current;
+          nextIdRef.current += 4;
+          setLines((old) => [
+            ...old,
+            { id: startId, text: `  [${idx + 1}] ${formatDate(a.date)}`, type: "output" },
+            {
+              id: startId + 1,
+              text: `  ${a.title}`,
+              type: "link" as const,
+              onClick: () => {
+                navigate(`/articles/${a.slug}`);
+                showArticle(a.slug);
+              },
+            },
+            { id: startId + 2, text: `  ${a.summary}`, type: "output" },
+            { id: startId + 3, text: "", type: "output" },
+          ]);
         });
-        addLines(articleLines);
+        addLines(["  Type 'read <number>' to open an article.", ""]);
       } else if (trimmed === "events" || trimmed === "2") {
         navigate("/events");
         const eventLines: (string | { text: string; href: string })[] = [
@@ -233,6 +283,21 @@ export default function TerminalTheme() {
           "",
         ]);
         setMsgStep("handle");
+      } else if (trimmed.startsWith("read ")) {
+        const arg = trimmed.slice(5).trim();
+        const num = parseInt(arg, 10);
+        let slug: string | undefined;
+        if (!isNaN(num) && num >= 1 && num <= ARTICLES.length) {
+          slug = ARTICLES[num - 1].slug;
+        } else {
+          slug = ARTICLES.find((a) => a.slug === arg)?.slug;
+        }
+        if (slug) {
+          navigate(`/articles/${slug}`);
+          showArticle(slug);
+        } else {
+          addLines(["", `  Article not found: ${arg}`, "  Usage: read <number> or read <slug>", ""]);
+        }
       } else if (trimmed.startsWith("theme ") || trimmed === "6") {
         const themeName = trimmed === "6" ? "" : trimmed.slice(6).trim();
         const validThemes = ["starship", "cyberpunk", "terminal", "holographic", "retro", "fms"];
@@ -256,7 +321,7 @@ export default function TerminalTheme() {
         ]);
       }
     },
-    [addLines, setTheme, msgStep, msgHandle, msgBody, navigate],
+    [addLines, setTheme, msgStep, msgHandle, msgBody, navigate, showArticle],
   );
 
   // Auto-display content based on URL section on mount
@@ -358,6 +423,10 @@ export default function TerminalTheme() {
                 <a href={line.href} target="_blank" rel="noopener noreferrer" className={styles.termLink}>
                   {line.text}
                 </a>
+              ) : line.onClick ? (
+                <span className={styles.termLink} onClick={line.onClick} style={{ cursor: "pointer" }}>
+                  {line.text}
+                </span>
               ) : (
                 line.text || "\u00A0"
               )}
