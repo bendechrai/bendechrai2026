@@ -309,11 +309,14 @@ function MCDUKeyboard({ onKey, onClear, onSpace }: {
   onClear: () => void;
   onSpace: () => void;
 }) {
-  // Alphabetical layout, not QWERTY
+  // 5x6 alphabetical grid (reading left-to-right, top-to-bottom)
   const alphaRows = [
-    ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"],
-    ["K", "L", "M", "N", "O", "P", "Q", "R", "S"],
-    ["T", "U", "V", "W", "X", "Y", "Z"],
+    ["A", "B", "C", "D", "E"],
+    ["F", "G", "H", "I", "J"],
+    ["K", "L", "M", "N", "O"],
+    ["P", "Q", "R", "S", "T"],
+    ["U", "V", "W", "X", "Y"],
+    ["Z", "SP", "/", "CLR", "OVFY"],
   ];
   // E, N, S, W are compass keys (boxed on real MCDU)
   const compassKeys = new Set(["E", "N", "S", "W"]);
@@ -325,33 +328,17 @@ function MCDUKeyboard({ onKey, onClear, onSpace }: {
     [".", "0", "+/-"],
   ];
 
+  const handleAlphaKey = (k: string) => {
+    if (k === "SP") onSpace();
+    else if (k === "CLR") onClear();
+    else if (k === "OVFY") onKey(".");
+    else if (k === "/") onKey("/");
+    else onKey(k);
+  };
+
   return (
     <div className={styles.inputArea}>
-      {/* Left: Alphabetical keys */}
-      <div className={styles.alphaKeys}>
-        {alphaRows.map((row, ri) => (
-          <div key={ri} className={styles.alphaRow}>
-            {row.map((k) => (
-              <button
-                key={k}
-                className={`${styles.key} ${compassKeys.has(k) ? styles.keyCompass : ""}`}
-                onClick={() => onKey(k)}
-              >
-                {k}
-              </button>
-            ))}
-          </div>
-        ))}
-        {/* Special keys row */}
-        <div className={styles.alphaRow}>
-          <button className={`${styles.key} ${styles.keySpecial} ${styles.keySp}`} onClick={onSpace}>SP</button>
-          <button className={`${styles.key} ${styles.keySpecial}`} onClick={() => onKey("/")}>/</button>
-          <button className={`${styles.key} ${styles.keySpecial} ${styles.keyClear}`} onClick={onClear}>CLR</button>
-          <button className={`${styles.key} ${styles.keySpecial}`} onClick={() => onKey(".")}>OVFY</button>
-        </div>
-      </div>
-
-      {/* Right: Numeric keypad */}
+      {/* Left: Numeric keypad */}
       <div className={styles.numericArea}>
         {numRows.map((row, ri) => (
           <div key={ri} className={styles.numRow}>
@@ -360,6 +347,23 @@ function MCDUKeyboard({ onKey, onClear, onSpace }: {
                 key={k}
                 className={`${styles.key} ${k === "+/-" ? styles.keySpecial : ""}`}
                 onClick={() => onKey(k === "+/-" ? "-" : k)}
+              >
+                {k}
+              </button>
+            ))}
+          </div>
+        ))}
+      </div>
+
+      {/* Right: 5x6 Alphabetical grid */}
+      <div className={styles.alphaKeys}>
+        {alphaRows.map((row, ri) => (
+          <div key={ri} className={styles.alphaRow}>
+            {row.map((k) => (
+              <button
+                key={k}
+                className={`${styles.key} ${compassKeys.has(k) ? styles.keyCompass : ""} ${k === "CLR" ? styles.keyClear : ""} ${["SP", "/", "CLR", "OVFY"].includes(k) ? styles.keySpecial : ""}`}
+                onClick={() => handleAlphaKey(k)}
               >
                 {k}
               </button>
