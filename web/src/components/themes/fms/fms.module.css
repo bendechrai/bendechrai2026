@@ -60,14 +60,16 @@
   position: relative;
 }
 
-/* Dark screen background spanning the full middle column */
+/* Dark screen background — absolutely positioned so it doesn't block grid auto-placement */
 .screenBg {
-  grid-column: 2;
-  grid-row: 1 / -1;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 28px;
+  right: 28px;
   background: #080808;
   border: 2px solid #222;
   border-radius: 3px;
-  position: relative;
 }
 
 /* Scanline CRT effect over the screen background */
