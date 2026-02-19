@@ -66,7 +66,7 @@ const colorClass = (c?: string) => {
   }
 };
 
-// Render exactly 6 data rows (label+data pairs), one per LSK
+// Render 6 row pairs as flat grid cells (4 cells per pair: label-left, label-right, data-left, data-right)
 function ScreenRows({ rows }: { rows: ScreenRowData[] }) {
   const padded = [...rows];
   while (padded.length < 6) padded.push({});
@@ -75,40 +75,42 @@ function ScreenRows({ rows }: { rows: ScreenRowData[] }) {
     <>
       {padded.slice(0, 6).map((row, i) => (
         <div key={i} className={styles.rowPair}>
-          {/* Label line */}
-          <div className={styles.labelRow}>
+          {/* Label left */}
+          <div className={`${styles.cell} ${styles.cellLeft}`}>
             <span className={`${styles.label} ${row.onLeftClick ? styles.labelAmber : ""}`}>
               {row.leftLabel || "\u00A0"}
             </span>
+          </div>
+          {/* Label right */}
+          <div className={`${styles.cell} ${styles.cellRight}`}>
             <span className={`${styles.label} ${row.onRightClick ? styles.labelAmber : ""}`}>
               {row.rightLabel || "\u00A0"}
             </span>
           </div>
-          {/* Data line */}
-          <div className={styles.screenRow}>
+          {/* Data left */}
+          <div className={`${styles.cell} ${styles.cellLeft}`}>
             {row.leftHref ? (
               <a href={row.leftHref} target="_blank" rel="noopener noreferrer" className={styles.socialLink}>
-                <span className={`${colorClass(row.leftColor)} ${row.leftSmall ? styles.dataSmall : ""}`}>
-                  {row.leftData || "\u00A0"}
-                </span>
+                <span className={colorClass(row.leftColor)}>{row.leftData || "\u00A0"}</span>
               </a>
             ) : (
               <span
-                className={`${colorClass(row.leftColor)} ${row.leftSmall ? styles.dataSmall : ""} ${row.onLeftClick ? styles.lskData : ""}`}
+                className={`${colorClass(row.leftColor)} ${row.onLeftClick ? styles.lskData : ""}`}
                 onClick={row.onLeftClick}
               >
                 {row.leftData || "\u00A0"}
               </span>
             )}
+          </div>
+          {/* Data right */}
+          <div className={`${styles.cell} ${styles.cellRight}`}>
             {row.rightHref ? (
               <a href={row.rightHref} target="_blank" rel="noopener noreferrer" className={styles.socialLink}>
-                <span className={`${colorClass(row.rightColor)} ${row.rightSmall ? styles.dataSmall : ""}`}>
-                  {row.rightData || "\u00A0"}
-                </span>
+                <span className={colorClass(row.rightColor)}>{row.rightData || "\u00A0"}</span>
               </a>
             ) : (
               <span
-                className={`${colorClass(row.rightColor)} ${row.rightSmall ? styles.dataSmall : ""} ${row.onRightClick ? styles.lskData : ""}`}
+                className={`${colorClass(row.rightColor)} ${row.onRightClick ? styles.lskData : ""}`}
                 onClick={row.onRightClick}
               >
                 {row.rightData || "\u00A0"}
@@ -299,76 +301,19 @@ function AtcCommRows({
   }
 
   return (
-    <>
-      {/* Row 1: From field — L1 loads scratchpad here */}
-      <div className={styles.rowPair}>
-        <div className={styles.labelRow}>
-          <span className={`${styles.label} ${styles.labelAmber}`}>FROM</span>
-          <span className={styles.label}>{"\u00A0"}</span>
-        </div>
-        <div className={styles.screenRow}>
-          <span className={name ? styles.dataCyan : styles.dataAmber}>
-            {name || "\u00A0"}
-          </span>
-          <span>{"\u00A0"}</span>
-        </div>
-      </div>
-      {/* Row 2: Message field — L2 loads scratchpad here */}
-      <div className={styles.rowPair}>
-        <div className={styles.labelRow}>
-          <span className={`${styles.label} ${styles.labelAmber}`}>MESSAGE</span>
-          <span className={styles.label}>{"\u00A0"}</span>
-        </div>
-        <div className={styles.screenRow}>
-          <span className={message ? styles.dataCyan : styles.dataAmber}>
-            {message ? message.slice(0, 30) + (message.length > 30 ? "..." : "") : "\u00A0"}
-          </span>
-          <span>{"\u00A0"}</span>
-        </div>
-      </div>
-      {/* Row 3: Message continued */}
-      <div className={styles.rowPair}>
-        <div className={styles.labelRow}>
-          <span className={styles.label}>{message.length > 30 ? "MSG CONT" : "\u00A0"}</span>
-        </div>
-        <div className={styles.screenRow}>
-          <span className={`${styles.dataGreen} ${styles.dataSmall}`}>
-            {message.length > 30 ? message.slice(30, 80) + (message.length > 80 ? "..." : "") : "\u00A0"}
-          </span>
-        </div>
-      </div>
-      {/* Row 4: Instructions */}
-      <div className={styles.rowPair}>
-        <div className={styles.labelRow}><span className={styles.label}>{"\u00A0"}</span></div>
-        <div className={styles.screenRow}>
-          <span className={`${styles.dataWhite} ${styles.dataSmall}`}>
-            {!name ? "TYPE IN SCRATCHPAD, PRESS L1" : !message ? "TYPE IN SCRATCHPAD, PRESS L2" : "\u00A0"}
-          </span>
-        </div>
-      </div>
-      {/* Row 5: empty */}
-      <div className={styles.rowPair}>
-        <div className={styles.labelRow}><span className={styles.label}>{"\u00A0"}</span></div>
-        <div className={styles.screenRow}><span>{"\u00A0"}</span></div>
-      </div>
-      {/* Row 6: Send */}
-      <div className={styles.rowPair}>
-        <div className={styles.labelRow}>
-          <span className={styles.label}>{"\u00A0"}</span>
-          <span className={`${styles.label} ${name.trim() && message.trim() ? styles.labelAmber : ""}`}>
-            {sending ? "TRANSMITTING" : name.trim() && message.trim() ? "SEND *" : "\u00A0"}
-          </span>
-        </div>
-        <div className={styles.screenRow}>
-          <span>{"\u00A0"}</span>
-          {name.trim() && message.trim() && !sending ? (
-            <span className={`${styles.dataAmber} ${styles.lskData}`} onClick={onSend}>TRANSMIT</span>
-          ) : (
-            <span>{"\u00A0"}</span>
-          )}
-        </div>
-      </div>
-    </>
+    <ScreenRows rows={[
+      { leftLabel: "FROM", leftData: name || "\u00A0", leftColor: name ? "cyan" : "amber", onLeftClick: () => {} },
+      { leftLabel: "MESSAGE", leftData: message ? message.slice(0, 30) + (message.length > 30 ? "..." : "") : "\u00A0", leftColor: message ? "cyan" : "amber", onLeftClick: () => {} },
+      { leftLabel: message.length > 30 ? "MSG CONT" : undefined, leftData: message.length > 30 ? message.slice(30, 80) + (message.length > 80 ? "..." : "") : undefined, leftColor: "green" },
+      { leftData: !name ? "TYPE IN SCRATCHPAD, PRESS L1" : !message ? "TYPE IN SCRATCHPAD, PRESS L2" : undefined, leftColor: "white" },
+      {},
+      {
+        rightLabel: sending ? "TRANSMITTING" : name.trim() && message.trim() ? "SEND *" : undefined,
+        rightData: name.trim() && message.trim() && !sending ? "TRANSMIT" : undefined,
+        rightColor: "amber",
+        onRightClick: name.trim() && message.trim() && !sending ? onSend : undefined,
+      },
+    ]} />
   );
 }
 

@@ -51,12 +51,11 @@
   color: #ff8800;
 }
 
-/* Screen + LSK area: 14-row uniform grid */
+/* Screen + LSK area: flat 2×14 grid */
 .screenArea {
   display: grid;
-  grid-template-columns: 28px 1fr 28px;
+  grid-template-columns: 28px 1fr 1fr 28px;
   grid-template-rows: repeat(14, 1fr);
-  gap: 0;
   position: relative;
 }
 
@@ -88,15 +87,14 @@
   border-radius: 3px;
 }
 
-/* Title area — row 1 of 14 */
+/* Title area — row 1, spans both content columns */
 .screenTitleArea {
-  grid-column: 2;
+  grid-column: 2 / 4;
   grid-row: 1;
   z-index: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0 8px;
 }
 
 /* LSK columns — span rows 2-13 (the 6 label+data pairs) */
@@ -108,7 +106,7 @@
 }
 
 .lskRight {
-  grid-column: 3;
+  grid-column: 4;
   grid-row: 2 / 14;
   display: grid;
   grid-template-rows: repeat(6, 1fr);
@@ -139,27 +137,43 @@
   border-color: #888;
 }
 
-/* Data rows wrapper — transparent, children participate in outer grid directly */
+/* Transparent wrappers — children go directly into outer grid */
 .screenRowsArea {
   display: contents;
 }
 
-/* Row pair wrapper — also transparent */
 .rowPair {
   display: contents;
 }
 
-/* Scratchpad area — row 14 of 14 */
-.screenScratchArea {
+/* Universal grid cell — no padding/margin, text handles its own spacing */
+.cell {
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.cellLeft {
   grid-column: 2;
+}
+
+.cellRight {
+  grid-column: 3;
+  justify-content: flex-end;
+}
+
+/* Scratchpad area — row 14, spans both content columns */
+.screenScratchArea {
+  grid-column: 2 / 4;
   grid-row: 14;
   z-index: 1;
-  padding: 0 8px;
   display: flex;
   align-items: center;
 }
 
-/* Page title line (row 1 of 14) */
+/* Page title */
 .pageTitle {
   color: #ffffff;
   font-size: 13px;
@@ -168,65 +182,58 @@
   font-weight: 700;
   text-transform: uppercase;
   line-height: 1;
+  padding: 0 4px;
   position: relative;
 }
 
-/* A screen data row: one of the 14 uniform rows */
-.screenRow {
-  grid-column: 2;
-  z-index: 1;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 8px;
-}
-
-/* Label text — same size as data for uniform rows */
+/* Label text */
 .label {
   color: #ffffff;
   font-size: 13px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   line-height: 1;
+  padding: 0 4px;
 }
 
 .labelAmber {
   color: #ffaa00;
 }
 
-/* Data values — uniform size */
+/* Data values — padding on text, not on cell */
 .dataGreen {
   color: #00ff00;
   font-size: 13px;
   line-height: 1;
+  padding: 0 4px;
 }
 
 .dataWhite {
   color: #ffffff;
   font-size: 13px;
   line-height: 1;
+  padding: 0 4px;
 }
 
 .dataCyan {
   color: #44ddff;
   font-size: 13px;
   line-height: 1;
+  padding: 0 4px;
 }
 
 .dataAmber {
   color: #ffaa00;
   font-size: 13px;
   line-height: 1;
+  padding: 0 4px;
 }
 
 .dataMagenta {
   color: #ff44ff;
   font-size: 13px;
   line-height: 1;
-}
-
-.dataSmall {
-  /* no-op: uniform sizing */
+  padding: 0 4px;
 }
 
 /* Clickable LSK data */
@@ -239,25 +246,6 @@
   opacity: 0.8;
 }
 
-/* Left-aligned and right-aligned within a row */
-.left {
-  text-align: left;
-}
-
-.right {
-  text-align: right;
-}
-
-/* Label row — one of the 14 uniform rows */
-.labelRow {
-  grid-column: 2;
-  z-index: 1;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 8px;
-}
-
 .scratchpadInput {
   flex: 1;
   background: transparent;
@@ -267,7 +255,7 @@
   font-size: 13px;
   outline: none;
   caret-color: #00ff00;
-  padding: 0;
+  padding: 0 4px;
   line-height: 1;
 }
 
@@ -280,6 +268,7 @@
   color: #ffaa00;
   font-size: 13px;
   line-height: 1;
+  padding: 0 4px;
 }
 
 /* Page arrow indicators on screen */
@@ -456,71 +445,6 @@
   min-width: 42px;
 }
 
-/* Message field on screen (for COMMS page) */
-.msgFieldRow {
-  display: flex;
-  align-items: flex-end;
-  padding: 0 4px;
-  min-height: 18px;
-  cursor: pointer;
-}
-
-.msgLabel {
-  color: #ffffff;
-  font-size: 13px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  min-width: 48px;
-}
-
-.msgValue {
-  color: #44ddff;
-  font-size: 13px;
-  flex: 1;
-  min-height: 1em;
-  word-break: break-all;
-}
-
-.msgValueActive {
-  color: #00ff00;
-}
-
-.msgTextValue {
-  color: #44ddff;
-  font-size: 13px;
-  padding: 0 4px;
-  line-height: 1;
-  word-break: break-word;
-  white-space: pre-wrap;
-  min-height: 40px;
-  cursor: pointer;
-}
-
-.msgTextValueActive {
-  color: #00ff00;
-}
-
-.msgSent {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  padding: 16px 4px;
-}
-
-.msgSentTitle {
-  color: #00ff00;
-  font-size: 13px;
-  font-weight: 700;
-}
-
-.msgSentText {
-  color: #ffffff;
-  font-size: 13px;
-  letter-spacing: 0.05em;
-}
 
 /* Social link */
 .socialLink {
