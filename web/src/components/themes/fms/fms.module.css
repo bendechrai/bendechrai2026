@@ -94,7 +94,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0 4px;
+  padding: 0 8px;
 }
 
 /* LSK columns — span rows 2-13 (the 6 label+data pairs) */
@@ -137,17 +137,12 @@
   border-color: #888;
 }
 
-/* Data rows area — rows 2-13 flanked by LSKs */
+/* Data rows wrapper — transparent, children participate in outer grid directly */
 .screenRowsArea {
-  grid-column: 2;
-  grid-row: 2 / 14;
-  z-index: 1;
-  display: grid;
-  grid-template-rows: repeat(12, 1fr);
-  padding: 0 4px;
+  display: contents;
 }
 
-/* Row pair wrapper is transparent to grid — children become direct grid items */
+/* Row pair wrapper — also transparent */
 .rowPair {
   display: contents;
 }
@@ -157,7 +152,7 @@
   grid-column: 2;
   grid-row: 14;
   z-index: 1;
-  padding: 0 4px;
+  padding: 0 8px;
   display: flex;
   align-items: center;
 }
@@ -176,10 +171,12 @@
 
 /* A screen data row: one of the 14 uniform rows */
 .screenRow {
+  grid-column: 2;
+  z-index: 1;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 4px;
+  padding: 0 8px;
 }
 
 /* Label text — same size as data for uniform rows */
@@ -251,10 +248,12 @@
 
 /* Label row — one of the 14 uniform rows */
 .labelRow {
+  grid-column: 2;
+  z-index: 1;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 4px;
+  padding: 0 8px;
 }
 
 .scratchpadInput {
