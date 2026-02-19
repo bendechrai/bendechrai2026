@@ -276,16 +276,12 @@ function buildPerfRows(page: number): { rows: ScreenRowData[]; totalPages: numbe
 // ============ ATC COMM page (special - has message form) ============
 
 function AtcCommScreen({
-  activeField,
-  setActiveField,
   name,
   message,
   msgSent,
   onSend,
   sending,
 }: {
-  activeField: "name" | "message";
-  setActiveField: (f: "name" | "message") => void;
   name: string;
   message: string;
   msgSent: boolean;
@@ -308,43 +304,27 @@ function AtcCommScreen({
   return (
     <>
       <div className={styles.pageTitle}>ATC COMM</div>
-      {/* Row 1: From label/field */}
+      {/* Row 1: From field — L1 loads scratchpad here */}
       <div className={styles.labelRow}>
-        <span className={styles.label}>FROM</span>
-        <span className={styles.label}>{activeField === "name" ? "EDITING" : "\u00A0"}</span>
+        <span className={`${styles.label} ${styles.labelAmber}`}>FROM</span>
+        <span className={styles.label}>{"\u00A0"}</span>
       </div>
       <div className={styles.screenRow}>
-        <span
-          className={`${activeField === "name" ? styles.dataGreen : styles.dataCyan} ${styles.lskData}`}
-          onClick={() => setActiveField("name")}
-        >
-          {name || "[ ]"}{activeField === "name" ? "_" : ""}
+        <span className={name ? styles.dataCyan : styles.dataAmber}>
+          {name || "[ ]"}
         </span>
-        <span
-          className={`${styles.dataCyan} ${styles.lskData}`}
-          onClick={() => setActiveField("name")}
-        >
-          {activeField !== "name" ? "SELECT" : "\u00A0"}
-        </span>
+        <span>{"\u00A0"}</span>
       </div>
-      {/* Row 2: Message label/field */}
+      {/* Row 2: Message field — L2 loads scratchpad here */}
       <div className={styles.labelRow}>
-        <span className={styles.label}>MESSAGE</span>
-        <span className={styles.label}>{activeField === "message" ? "EDITING" : "\u00A0"}</span>
+        <span className={`${styles.label} ${styles.labelAmber}`}>MESSAGE</span>
+        <span className={styles.label}>{"\u00A0"}</span>
       </div>
       <div className={styles.screenRow}>
-        <span
-          className={`${activeField === "message" ? styles.dataGreen : styles.dataCyan} ${styles.lskData}`}
-          onClick={() => setActiveField("message")}
-        >
-          {(message || "[ ]").slice(0, 30)}{message.length > 30 ? "..." : ""}{activeField === "message" ? "_" : ""}
+        <span className={message ? styles.dataCyan : styles.dataAmber}>
+          {message ? message.slice(0, 30) + (message.length > 30 ? "..." : "") : "[ ]"}
         </span>
-        <span
-          className={`${styles.dataCyan} ${styles.lskData}`}
-          onClick={() => setActiveField("message")}
-        >
-          {activeField !== "message" ? "SELECT" : "\u00A0"}
-        </span>
+        <span>{"\u00A0"}</span>
       </div>
       {/* Row 3: Message continued */}
       <div className={styles.labelRow}>
@@ -355,9 +335,13 @@ function AtcCommScreen({
           {message.length > 30 ? message.slice(30, 80) + (message.length > 80 ? "..." : "") : "\u00A0"}
         </span>
       </div>
-      {/* Row 4: empty */}
+      {/* Row 4: Instructions */}
       <div className={styles.labelRow}><span className={styles.label}>{"\u00A0"}</span></div>
-      <div className={styles.screenRow}><span>{"\u00A0"}</span></div>
+      <div className={styles.screenRow}>
+        <span className={`${styles.dataWhite} ${styles.dataSmall}`}>
+          {!name ? "TYPE IN SCRATCHPAD, PRESS L1" : !message ? "TYPE IN SCRATCHPAD, PRESS L2" : "\u00A0"}
+        </span>
+      </div>
       {/* Row 5: empty */}
       <div className={styles.labelRow}><span className={styles.label}>{"\u00A0"}</span></div>
       <div className={styles.screenRow}><span>{"\u00A0"}</span></div>
@@ -470,7 +454,6 @@ export default function FmsTheme() {
   }, [activePage, articleSlug]);
 
   // COMMS page state
-  const [activeField, setActiveField] = useState<"name" | "message">("name");
   const [msgName, setMsgName] = useState("");
   const [msgBody, setMsgBody] = useState("");
   const [msgSent, setMsgSent] = useState(false);
@@ -510,38 +493,21 @@ export default function FmsTheme() {
     }
   };
 
-  // Keyboard key press routing
+  // Keyboard key press routing — always writes to scratchpad
   const handleKeyPress = useCallback(
     (key: string) => {
-      if (activePage === "atcComm") {
-        if (activeField === "name") {
-          setMsgName((prev) => prev + key);
-        } else {
-          setMsgBody((prev) => prev + key);
-        }
-      } else {
-        setScratchpad((prev) => prev + key);
-        scratchRef.current?.focus();
-      }
+      setScratchpad((prev) => prev + key);
     },
-    [activePage, activeField],
+    [],
   );
 
   const handleKeyClear = useCallback(() => {
-    if (activePage === "atcComm") {
-      if (activeField === "name") {
-        setMsgName((prev) => prev.slice(0, -1));
-      } else {
-        setMsgBody((prev) => prev.slice(0, -1));
-      }
-    } else {
-      setScratchpad((prev) => prev.slice(0, -1));
-    }
-  }, [activePage, activeField]);
+    setScratchpad((prev) => prev.slice(0, -1));
+  }, []);
 
   const handleKeySpace = useCallback(() => {
-    handleKeyPress(" ");
-  }, [handleKeyPress]);
+    setScratchpad((prev) => prev + " ");
+  }, []);
 
   const handleSendMessage = useCallback(async () => {
     if (!msgName.trim() || !msgBody.trim() || sending) return;
@@ -601,10 +567,17 @@ export default function FmsTheme() {
   const handleLsk = useCallback(
     (side: "left" | "right", row: number) => {
       if (activePage === "atcComm") {
-        if (side === "left" && row === 1) setActiveField("name");
-        else if (side === "left" && row === 2) setActiveField("message");
-        else if (side === "right" && row === 1) setActiveField("name");
-        else if (side === "right" && row === 2) setActiveField("message");
+        // L1: load scratchpad into FROM field
+        if (side === "left" && row === 1 && scratchpad.trim()) {
+          setMsgName(scratchpad.trim());
+          setScratchpad("");
+        }
+        // L2: load scratchpad into MESSAGE field
+        else if (side === "left" && row === 2 && scratchpad.trim()) {
+          setMsgBody(scratchpad.trim());
+          setScratchpad("");
+        }
+        // R6: transmit
         else if (side === "right" && row === 6) handleSendMessage();
         return;
       }
@@ -640,7 +613,7 @@ export default function FmsTheme() {
         else if (side === "right" && r.onRightClick) r.onRightClick();
       }
     },
-    [activePage, articleSlug, detailPage, screenRows, handleSendMessage],
+    [activePage, articleSlug, detailPage, screenRows, handleSendMessage, scratchpad],
   );
 
   // Slew keys for pagination - use ref for totalPages to avoid stale closures
@@ -674,7 +647,7 @@ export default function FmsTheme() {
   const pageKeysRow1 = [
     { id: "dir" as const, label: "DIR", page: "init" as McduPage },
     { id: "prog" as const, label: "PROG", page: "prog" as McduPage },
-    { id: "perf" as const, label: "PERF", page: "data" as McduPage },
+    { id: "perf" as const, label: "PERF", page: "perf" as McduPage },
     { id: "init" as const, label: "INIT", page: "init" as McduPage },
     { id: "data" as const, label: "DATA", page: "data" as McduPage },
     { id: "fpln" as const, label: "F-PLN", page: "fPln" as McduPage },
@@ -786,8 +759,6 @@ export default function FmsTheme() {
               <div className={styles.screen}>
                 {activePage === "atcComm" ? (
                   <AtcCommScreen
-                    activeField={activeField}
-                    setActiveField={setActiveField}
                     name={msgName}
                     message={msgBody}
                     msgSent={msgSent}
@@ -808,6 +779,7 @@ export default function FmsTheme() {
                     <input
                       ref={scratchRef}
                       type="text"
+                      inputMode="none"
                       value={scratchpad}
                       onChange={(e) => setScratchpad(e.target.value)}
                       onKeyDown={handleScratchKeyDown}
