@@ -3,7 +3,7 @@
 import { usePathname, useRouter } from "next/navigation";
 import { useCallback, useMemo } from "react";
 
-export type Section = "home" | "articles" | "events" | "talks" | "contact";
+export type Section = "home" | "articles" | "events" | "talks" | "projects" | "contact";
 
 export interface SectionState {
   section: Section;
@@ -22,6 +22,7 @@ export function useSection(): SectionState {
     if (pathname === "/articles") return { section: "articles" as Section, articleSlug: null };
     if (pathname === "/events") return { section: "events" as Section, articleSlug: null };
     if (pathname === "/talks") return { section: "talks" as Section, articleSlug: null };
+    if (pathname === "/projects") return { section: "projects" as Section, articleSlug: null };
     if (pathname === "/contact") return { section: "contact" as Section, articleSlug: null };
     return { section: "home" as Section, articleSlug: null };
   }, [pathname]);

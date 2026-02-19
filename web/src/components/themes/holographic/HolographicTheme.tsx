@@ -2,12 +2,12 @@
 
 import { useState, useRef, useCallback, useEffect } from "react";
 import { useTheme } from "@/context/ThemeContext";
-import { ARTICLES, EVENTS, TALKS, SOCIAL_LINKS, getArticleBySlug } from "@/data/content";
+import { ARTICLES, EVENTS, TALKS, PROJECTS, SOCIAL_LINKS, getArticleBySlug } from "@/data/content";
 import { sendMessage } from "@/lib/sendMessage";
 import { useSection } from "@/hooks/useSection";
 import styles from "./holographic.module.css";
 
-type PanelId = "about" | "articles" | "events" | "talks" | "contact";
+type PanelId = "about" | "articles" | "events" | "talks" | "projects" | "contact";
 
 interface PanelConfig {
   id: PanelId;
@@ -20,6 +20,7 @@ const PANELS: PanelConfig[] = [
   { id: "articles", title: "ARTICLES", path: "/articles" },
   { id: "events", title: "EVENTS", path: "/events" },
   { id: "talks", title: "TALKS", path: "/talks" },
+  { id: "projects", title: "PROJECTS", path: "/projects" },
   { id: "contact", title: "QUANTUM RELAY", path: "/contact" },
 ];
 
@@ -28,6 +29,7 @@ function sectionToPanelId(section: string): PanelId {
     case "articles": return "articles";
     case "events": return "events";
     case "talks": return "talks";
+    case "projects": return "projects";
     case "contact": return "contact";
     default: return "about";
   }
@@ -161,6 +163,21 @@ function PanelContent({ id, articleSlug, navigate }: { id: PanelId; articleSlug:
               <span>{t.title}</span>
               <span className={styles.holoDetail}>{t.event} &mdash; {formatDate(t.date)}</span>
               <span className={styles.holoDetail}>{t.description}</span>
+            </div>
+          ))}
+        </>
+      );
+    case "projects":
+      return (
+        <>
+          {PROJECTS.map((p) => (
+            <div key={p.name} className={styles.dataLine} style={{ flexDirection: "column", gap: "0.25rem" }}>
+              <span className={styles.label}>{p.status.toUpperCase()}</span>
+              <a href={p.url} target="_blank" rel="noopener noreferrer" className={styles.holoLink}>
+                {p.name}
+              </a>
+              <span className={styles.holoDetail}>{p.tagline}</span>
+              <span className={styles.holoDetail}>{p.tech.join(" / ")}</span>
             </div>
           ))}
         </>

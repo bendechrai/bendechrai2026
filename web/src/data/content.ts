@@ -23,6 +23,55 @@ export interface Talk {
   description: string;
 }
 
+export interface Project {
+  name: string;
+  url: string;
+  status: "Live" | "Beta" | "Public Beta";
+  tagline: string;
+  description: string;
+  tech: string[];
+  category: "fintech" | "devtools" | "ai";
+}
+
+export const PROJECTS: Project[] = [
+  {
+    name: "Sinking Fund",
+    url: "https://sinkingfund.up.railway.app/",
+    status: "Live",
+    tagline: "Never be caught off guard by a bill again",
+    description: "A personal finance planner that calculates exactly what to set aside each pay cycle so every obligation is covered before it hits. Features fund health tracking, balance projections, and upcoming obligation alerts. Built for the Anthropic Claude Code hackathon in Feb 2026.",
+    tech: ["TypeScript", "Node.js", "Railway"],
+    category: "fintech",
+  },
+  {
+    name: "VENNmoney",
+    url: "https://vennmoney.com/",
+    status: "Beta",
+    tagline: "Money Matters. Find Your Perspective.",
+    description: "A gamified personal finance education platform designed as a not-for-profit tool that teaches people how money actually works. Built from years of creating complex budget spreadsheets and a belief that financial literacy shouldn't be boring or inaccessible.",
+    tech: ["TypeScript", "Node.js"],
+    category: "fintech",
+  },
+  {
+    name: "Deplotify",
+    url: "https://deplotify.com/",
+    status: "Public Beta",
+    tagline: "Never miss a deployment again",
+    description: "A deployment notification SaaS for engineering teams. Get instant alerts when deployments succeed or fail, delivered to Discord and Email, with more to come! Free tier includes 5 projects and 250 notifications/month.",
+    tech: ["TypeScript", "Node.js", "Discord API"],
+    category: "devtools",
+  },
+  {
+    name: "BraidFlow",
+    url: "https://braidflow.io/",
+    status: "Beta",
+    tagline: "Finally, chats that actually go somewhere",
+    description: "An AI-powered conversation platform that turns meandering discussions into clear decisions. Uses multi-actor LLM orchestration with specialized AI personas that know when to jump in and when to stay quiet, solving context drift and poisoning in team communication.",
+    tech: ["TypeScript", "Node.js", "LLM Orchestration", "PostgreSQL"],
+    category: "ai",
+  },
+];
+
 export const SOCIAL_LINKS = {
   github: "https://github.com/bendechrai",
   linkedin: "https://www.linkedin.com/in/bendechrai/",

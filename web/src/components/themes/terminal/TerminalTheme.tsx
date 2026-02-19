@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useTheme } from "@/context/ThemeContext";
-import { ARTICLES, EVENTS, TALKS, SOCIAL_LINKS, getArticleBySlug } from "@/data/content";
+import { ARTICLES, EVENTS, TALKS, PROJECTS, SOCIAL_LINKS, getArticleBySlug } from "@/data/content";
 import { sendMessage } from "@/lib/sendMessage";
 import { useSection } from "@/hooks/useSection";
 import styles from "./terminal.module.css";
@@ -27,10 +27,11 @@ const WELCOME_LINES: TerminalLine[] = [
   { id: 9, text: "  1) articles    - Published writings", type: "menu" },
   { id: 10, text: "  2) events      - Upcoming appearances", type: "menu" },
   { id: 11, text: "  3) talks       - Talks & workshops", type: "menu" },
-  { id: 12, text: "  4) contact     - Subspace relay", type: "menu" },
-  { id: 13, text: "  5) help        - Show this menu", type: "menu" },
-  { id: 14, text: "  6) theme <n>   - Change visual theme", type: "menu" },
-  { id: 15, text: "     read <n>    - Open article by number", type: "menu" },
+  { id: 12, text: "  4) projects    - Active projects", type: "menu" },
+  { id: 13, text: "  5) contact     - Subspace relay", type: "menu" },
+  { id: 14, text: "  6) help        - Show this menu", type: "menu" },
+  { id: 15, text: "  7) theme <n>   - Change visual theme", type: "menu" },
+  { id: 16, text: "     read <n>    - Open article by number", type: "menu" },
   { id: 16, text: "", type: "output" },
   { id: 17, text: "Type a command or number to continue.", type: "output" },
   { id: 18, text: "", type: "output" },
@@ -188,7 +189,7 @@ export default function TerminalTheme() {
 
       if (trimmed === "") return;
 
-      if (trimmed === "help" || trimmed === "5") {
+      if (trimmed === "help" || trimmed === "6") {
         addLines(
           [
             "",
@@ -197,9 +198,10 @@ export default function TerminalTheme() {
             "    1) articles    - Published writings",
             "    2) events      - Upcoming appearances",
             "    3) talks       - Talks & workshops",
-            "    4) contact     - Subspace relay",
-            "    5) help        - Show this menu",
-            "    6) theme <n>   - Change visual theme",
+            "    4) projects    - Active projects",
+            "    5) contact     - Subspace relay",
+            "    6) help        - Show this menu",
+            "    7) theme <n>   - Change visual theme",
             "       read <n>    - Open article by number",
             "",
           ],
@@ -252,7 +254,23 @@ export default function TerminalTheme() {
           talkLines.push("");
         });
         addLines(talkLines);
-      } else if (trimmed === "contact" || trimmed === "4") {
+      } else if (trimmed === "projects" || trimmed === "4") {
+        navigate("/projects");
+        const projectLines: (string | { text: string; href: string })[] = [
+          "",
+          "── ACTIVE PROJECTS ───────",
+          "",
+        ];
+        PROJECTS.forEach((p) => {
+          const statusTag = `[${p.status.toUpperCase()}]`;
+          projectLines.push(`  ${statusTag} ${p.name}`);
+          projectLines.push(`  ${p.tagline}`);
+          projectLines.push(`  Tech: ${p.tech.join(", ")}`);
+          projectLines.push({ text: `  → ${p.url}`, href: p.url });
+          projectLines.push("");
+        });
+        addLines(projectLines);
+      } else if (trimmed === "contact" || trimmed === "5") {
         navigate("/contact");
         addLines([
           "",
@@ -289,8 +307,8 @@ export default function TerminalTheme() {
         } else {
           addLines(["", `  Article not found: ${arg}`, "  Usage: read <number> or read <slug>", ""]);
         }
-      } else if (trimmed.startsWith("theme ") || trimmed === "6") {
-        const themeName = trimmed === "6" ? "" : trimmed.slice(6).trim();
+      } else if (trimmed.startsWith("theme ") || trimmed === "7") {
+        const themeName = trimmed === "7" ? "" : trimmed.slice(6).trim();
         const validThemes = ["starship", "cyberpunk", "terminal", "holographic", "retro", "fms"];
         if (validThemes.includes(themeName)) {
           addLines([``, `  Switching to ${themeName} theme...`, ``]);
@@ -356,6 +374,7 @@ export default function TerminalTheme() {
           articles: "articles",
           events: "events",
           talks: "talks",
+          projects: "projects",
           contact: "contact",
         };
         const cmd = sectionCommands[section];

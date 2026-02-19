@@ -2,7 +2,7 @@
 
 import { useState, useRef, useCallback } from "react";
 import { useTheme } from "@/context/ThemeContext";
-import { ARTICLES, EVENTS, TALKS, SOCIAL_LINKS, getArticleBySlug } from "@/data/content";
+import { ARTICLES, EVENTS, TALKS, PROJECTS, SOCIAL_LINKS, getArticleBySlug } from "@/data/content";
 import { sendMessage } from "@/lib/sendMessage";
 import { useSection } from "@/hooks/useSection";
 
@@ -12,12 +12,13 @@ const SYSTEM_TIME = (() => {
 })();
 import styles from "./starship.module.css";
 
-type StarshipSection = "articles" | "events" | "talks" | "contact";
+type StarshipSection = "articles" | "events" | "talks" | "projects" | "contact";
 
 function sectionFromUrl(section: string): StarshipSection {
   switch (section) {
     case "events": return "events";
     case "talks": return "talks";
+    case "projects": return "projects";
     case "contact": return "contact";
     default: return "articles";
   }
@@ -27,6 +28,7 @@ const NAV_ITEMS: { id: StarshipSection; label: string; color: string; path: stri
   { id: "articles", label: "ARTICLES", color: "#ffaa00", path: "/articles" },
   { id: "events", label: "EVENTS", color: "#cc99ff", path: "/events" },
   { id: "talks", label: "TALKS", color: "#99ccff", path: "/talks" },
+  { id: "projects", label: "PROJECTS", color: "#66cc99", path: "/projects" },
   { id: "contact", label: "COMMS", color: "#cc6699", path: "/contact" },
 ];
 
@@ -130,6 +132,24 @@ function SectionContent({ section, articleSlug, navigate }: { section: StarshipS
           ))}
         </>
       );
+    case "projects":
+      return (
+        <>
+          <h2 className={styles.contentTitle}>ACTIVE PROJECTS</h2>
+          {PROJECTS.map((p) => (
+            <div key={p.name} className={styles.dataRow}>
+              <span className={styles.dataLabel}>{p.status.toUpperCase()}</span>
+              <div>
+                <a href={p.url} target="_blank" rel="noopener noreferrer" className={styles.themeLink}>
+                  {p.name}
+                </a>
+                <p className={styles.contentText}>{p.tagline}</p>
+                <p className={styles.contentText}>{p.tech.join(" / ")}</p>
+              </div>
+            </div>
+          ))}
+        </>
+      );
     case "contact":
       return (
         <>
@@ -212,7 +232,8 @@ export default function StarshipTheme() {
       if (["articles", "1"].includes(trimmed)) navigate("/articles");
       else if (["events", "2"].includes(trimmed)) navigate("/events");
       else if (["talks", "3"].includes(trimmed)) navigate("/talks");
-      else if (["contact", "4", "comms"].includes(trimmed)) navigate("/contact");
+      else if (["projects", "4"].includes(trimmed)) navigate("/projects");
+      else if (["contact", "5", "comms"].includes(trimmed)) navigate("/contact");
       else if (trimmed.startsWith("theme ")) {
         const name = trimmed.slice(6).trim();
         const valid = ["starship", "cyberpunk", "terminal", "holographic", "retro", "fms"];

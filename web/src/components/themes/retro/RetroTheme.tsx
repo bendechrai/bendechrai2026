@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useRef, useEffect } from "react";
 import { useTheme } from "@/context/ThemeContext";
-import { ARTICLES, EVENTS, TALKS, SOCIAL_LINKS, getArticleBySlug } from "@/data/content";
+import { ARTICLES, EVENTS, TALKS, PROJECTS, SOCIAL_LINKS, getArticleBySlug } from "@/data/content";
 import { sendMessage } from "@/lib/sendMessage";
 import { useSection } from "@/hooks/useSection";
 import styles from "./retro.module.css";
@@ -19,12 +19,13 @@ interface WindowState {
   zIndex: number;
 }
 
-type ContentId = "articles" | "events" | "talks" | "contact" | "dos";
+type ContentId = "articles" | "events" | "talks" | "projects" | "contact" | "dos";
 
 const DESKTOP_ICONS: { id: ContentId; label: string; path: string }[] = [
   { id: "articles", label: "Articles", path: "/articles" },
   { id: "events", label: "Events", path: "/events" },
   { id: "talks", label: "Talks", path: "/talks" },
+  { id: "projects", label: "Projects", path: "/projects" },
   { id: "contact", label: "Message", path: "/contact" },
 ];
 
@@ -98,7 +99,7 @@ function WindowContent({ windowId, articleSlug, navigate, onOpenWindow }: { wind
       if (trimmed === "help") {
         setDosLines((prev) => [
           ...prev,
-          "  articles  events  talks  contact  theme <name>  cls",
+          "  articles  events  talks  projects  contact  theme <name>  cls",
         ]);
       } else if (trimmed === "cls") {
         setDosLines([]);
@@ -111,11 +112,12 @@ function WindowContent({ windowId, articleSlug, navigate, onOpenWindow }: { wind
         } else {
           setDosLines((prev) => [...prev, `Bad command or theme name. Valid: ${valid.join(", ")}`]);
         }
-      } else if (["articles", "events", "talks", "contact"].includes(trimmed)) {
+      } else if (["articles", "events", "talks", "projects", "contact"].includes(trimmed)) {
         const pathMap: Record<string, string> = {
           articles: "/articles",
           events: "/events",
           talks: "/talks",
+          projects: "/projects",
           contact: "/contact",
         };
         navigate(pathMap[trimmed]);
@@ -148,6 +150,7 @@ function WindowContent({ windowId, articleSlug, navigate, onOpenWindow }: { wind
                 {icon.id === "articles" && "\u{1F4C4}"}
                 {icon.id === "events" && "\u{1F4C5}"}
                 {icon.id === "talks" && "\u{1F3A4}"}
+                {icon.id === "projects" && "\u{1F680}"}
                 {icon.id === "contact" && "\u{1F4E8}"}
               </div>
               <span className={styles.iconLabel}>{icon.label}</span>
@@ -304,6 +307,18 @@ function WindowContent({ windowId, articleSlug, navigate, onOpenWindow }: { wind
         ))}
       </div>
     ),
+    projects: (
+      <div className={styles.notepadContent}>
+        {PROJECTS.map((p) => (
+          <div key={p.name} style={{ marginBottom: "12px" }}>
+            <p><b>{p.name}</b> [{p.status.toUpperCase()}]</p>
+            <p>{p.tagline}</p>
+            <p>Tech: {p.tech.join(", ")}</p>
+            <p><a href={p.url} target="_blank" rel="noopener noreferrer">{p.url}</a></p>
+          </div>
+        ))}
+      </div>
+    ),
   };
 
   return contentMap[windowId] || <div className={styles.notepadContent}><p>Unknown window.</p></div>;
@@ -341,6 +356,7 @@ export default function RetroTheme() {
           articles: "Articles - Notepad",
           events: "Events - Notepad",
           talks: "Talks - Notepad",
+          projects: "Projects - Notepad",
           contact: "Message 1.0",
           dos: "Command Prompt",
         };
@@ -375,6 +391,7 @@ export default function RetroTheme() {
         articles: "articles",
         events: "events",
         talks: "talks",
+        projects: "projects",
         contact: "contact",
       };
       const contentId = sectionToContentId[section];

@@ -2,18 +2,19 @@
 
 import { useState, useRef, useCallback } from "react";
 import { useTheme } from "@/context/ThemeContext";
-import { ARTICLES, EVENTS, TALKS, SOCIAL_LINKS, getArticleBySlug } from "@/data/content";
+import { ARTICLES, EVENTS, TALKS, PROJECTS, SOCIAL_LINKS, getArticleBySlug } from "@/data/content";
 import { sendMessage } from "@/lib/sendMessage";
 import { useSection } from "@/hooks/useSection";
 import styles from "./cyberpunk.module.css";
 
-type Tab = "data" | "comms" | "events" | "archives";
+type Tab = "data" | "comms" | "events" | "archives" | "projects";
 
 const TABS: { id: Tab; label: string; path: string }[] = [
   { id: "data", label: "DATA", path: "/" },
-  { id: "comms", label: "COMMS", path: "/contact" },
-  { id: "events", label: "EVENTS", path: "/events" },
   { id: "archives", label: "ARCHIVES", path: "/articles" },
+  { id: "projects", label: "PROJECTS", path: "/projects" },
+  { id: "events", label: "EVENTS", path: "/events" },
+  { id: "comms", label: "COMMS", path: "/contact" },
 ];
 
 function sectionToTab(section: string): Tab {
@@ -21,6 +22,7 @@ function sectionToTab(section: string): Tab {
     case "articles": return "archives";
     case "events": return "events";
     case "talks": return "events";
+    case "projects": return "projects";
     case "contact": return "comms";
     default: return "data";
   }
@@ -192,6 +194,24 @@ function TabContent({ tab, articleSlug, navigate }: { tab: Tab; articleSlug: str
           </div>
         </div>
       );
+    case "projects":
+      return (
+        <div className={styles.contentSection}>
+          <h2 className={styles.sectionTitle}>ACTIVE PROJECTS</h2>
+          <div className={styles.commsList}>
+            {PROJECTS.map((p) => (
+              <a key={p.name} href={p.url} target="_blank" rel="noopener noreferrer" className={styles.commsItem} style={{ textDecoration: "none" }}>
+                <span className={styles.commsLabel}>{p.status.toUpperCase()}</span>
+                <div>
+                  <div className={styles.commsValue}>{p.name}</div>
+                  <div className={styles.commsDetail}>{p.tagline}</div>
+                  <div className={styles.commsDetail}>{p.tech.join(" / ")}</div>
+                </div>
+              </a>
+            ))}
+          </div>
+        </div>
+      );
     case "archives": {
       if (articleSlug) {
         const article = getArticleBySlug(articleSlug);
@@ -255,7 +275,7 @@ export default function CyberpunkTheme() {
       if (trimmed === "help") {
         setTerminalLines((prev) => [
           ...prev,
-          "  articles | events | talks | contact | theme <name> | clear",
+          "  articles | events | talks | projects | contact | theme <name> | clear",
         ]);
       } else if (trimmed === "clear") {
         setTerminalLines([]);
@@ -280,6 +300,9 @@ export default function CyberpunkTheme() {
       } else if (["talks"].includes(trimmed)) {
         navigate("/events");
         setTerminalLines((prev) => [...prev, "  Switching to EVENTS..."]);
+      } else if (trimmed === "projects") {
+        navigate("/projects");
+        setTerminalLines((prev) => [...prev, "  Switching to PROJECTS..."]);
       } else if (["contact", "comms"].includes(trimmed)) {
         navigate("/contact");
         setTerminalLines((prev) => [...prev, "  Switching to COMMS..."]);

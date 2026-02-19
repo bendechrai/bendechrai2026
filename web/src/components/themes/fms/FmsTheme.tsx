@@ -2,7 +2,7 @@
 
 import { useState, useRef, useCallback, useEffect } from "react";
 import { useTheme } from "@/context/ThemeContext";
-import { ARTICLES, EVENTS, TALKS, SOCIAL_LINKS, getArticleBySlug } from "@/data/content";
+import { ARTICLES, EVENTS, TALKS, PROJECTS, SOCIAL_LINKS, getArticleBySlug } from "@/data/content";
 import { sendMessage } from "@/lib/sendMessage";
 import { useSection } from "@/hooks/useSection";
 import styles from "./fms.module.css";
@@ -15,6 +15,7 @@ function sectionToPage(section: string): McduPage {
     case "articles": return "fPln";
     case "events": return "prog";
     case "talks": return "data";
+    case "projects": return "perf";
     case "contact": return "atcComm";
     default: return "init";
   }
@@ -26,8 +27,8 @@ function pageToPath(page: McduPage): string {
     case "fPln": return "/articles";
     case "prog": return "/events";
     case "data": return "/talks";
+    case "perf": return "/projects";
     case "atcComm": return "/contact";
-    case "perf": return "/talks";
     default: return "/";
   }
 }
@@ -241,6 +242,31 @@ function buildDataRows(page: number): { rows: ScreenRowData[]; totalPages: numbe
     rows.push({
       leftData: `${t.event} - ${t.description}`,
       leftColor: "green",
+      leftSmall: true,
+    });
+  }
+  return { rows: rows.slice(0, 6), totalPages };
+}
+
+function buildPerfRows(page: number): { rows: ScreenRowData[]; totalPages: number } {
+  const perPage = 3; // ~2 rows per project
+  const totalPages = Math.ceil(PROJECTS.length / perPage);
+  const start = page * perPage;
+  const slice = PROJECTS.slice(start, start + perPage);
+  const rows: ScreenRowData[] = [];
+  for (const p of slice) {
+    rows.push({
+      leftLabel: p.category.toUpperCase(),
+      rightLabel: p.status.toUpperCase(),
+      leftData: p.name,
+      leftColor: "green",
+      rightData: p.tech.slice(0, 2).join("/"),
+      rightColor: "cyan",
+      leftHref: p.url,
+    });
+    rows.push({
+      leftData: p.tagline,
+      leftColor: "white",
       leftSmall: true,
     });
   }
@@ -463,6 +489,7 @@ export default function FmsTheme() {
       if (["articles", "f-pln", "fpln", "log"].includes(trimmed)) navigate("/articles");
       else if (["events", "prog", "departures"].includes(trimmed)) navigate("/events");
       else if (["talks", "data", "nav"].includes(trimmed)) navigate("/talks");
+      else if (["projects", "perf"].includes(trimmed)) navigate("/projects");
       else if (["contact", "comms", "atc", "msg"].includes(trimmed)) navigate("/contact");
       else if (["init", "home", "ident"].includes(trimmed)) navigate("/");
       else if (trimmed.startsWith("theme ")) {
@@ -556,9 +583,15 @@ export default function FmsTheme() {
     screenRows = result.rows;
     totalPages = result.totalPages;
     pageNum = listPage + 1;
-  } else if (activePage === "data" || activePage === "perf") {
+  } else if (activePage === "data") {
     const result = buildDataRows(listPage);
     screenTitle = "DATA";
+    screenRows = result.rows;
+    totalPages = result.totalPages;
+    pageNum = listPage + 1;
+  } else if (activePage === "perf") {
+    const result = buildPerfRows(listPage);
+    screenTitle = "PERF";
     screenRows = result.rows;
     totalPages = result.totalPages;
     pageNum = listPage + 1;
