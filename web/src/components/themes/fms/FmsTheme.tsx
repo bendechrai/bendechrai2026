@@ -52,6 +52,7 @@ interface ScreenRowData {
   onLeftClick?: () => void;
   onRightClick?: () => void;
   leftHref?: string;
+  rightHref?: string;
 }
 
 const colorClass = (c?: string) => {
@@ -65,27 +66,15 @@ const colorClass = (c?: string) => {
   }
 };
 
-// Render exactly 6 rows with label+data pairs aligned to LSKs
-function SixRowScreen({ title, rows, pageNum, totalPages }: {
-  title: string;
-  rows: ScreenRowData[];
-  pageNum?: number;
-  totalPages?: number;
-}) {
-  // Pad to exactly 6
+// Render exactly 6 data rows (label+data pairs), one per LSK
+function ScreenRows({ rows }: { rows: ScreenRowData[] }) {
   const padded = [...rows];
   while (padded.length < 6) padded.push({});
 
   return (
     <>
-      <div className={styles.pageTitle}>
-        {title}
-        {totalPages && totalPages > 1 && (
-          <span className={styles.pageArrow}>{pageNum}/{totalPages}</span>
-        )}
-      </div>
       {padded.slice(0, 6).map((row, i) => (
-        <div key={i}>
+        <div key={i} className={styles.rowPair}>
           {/* Label line */}
           <div className={styles.labelRow}>
             <span className={`${styles.label} ${row.onLeftClick ? styles.labelAmber : ""}`}>
@@ -111,12 +100,20 @@ function SixRowScreen({ title, rows, pageNum, totalPages }: {
                 {row.leftData || "\u00A0"}
               </span>
             )}
-            <span
-              className={`${colorClass(row.rightColor)} ${row.rightSmall ? styles.dataSmall : ""} ${row.onRightClick ? styles.lskData : ""}`}
-              onClick={row.onRightClick}
-            >
-              {row.rightData || "\u00A0"}
-            </span>
+            {row.rightHref ? (
+              <a href={row.rightHref} target="_blank" rel="noopener noreferrer" className={styles.socialLink}>
+                <span className={`${colorClass(row.rightColor)} ${row.rightSmall ? styles.dataSmall : ""}`}>
+                  {row.rightData || "\u00A0"}
+                </span>
+              </a>
+            ) : (
+              <span
+                className={`${colorClass(row.rightColor)} ${row.rightSmall ? styles.dataSmall : ""} ${row.onRightClick ? styles.lskData : ""}`}
+                onClick={row.onRightClick}
+              >
+                {row.rightData || "\u00A0"}
+              </span>
+            )}
           </div>
         </div>
       ))}
@@ -128,11 +125,11 @@ function SixRowScreen({ title, rows, pageNum, totalPages }: {
 
 function buildInitRows(navigate: (p: string) => void): ScreenRowData[] {
   return [
-    { leftLabel: "OPERATOR", rightLabel: "STATUS", leftData: "BEN DECHRAI", leftColor: "green", rightData: "ACTIVE", rightColor: "green" },
-    { leftLabel: "ROLE", rightLabel: "BASE", leftData: "DEV / SPEAKER", leftColor: "green", rightData: "YMML", rightColor: "green" },
-    { leftLabel: "CODE ARCHIVE", leftData: "github.com/bendechrai", leftColor: "cyan", leftHref: SOCIAL_LINKS.github },
-    { leftLabel: "NETWORK", leftData: "linkedin.com/in/bendechrai", leftColor: "cyan", leftHref: SOCIAL_LINKS.linkedin },
+    { leftLabel: "OPERATOR", rightLabel: "STATUS", leftData: "BEN DECHRAI", leftColor: "cyan", rightData: "ACTIVE", rightColor: "green" },
+    { leftLabel: "ROLE", rightLabel: "BASE", leftData: "DEV / SPEAKER", leftColor: "cyan", rightData: "YMML", rightColor: "green" },
+    { leftLabel: "CODE ARCHIVE", rightLabel: "NETWORK", leftData: "github.com/bendechrai", leftColor: "cyan", leftHref: SOCIAL_LINKS.github, rightData: "linkedin.com/in/bendechrai", rightColor: "cyan", rightHref: SOCIAL_LINKS.linkedin },
     { leftLabel: "SIGNAL", leftData: "twitter.com/bendechrai", leftColor: "cyan", leftHref: SOCIAL_LINKS.twitter },
+    {},
     { rightLabel: "ATC COMM >", rightData: "SEND MSG", rightColor: "amber", onRightClick: () => navigate("/contact") },
   ];
 }
@@ -275,7 +272,7 @@ function buildPerfRows(page: number): { rows: ScreenRowData[]; totalPages: numbe
 
 // ============ ATC COMM page (special - has message form) ============
 
-function AtcCommScreen({
+function AtcCommRows({
   name,
   message,
   msgSent,
@@ -290,7 +287,7 @@ function AtcCommScreen({
 }) {
   if (msgSent) {
     return (
-      <SixRowScreen title="ATC COMM" rows={[
+      <ScreenRows rows={[
         {},
         { leftData: "UPLINK SENT", leftColor: "green" },
         { leftData: "MESSAGE TRANSMITTED VIA ACARS", leftColor: "white", leftSmall: true },
@@ -303,62 +300,73 @@ function AtcCommScreen({
 
   return (
     <>
-      <div className={styles.pageTitle}>ATC COMM</div>
       {/* Row 1: From field — L1 loads scratchpad here */}
-      <div className={styles.labelRow}>
-        <span className={`${styles.label} ${styles.labelAmber}`}>FROM</span>
-        <span className={styles.label}>{"\u00A0"}</span>
-      </div>
-      <div className={styles.screenRow}>
-        <span className={name ? styles.dataCyan : styles.dataAmber}>
-          {name || "[ ]"}
-        </span>
-        <span>{"\u00A0"}</span>
+      <div className={styles.rowPair}>
+        <div className={styles.labelRow}>
+          <span className={`${styles.label} ${styles.labelAmber}`}>FROM</span>
+          <span className={styles.label}>{"\u00A0"}</span>
+        </div>
+        <div className={styles.screenRow}>
+          <span className={name ? styles.dataCyan : styles.dataAmber}>
+            {name || "[ ]"}
+          </span>
+          <span>{"\u00A0"}</span>
+        </div>
       </div>
       {/* Row 2: Message field — L2 loads scratchpad here */}
-      <div className={styles.labelRow}>
-        <span className={`${styles.label} ${styles.labelAmber}`}>MESSAGE</span>
-        <span className={styles.label}>{"\u00A0"}</span>
-      </div>
-      <div className={styles.screenRow}>
-        <span className={message ? styles.dataCyan : styles.dataAmber}>
-          {message ? message.slice(0, 30) + (message.length > 30 ? "..." : "") : "[ ]"}
-        </span>
-        <span>{"\u00A0"}</span>
+      <div className={styles.rowPair}>
+        <div className={styles.labelRow}>
+          <span className={`${styles.label} ${styles.labelAmber}`}>MESSAGE</span>
+          <span className={styles.label}>{"\u00A0"}</span>
+        </div>
+        <div className={styles.screenRow}>
+          <span className={message ? styles.dataCyan : styles.dataAmber}>
+            {message ? message.slice(0, 30) + (message.length > 30 ? "..." : "") : "[ ]"}
+          </span>
+          <span>{"\u00A0"}</span>
+        </div>
       </div>
       {/* Row 3: Message continued */}
-      <div className={styles.labelRow}>
-        <span className={styles.label}>{message.length > 30 ? "MSG CONT" : "\u00A0"}</span>
-      </div>
-      <div className={styles.screenRow}>
-        <span className={`${styles.dataGreen} ${styles.dataSmall}`}>
-          {message.length > 30 ? message.slice(30, 80) + (message.length > 80 ? "..." : "") : "\u00A0"}
-        </span>
+      <div className={styles.rowPair}>
+        <div className={styles.labelRow}>
+          <span className={styles.label}>{message.length > 30 ? "MSG CONT" : "\u00A0"}</span>
+        </div>
+        <div className={styles.screenRow}>
+          <span className={`${styles.dataGreen} ${styles.dataSmall}`}>
+            {message.length > 30 ? message.slice(30, 80) + (message.length > 80 ? "..." : "") : "\u00A0"}
+          </span>
+        </div>
       </div>
       {/* Row 4: Instructions */}
-      <div className={styles.labelRow}><span className={styles.label}>{"\u00A0"}</span></div>
-      <div className={styles.screenRow}>
-        <span className={`${styles.dataWhite} ${styles.dataSmall}`}>
-          {!name ? "TYPE IN SCRATCHPAD, PRESS L1" : !message ? "TYPE IN SCRATCHPAD, PRESS L2" : "\u00A0"}
-        </span>
+      <div className={styles.rowPair}>
+        <div className={styles.labelRow}><span className={styles.label}>{"\u00A0"}</span></div>
+        <div className={styles.screenRow}>
+          <span className={`${styles.dataWhite} ${styles.dataSmall}`}>
+            {!name ? "TYPE IN SCRATCHPAD, PRESS L1" : !message ? "TYPE IN SCRATCHPAD, PRESS L2" : "\u00A0"}
+          </span>
+        </div>
       </div>
       {/* Row 5: empty */}
-      <div className={styles.labelRow}><span className={styles.label}>{"\u00A0"}</span></div>
-      <div className={styles.screenRow}><span>{"\u00A0"}</span></div>
-      {/* Row 6: Send */}
-      <div className={styles.labelRow}>
-        <span className={styles.label}>{"\u00A0"}</span>
-        <span className={`${styles.label} ${name.trim() && message.trim() ? styles.labelAmber : ""}`}>
-          {sending ? "TRANSMITTING" : name.trim() && message.trim() ? "SEND *" : "\u00A0"}
-        </span>
+      <div className={styles.rowPair}>
+        <div className={styles.labelRow}><span className={styles.label}>{"\u00A0"}</span></div>
+        <div className={styles.screenRow}><span>{"\u00A0"}</span></div>
       </div>
-      <div className={styles.screenRow}>
-        <span>{"\u00A0"}</span>
-        {name.trim() && message.trim() && !sending ? (
-          <span className={`${styles.dataAmber} ${styles.lskData}`} onClick={onSend}>TRANSMIT</span>
-        ) : (
+      {/* Row 6: Send */}
+      <div className={styles.rowPair}>
+        <div className={styles.labelRow}>
+          <span className={styles.label}>{"\u00A0"}</span>
+          <span className={`${styles.label} ${name.trim() && message.trim() ? styles.labelAmber : ""}`}>
+            {sending ? "TRANSMITTING" : name.trim() && message.trim() ? "SEND *" : "\u00A0"}
+          </span>
+        </div>
+        <div className={styles.screenRow}>
           <span>{"\u00A0"}</span>
-        )}
+          {name.trim() && message.trim() && !sending ? (
+            <span className={`${styles.dataAmber} ${styles.lskData}`} onClick={onSend}>TRANSMIT</span>
+          ) : (
+            <span>{"\u00A0"}</span>
+          )}
+        </div>
       </div>
     </>
   );
@@ -561,21 +569,41 @@ export default function FmsTheme() {
     screenRows = result.rows;
     totalPages = result.totalPages;
     pageNum = listPage + 1;
+  } else if (activePage === "atcComm") {
+    screenTitle = "ATC COMM";
   }
+
+  // Scratchpad error message state
+  const [scratchError, setScratchError] = useState("");
+  const scratchErrorTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
+
+  const showScratchError = useCallback((msg: string) => {
+    setScratchError(msg);
+    if (scratchErrorTimer.current) clearTimeout(scratchErrorTimer.current);
+    scratchErrorTimer.current = setTimeout(() => setScratchError(""), 2000);
+  }, []);
 
   // Handle LSK presses - delegates to the row's onClick
   const handleLsk = useCallback(
     (side: "left" | "right", row: number) => {
       if (activePage === "atcComm") {
         // L1: load scratchpad into FROM field
-        if (side === "left" && row === 1 && scratchpad.trim()) {
-          setMsgName(scratchpad.trim());
-          setScratchpad("");
+        if (side === "left" && row === 1) {
+          if (scratchpad.trim()) {
+            setMsgName(scratchpad.trim());
+            setScratchpad("");
+          } else {
+            showScratchError("ENTRY REQUIRED");
+          }
         }
         // L2: load scratchpad into MESSAGE field
-        else if (side === "left" && row === 2 && scratchpad.trim()) {
-          setMsgBody(scratchpad.trim());
-          setScratchpad("");
+        else if (side === "left" && row === 2) {
+          if (scratchpad.trim()) {
+            setMsgBody(scratchpad.trim());
+            setScratchpad("");
+          } else {
+            showScratchError("ENTRY REQUIRED");
+          }
         }
         // R6: transmit
         else if (side === "right" && row === 6) handleSendMessage();
@@ -613,7 +641,7 @@ export default function FmsTheme() {
         else if (side === "right" && r.onRightClick) r.onRightClick();
       }
     },
-    [activePage, articleSlug, detailPage, screenRows, handleSendMessage, scratchpad],
+    [activePage, articleSlug, detailPage, screenRows, handleSendMessage, scratchpad, showScratchError],
   );
 
   // Slew keys for pagination - use ref for totalPages to avoid stale closures
@@ -744,10 +772,23 @@ export default function FmsTheme() {
               <span className={styles.annunciator}>FM2</span>
             </div>
 
-            {/* Screen area with LSKs on both sides */}
+            {/* Screen area: title | LSKs+rows | scratchpad */}
             <div className={styles.screenArea}>
-              {/* Left LSKs (L1-L6) */}
-              <div className={styles.lskColumn}>
+              {/* Screen background (dark bezel spanning full middle column) */}
+              <div className={styles.screenBg} />
+
+              {/* Title bar — no LSKs beside it */}
+              <div className={styles.screenTitleArea}>
+                <div className={styles.pageTitle}>
+                  {screenTitle}
+                  {totalPages > 1 && (
+                    <span className={styles.pageArrow}>{pageNum}/{totalPages}</span>
+                  )}
+                </div>
+              </div>
+
+              {/* Left LSKs (L1-L6) — aligned with data rows */}
+              <div className={styles.lskLeft}>
                 {[1, 2, 3, 4, 5, 6].map((n) => (
                   <button key={n} className={styles.lsk} onClick={() => handleLsk("left", n)} aria-label={`L${n}`}>
                     &lt;
@@ -755,10 +796,10 @@ export default function FmsTheme() {
                 ))}
               </div>
 
-              {/* Screen */}
-              <div className={styles.screen}>
+              {/* 6 data rows */}
+              <div className={styles.screenRowsArea}>
                 {activePage === "atcComm" ? (
-                  <AtcCommScreen
+                  <AtcCommRows
                     name={msgName}
                     message={msgBody}
                     msgSent={msgSent}
@@ -766,40 +807,38 @@ export default function FmsTheme() {
                     sending={sending}
                   />
                 ) : (
-                  <SixRowScreen
-                    title={screenTitle}
-                    rows={screenRows}
-                    pageNum={pageNum}
-                    totalPages={totalPages}
-                  />
+                  <ScreenRows rows={screenRows} />
                 )}
-                {/* Scratchpad */}
-                <div className={styles.scratchpad} onClick={() => scratchRef.current?.focus()}>
-                  <div className={styles.scratchpadBox}>
-                    <input
-                      ref={scratchRef}
-                      type="text"
-                      inputMode="none"
-                      value={scratchpad}
-                      onChange={(e) => setScratchpad(e.target.value)}
-                      onKeyDown={handleScratchKeyDown}
-                      className={styles.scratchpadInput}
-                      placeholder="[ ]"
-                      spellCheck={false}
-                      autoComplete="off"
-                      aria-label="Scratchpad input"
-                    />
-                  </div>
-                </div>
               </div>
 
-              {/* Right LSKs (R1-R6) */}
-              <div className={styles.lskColumn}>
+              {/* Right LSKs (R1-R6) — aligned with data rows */}
+              <div className={styles.lskRight}>
                 {[1, 2, 3, 4, 5, 6].map((n) => (
                   <button key={n} className={styles.lsk} onClick={() => handleLsk("right", n)} aria-label={`R${n}`}>
                     &gt;
                   </button>
                 ))}
+              </div>
+
+              {/* Scratchpad — below L6/R6, no LSKs beside it */}
+              <div className={styles.screenScratchArea} onClick={() => { if (!scratchError) scratchRef.current?.focus(); }}>
+                {scratchError ? (
+                  <span className={styles.scratchpadAmber}>{scratchError}</span>
+                ) : (
+                  <input
+                    ref={scratchRef}
+                    type="text"
+                    inputMode="none"
+                    value={scratchpad}
+                    onChange={(e) => setScratchpad(e.target.value)}
+                    onKeyDown={handleScratchKeyDown}
+                    className={styles.scratchpadInput}
+                    placeholder="[ ]"
+                    spellCheck={false}
+                    autoComplete="off"
+                    aria-label="Scratchpad input"
+                  />
+                )}
               </div>
             </div>
 

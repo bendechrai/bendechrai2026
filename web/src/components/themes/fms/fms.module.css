@@ -51,20 +51,62 @@
   color: #ff8800;
 }
 
-/* Screen + LSK area: LSKs on both sides of the screen */
+/* Screen + LSK area: 3-row grid — title | rows+LSKs | scratchpad */
 .screenArea {
   display: grid;
   grid-template-columns: 28px 1fr 28px;
+  grid-template-rows: auto 1fr auto;
   gap: 0;
+  position: relative;
 }
 
-/* LSK columns - physical buttons flanking the screen */
-.lskColumn {
+/* Dark screen background spanning the full middle column */
+.screenBg {
+  grid-column: 2;
+  grid-row: 1 / -1;
+  background: #080808;
+  border: 2px solid #222;
+  border-radius: 3px;
+  position: relative;
+}
+
+/* Scanline CRT effect over the screen background */
+.screenBg::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent 0px,
+    transparent 2px,
+    rgba(0,0,0,0.12) 2px,
+    rgba(0,0,0,0.12) 4px
+  );
+  pointer-events: none;
+  border-radius: 3px;
+}
+
+/* Title area — top of the screen, no LSKs beside it */
+.screenTitleArea {
+  grid-column: 2;
+  grid-row: 1;
+  z-index: 1;
+  padding: 6px 4px 2px;
+}
+
+/* LSK columns — only span the data rows (row 2) */
+.lskLeft {
+  grid-column: 1;
+  grid-row: 2;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  padding: 20px 0 4px;
-  gap: 2px;
+}
+
+.lskRight {
+  grid-column: 3;
+  grid-row: 2;
+  display: flex;
+  flex-direction: column;
 }
 
 .lsk {
@@ -74,14 +116,12 @@
   color: #777;
   font-size: 7px;
   width: 24px;
-  height: 30px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   transition: background 0.1s, border-color 0.1s;
   flex: 1;
-  max-height: 38px;
 }
 
 .lsk:hover {
@@ -95,32 +135,33 @@
   border-color: #888;
 }
 
-/* The screen itself */
-.screen {
-  background: #080808;
-  border: 2px solid #222;
-  border-radius: 3px;
-  padding: 6px 4px;
-  min-height: 300px;
+/* Data rows area — flanked by LSKs */
+.screenRowsArea {
+  grid-column: 2;
+  grid-row: 2;
+  z-index: 1;
   display: flex;
   flex-direction: column;
-  position: relative;
+  padding: 0 4px;
 }
 
-/* Screen scanline CRT effect */
-.screen::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: repeating-linear-gradient(
-    0deg,
-    transparent 0px,
-    transparent 2px,
-    rgba(0,0,0,0.12) 2px,
-    rgba(0,0,0,0.12) 4px
-  );
-  pointer-events: none;
-  border-radius: 3px;
+/* Each row pair (label + data) gets equal height */
+.rowPair {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* Scratchpad area — bottom of screen, no LSKs beside it */
+.screenScratchArea {
+  grid-column: 2;
+  grid-row: 3;
+  z-index: 1;
+  border-top: 1px solid #222;
+  padding: 4px;
+  display: flex;
+  align-items: center;
 }
 
 /* Page title line (line 1 of MCDU screen) */
@@ -216,21 +257,6 @@
   justify-content: space-between;
   padding: 3px 4px 0;
   min-height: 12px;
-}
-
-/* Scratchpad (bottom of screen) */
-.scratchpad {
-  border-top: 1px solid #222;
-  margin-top: auto;
-  padding: 4px;
-  display: flex;
-  align-items: center;
-}
-
-.scratchpadBox {
-  flex: 1;
-  display: flex;
-  align-items: center;
 }
 
 .scratchpadInput {
@@ -876,7 +902,6 @@
   }
 
   .lsk {
-    width: 22px;
     font-size: 6px;
   }
 
