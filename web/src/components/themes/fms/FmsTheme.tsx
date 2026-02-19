@@ -308,7 +308,7 @@ function AtcCommRows({
         </div>
         <div className={styles.screenRow}>
           <span className={name ? styles.dataCyan : styles.dataAmber}>
-            {name || "[ ]"}
+            {name || "\u00A0"}
           </span>
           <span>{"\u00A0"}</span>
         </div>
@@ -321,7 +321,7 @@ function AtcCommRows({
         </div>
         <div className={styles.screenRow}>
           <span className={message ? styles.dataCyan : styles.dataAmber}>
-            {message ? message.slice(0, 30) + (message.length > 30 ? "..." : "") : "[ ]"}
+            {message ? message.slice(0, 30) + (message.length > 30 ? "..." : "") : "\u00A0"}
           </span>
           <span>{"\u00A0"}</span>
         </div>
@@ -833,7 +833,7 @@ export default function FmsTheme() {
                     onChange={(e) => setScratchpad(e.target.value)}
                     onKeyDown={handleScratchKeyDown}
                     className={styles.scratchpadInput}
-                    placeholder="[ ]"
+                    placeholder=""
                     spellCheck={false}
                     autoComplete="off"
                     aria-label="Scratchpad input"
