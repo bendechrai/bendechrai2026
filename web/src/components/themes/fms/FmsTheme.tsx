@@ -126,10 +126,10 @@ function ScreenRows({ rows }: { rows: ScreenRowData[] }) {
 function buildInitRows(navigate: (p: string) => void): ScreenRowData[] {
   return [
     { leftLabel: "OPERATOR", rightLabel: "STATUS", leftData: "BEN DECHRAI", leftColor: "cyan", rightData: "ACTIVE", rightColor: "green" },
-    { leftLabel: "ROLE", rightLabel: "BASE", leftData: "DEV / SPEAKER", leftColor: "cyan", rightData: "YMML", rightColor: "green" },
-    { leftLabel: "CODE ARCHIVE", rightLabel: "NETWORK", leftData: "github.com/bendechrai", leftColor: "cyan", leftHref: SOCIAL_LINKS.github, rightData: "linkedin.com/in/bendechrai", rightColor: "cyan", rightHref: SOCIAL_LINKS.linkedin },
-    { leftLabel: "SIGNAL", leftData: "twitter.com/bendechrai", leftColor: "cyan", leftHref: SOCIAL_LINKS.twitter },
-    {},
+    { leftLabel: "ROLE", rightLabel: "BASE", leftData: "DEV / SPEAKER", leftColor: "cyan", rightData: "KMCI", rightColor: "green" },
+    { leftLabel: "CODE ARCHIVE", leftData: "github.com/bendechrai", leftColor: "cyan", leftHref: SOCIAL_LINKS.github },
+    { leftLabel: "NETWORK", leftData: "linkedin.com/in/bendechrai", leftColor: "cyan", leftHref: SOCIAL_LINKS.linkedin },
+    { leftLabel: "TWITTER", leftData: "twitter.com/bendechrai", leftColor: "cyan", leftHref: SOCIAL_LINKS.twitter },
     { rightLabel: "ATC COMM >", rightData: "SEND MSG", rightColor: "amber", onRightClick: () => navigate("/contact") },
   ];
 }
