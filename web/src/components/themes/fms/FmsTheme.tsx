@@ -350,7 +350,7 @@ function MCDUKeyboard({ onKey, onClear, onSpace }: {
   };
 
   return (
-    <div className={styles.inputArea}>
+    <>
       <div className={styles.numericArea}>
         {numRows.map((row, ri) => (
           <div key={ri} className={styles.numRow}>
@@ -381,7 +381,7 @@ function MCDUKeyboard({ onKey, onClear, onSpace }: {
           </div>
         ))}
       </div>
-    </div>
+    </>
   );
 }
 
@@ -833,14 +833,12 @@ export default function FmsTheme() {
               <button className={styles.arrowKey} style={{ gridColumn: 1, gridRow: 5 }} aria-label="Slew right">&rarr;</button>
               <button className={styles.arrowKey} onClick={handleSlewDown} style={{ gridColumn: 2, gridRow: 5 }} aria-label="Slew down">&darr;</button>
 
-              {/* Keyboard — cols 3+, rows 3-8 */}
-              <div className={styles.keyboardArea}>
-                <MCDUKeyboard
-                  onKey={handleKeyPress}
-                  onClear={handleKeyClear}
-                  onSpace={handleKeySpace}
-                />
-              </div>
+              {/* Keyboard: numpad under arrows, alpha beside AIRPORT/arrows */}
+              <MCDUKeyboard
+                onKey={handleKeyPress}
+                onClear={handleKeyClear}
+                onSpace={handleKeySpace}
+              />
             </nav>
 
           </div>
