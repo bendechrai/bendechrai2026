@@ -801,7 +801,6 @@ export default function FmsTheme() {
                   key={pk.id}
                   className={`${styles.pageKey} ${activePage === pk.page ? styles.pageKeyActive : ""}`}
                   onClick={() => handlePageKey(pk.page)}
-                  style={{ whiteSpace: "pre-line" }}
                 >
                   {pk.label}
                 </button>
@@ -813,34 +812,36 @@ export default function FmsTheme() {
                   key={pk.id}
                   className={`${styles.pageKey} ${activePage === pk.page ? styles.pageKeyActive : ""}`}
                   onClick={() => handlePageKey(pk.page)}
-                  style={{ whiteSpace: "pre-line" }}
                 >
                   {pk.label}
                 </button>
               ))}
 
-              {/* Row 3: AIRPORT */}
+              {/* Row 3: AIRPORT + blank */}
               <button
                 className={`${styles.pageKey} ${activePage === "prog" ? styles.pageKeyActive : ""}`}
                 onClick={() => handlePageKey("prog")}
-                style={{ gridColumn: 1, gridRow: 3, whiteSpace: "pre-line" }}
+                style={{ gridColumn: 1, gridRow: 3 }}
               >
                 {"AIR\nPORT"}
               </button>
+              <div className={styles.blankKey} style={{ gridColumn: 2, gridRow: 3 }} />
 
               {/* Rows 4-5: arrow keys */}
               <button className={styles.arrowKey} onClick={handleSlewUp} style={{ gridColumn: 1, gridRow: 4 }} aria-label="Slew left">&larr;</button>
               <button className={styles.arrowKey} onClick={handleSlewUp} style={{ gridColumn: 2, gridRow: 4 }} aria-label="Slew up">&uarr;</button>
               <button className={styles.arrowKey} style={{ gridColumn: 1, gridRow: 5 }} aria-label="Slew right">&rarr;</button>
               <button className={styles.arrowKey} onClick={handleSlewDown} style={{ gridColumn: 2, gridRow: 5 }} aria-label="Slew down">&darr;</button>
-            </nav>
 
-            {/* Keyboard */}
-            <MCDUKeyboard
-              onKey={handleKeyPress}
-              onClear={handleKeyClear}
-              onSpace={handleKeySpace}
-            />
+              {/* Keyboard — cols 3+, rows 3-8 */}
+              <div className={styles.keyboardArea}>
+                <MCDUKeyboard
+                  onKey={handleKeyPress}
+                  onClear={handleKeyClear}
+                  onSpace={handleKeySpace}
+                />
+              </div>
+            </nav>
 
           </div>
 

@@ -305,13 +305,19 @@
   color: #bbb;
   font-family: 'B612 Mono', 'Courier New', monospace;
   font-size: 8px;
-  padding: 5px 1px;
+  padding: 2px 1px;
   cursor: pointer;
   text-align: center;
   text-transform: uppercase;
   transition: background 0.1s, color 0.1s;
   letter-spacing: 0.02em;
   line-height: 1.2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 32px;
+  box-sizing: border-box;
+  white-space: pre-line;
 }
 
 .pageKey:hover {
@@ -369,11 +375,28 @@
   justify-content: center;
   cursor: pointer;
   transition: background 0.1s;
+  height: 32px;
+  box-sizing: border-box;
 }
 
 .arrowKey:hover {
   background: #3a3a3a;
   color: #fff;
+}
+
+/* Blank key placeholder (visible dark button) */
+.blankKey {
+  background: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 3px;
+  height: 32px;
+  box-sizing: border-box;
+}
+
+/* Keyboard area inside controls grid — cols 3-7, rows 3-8 */
+.keyboardArea {
+  grid-column: 3 / -1;
+  grid-row: 3 / span 6;
 }
 
 /* Alphabetical keyboard + numeric keypad area */
@@ -837,7 +860,16 @@
 
   .pageKey {
     font-size: 7px;
-    padding: 4px 0;
+    padding: 2px 0;
+    height: 28px;
+  }
+
+  .arrowKey {
+    height: 28px;
+  }
+
+  .blankKey {
+    height: 28px;
   }
 
   .dataGreen, .dataWhite, .dataCyan, .dataAmber, .dataMagenta {
