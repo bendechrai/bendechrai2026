@@ -465,6 +465,14 @@
   flex: 0 0 32px;
 }
 
+/* Alpha keyboard buttons — square */
+.keyAlpha {
+  width: 34px;
+  height: 34px;
+  min-width: 34px;
+  flex: 0 0 34px;
+}
+
 /* Compass keys (E, N, S, W) have a box border */
 .keyCompass {
   border: 2px solid #888;
@@ -867,6 +875,13 @@
     height: 28px;
     min-width: 28px;
     flex: 0 0 28px;
+  }
+
+  .keyAlpha {
+    width: 30px;
+    height: 30px;
+    min-width: 30px;
+    flex: 0 0 30px;
   }
 
   .pageKey {

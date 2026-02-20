@@ -372,7 +372,7 @@ function MCDUKeyboard({ onKey, onClear, onSpace }: {
             {row.map((k) => (
               <button
                 key={k}
-                className={`${styles.key} ${compassKeys.has(k) ? styles.keyCompass : ""} ${k === "CLR" ? styles.keyClear : ""} ${["SP", "/", "CLR", "OVFY"].includes(k) ? styles.keySpecial : ""}`}
+                className={`${styles.key} ${styles.keyAlpha} ${compassKeys.has(k) ? styles.keyCompass : ""} ${k === "CLR" ? styles.keyClear : ""} ${["SP", "/", "CLR", "OVFY"].includes(k) ? styles.keySpecial : ""}`}
                 onClick={() => handleAlphaKey(k)}
               >
                 {k}
