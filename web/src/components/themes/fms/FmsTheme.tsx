@@ -623,15 +623,15 @@ export default function FmsTheme() {
     { id: "perf" as const, label: "PERF", page: "perf" as McduPage },
     { id: "init" as const, label: "INIT", page: "init" as McduPage },
     { id: "data" as const, label: "DATA", page: "data" as McduPage },
-    { id: "fpln" as const, label: "F-PLN", page: "fPln" as McduPage },
+    { id: "video" as const, label: "VIDEO", page: "init" as McduPage },
   ];
   const pageKeysRow2 = [
+    { id: "fpln" as const, label: "F-PLAN", page: "fPln" as McduPage },
     { id: "radnav" as const, label: "RAD\nNAV", page: "init" as McduPage },
     { id: "fuelpred" as const, label: "FUEL\nPRED", page: "init" as McduPage },
-    { id: "secfpln" as const, label: "SEC\nF-PLN", page: "fPln" as McduPage },
+    { id: "secfpln" as const, label: "SEC\nF-PLAN", page: "fPln" as McduPage },
     { id: "atccomm" as const, label: "ATC\nCOMM", page: "atcComm" as McduPage },
     { id: "mcdumenu" as const, label: "MCDU\nMENU", page: "init" as McduPage },
-    { id: "airport" as const, label: "AIRPORT", page: "prog" as McduPage },
   ];
 
   // Screen-only reading mode: scrollable content without MCDU hardware
@@ -787,8 +787,15 @@ export default function FmsTheme() {
               </div>
             </div>
 
-            {/* Page keys - Row 1 */}
-            <nav className={styles.pageKeys} role="navigation" aria-label="FMS page navigation">
+            {/* Controls area: page keys (6×2), rocker, AIRPORT, arrows */}
+            <nav className={styles.controlsArea} role="navigation" aria-label="FMS page navigation">
+              {/* BRT/DIM rocker — col 7, rows 1-2 */}
+              <div className={styles.rocker} style={{ gridColumn: 7, gridRow: "1 / 3" }}>
+                <span className={styles.rockerLabel}>BRT</span>
+                <span className={styles.rockerLabel}>DIM</span>
+              </div>
+
+              {/* Row 1: page keys */}
               {pageKeysRow1.map((pk) => (
                 <button
                   key={pk.id}
@@ -799,10 +806,8 @@ export default function FmsTheme() {
                   {pk.label}
                 </button>
               ))}
-            </nav>
 
-            {/* Page keys - Row 2 */}
-            <div className={styles.pageKeys}>
+              {/* Row 2: page keys */}
               {pageKeysRow2.map((pk) => (
                 <button
                   key={pk.id}
@@ -813,15 +818,22 @@ export default function FmsTheme() {
                   {pk.label}
                 </button>
               ))}
-            </div>
 
-            {/* Slew keys */}
-            <div className={styles.slewKeys}>
-              <button className={styles.slewKey} aria-label="Slew left">&larr;</button>
-              <button className={styles.slewKey} onClick={handleSlewUp} aria-label="Slew up">&uarr;</button>
-              <button className={styles.slewKey} onClick={handleSlewDown} aria-label="Slew down">&darr;</button>
-              <button className={styles.slewKey} aria-label="Slew right">&rarr;</button>
-            </div>
+              {/* Row 3: AIRPORT */}
+              <button
+                className={`${styles.pageKey} ${activePage === "prog" ? styles.pageKeyActive : ""}`}
+                onClick={() => handlePageKey("prog")}
+                style={{ gridColumn: 1, gridRow: 3, whiteSpace: "pre-line" }}
+              >
+                {"AIR\nPORT"}
+              </button>
+
+              {/* Rows 4-5: arrow keys */}
+              <button className={styles.arrowKey} onClick={handleSlewUp} style={{ gridColumn: 1, gridRow: 4 }} aria-label="Slew left">&larr;</button>
+              <button className={styles.arrowKey} onClick={handleSlewUp} style={{ gridColumn: 2, gridRow: 4 }} aria-label="Slew up">&uarr;</button>
+              <button className={styles.arrowKey} style={{ gridColumn: 1, gridRow: 5 }} aria-label="Slew right">&rarr;</button>
+              <button className={styles.arrowKey} onClick={handleSlewDown} style={{ gridColumn: 2, gridRow: 5 }} aria-label="Slew down">&darr;</button>
+            </nav>
 
             {/* Keyboard */}
             <MCDUKeyboard
@@ -830,11 +842,6 @@ export default function FmsTheme() {
               onSpace={handleKeySpace}
             />
 
-            {/* BRT / DIM */}
-            <div className={styles.bottomControls}>
-              <span className={styles.bottomBtn}>BRT</span>
-              <span className={styles.bottomBtn}>DIM</span>
-            </div>
           </div>
 
           <div className={styles.cockpitPanel}>

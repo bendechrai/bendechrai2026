@@ -290,10 +290,10 @@
 
 /* ============ BELOW-SCREEN PHYSICAL BUTTONS ============ */
 
-/* Page/function keys - two rows of 6 */
-.pageKeys {
+/* Unified controls: 6 key cols + rocker col, up to 5 rows */
+.controlsArea {
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
+  grid-template-columns: repeat(6, 1fr) auto;
   gap: 3px;
   padding: 2px 2px;
 }
@@ -329,22 +329,41 @@
   border-color: #00aa00;
 }
 
-/* Slew/arrow keys between page keys and keyboard */
-.slewKeys {
+/* BRT/DIM rocker — spans rows 1-2 of controls grid */
+.rocker {
   display: flex;
+  flex-direction: column;
   justify-content: center;
-  gap: 8px;
-  padding: 2px 0;
+  gap: 1px;
 }
 
-.slewKey {
+.rockerLabel {
+  background: #1a1a1a;
+  border: 1px solid #333;
+  color: #555;
+  font-family: 'B612 Mono', 'Courier New', monospace;
+  font-size: 7px;
+  padding: 4px 6px;
+  text-align: center;
+  letter-spacing: 0.1em;
+}
+
+.rockerLabel:first-child {
+  border-radius: 3px 3px 0 0;
+}
+
+.rockerLabel:last-child {
+  border-radius: 0 0 3px 3px;
+  border-top: none;
+}
+
+/* Arrow keys in cols 1-2, rows 4-5 of controls grid */
+.arrowKey {
   background: #222;
   border: 1px solid #444;
   border-radius: 3px;
   color: #999;
   font-size: 12px;
-  width: 32px;
-  height: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -352,7 +371,7 @@
   transition: background 0.1s;
 }
 
-.slewKey:hover {
+.arrowKey:hover {
   background: #3a3a3a;
   color: #fff;
 }
@@ -786,25 +805,6 @@
   }
 }
 
-/* BRT/DIM at bottom */
-.bottomControls {
-  display: flex;
-  justify-content: center;
-  gap: 16px;
-  padding: 2px 0 0;
-}
-
-.bottomBtn {
-  background: none;
-  border: 1px solid #333;
-  border-radius: 3px;
-  color: #555;
-  font-family: 'B612 Mono', 'Courier New', monospace;
-  font-size: 7px;
-  padding: 3px 10px;
-  cursor: default;
-  letter-spacing: 0.1em;
-}
 
 /* Mobile adjustments */
 @media (max-width: 520px) {
