@@ -357,7 +357,7 @@ function MCDUKeyboard({ onKey, onClear, onSpace }: {
             {row.map((k) => (
               <button
                 key={k}
-                className={`${styles.key} ${k === "+/-" ? styles.keySpecial : ""}`}
+                className={`${styles.key} ${styles.keyNum} ${k === "+/-" ? styles.keySpecial : ""}`}
                 onClick={() => onKey(k === "+/-" ? "-" : k)}
               >
                 {k}
@@ -790,7 +790,7 @@ export default function FmsTheme() {
             {/* Controls area: page keys (6×2), rocker, AIRPORT, arrows */}
             <nav className={styles.controlsArea} role="navigation" aria-label="FMS page navigation">
               {/* BRT/DIM rocker — col 7, rows 1-2 */}
-              <div className={styles.rocker} style={{ gridColumn: 7, gridRow: "1 / 3" }}>
+              <div className={styles.rocker} style={{ gridColumn: 13, gridRow: "1 / 3" }}>
                 <span className={styles.rockerLabel}>BRT</span>
                 <span className={styles.rockerLabel}>DIM</span>
               </div>
@@ -821,17 +821,17 @@ export default function FmsTheme() {
               <button
                 className={`${styles.pageKey} ${activePage === "prog" ? styles.pageKeyActive : ""}`}
                 onClick={() => handlePageKey("prog")}
-                style={{ gridColumn: 1, gridRow: 3 }}
+                style={{ gridColumn: '1 / span 2', gridRow: 3 }}
               >
                 {"AIR\nPORT"}
               </button>
-              <div className={styles.blankKey} style={{ gridColumn: 2, gridRow: 3 }} />
+              <div className={styles.blankKey} style={{ gridColumn: '3 / span 2', gridRow: 3 }} />
 
               {/* Rows 4-5: arrow keys */}
-              <button className={styles.arrowKey} onClick={handleSlewUp} style={{ gridColumn: 1, gridRow: 4 }} aria-label="Slew left">&larr;</button>
-              <button className={styles.arrowKey} onClick={handleSlewUp} style={{ gridColumn: 2, gridRow: 4 }} aria-label="Slew up">&uarr;</button>
-              <button className={styles.arrowKey} style={{ gridColumn: 1, gridRow: 5 }} aria-label="Slew right">&rarr;</button>
-              <button className={styles.arrowKey} onClick={handleSlewDown} style={{ gridColumn: 2, gridRow: 5 }} aria-label="Slew down">&darr;</button>
+              <button className={styles.arrowKey} onClick={handleSlewUp} style={{ gridColumn: '1 / span 2', gridRow: 4 }} aria-label="Slew left">&larr;</button>
+              <button className={styles.arrowKey} onClick={handleSlewUp} style={{ gridColumn: '3 / span 2', gridRow: 4 }} aria-label="Slew up">&uarr;</button>
+              <button className={styles.arrowKey} style={{ gridColumn: '1 / span 2', gridRow: 5 }} aria-label="Slew right">&rarr;</button>
+              <button className={styles.arrowKey} onClick={handleSlewDown} style={{ gridColumn: '3 / span 2', gridRow: 5 }} aria-label="Slew down">&darr;</button>
 
               {/* Keyboard: numpad under arrows, alpha beside AIRPORT/arrows */}
               <MCDUKeyboard

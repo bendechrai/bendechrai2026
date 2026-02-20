@@ -290,10 +290,12 @@
 
 /* ============ BELOW-SCREEN PHYSICAL BUTTONS ============ */
 
-/* Unified controls: 6 key cols + rocker col, up to 5 rows */
+/* Unified controls: 12 sub-cols (each button spans 2) + rocker col.
+   Sub-col 5 is left empty to create a half-button gap between
+   the left segment (AIRPORT/arrows/numpad) and the alpha keyboard. */
 .controlsArea {
   display: grid;
-  grid-template-columns: repeat(6, 1fr) auto;
+  grid-template-columns: repeat(12, 1fr) auto;
   gap: 3px;
   padding: 2px 2px;
 }
@@ -318,6 +320,7 @@
   height: 32px;
   box-sizing: border-box;
   white-space: pre-line;
+  grid-column: span 2;
 }
 
 .pageKey:hover {
@@ -393,10 +396,11 @@
   box-sizing: border-box;
 }
 
-/* Alpha keyboard — cols 3+, rows 3-8 (beside AIRPORT/arrows) */
+/* Alpha keyboard — sub-cols 6+, rows 3-8 (gap at sub-col 5) */
 .alphaKeys {
-  grid-column: 3 / -1;
+  grid-column: 6 / -1;
   grid-row: 3 / span 6;
+  align-self: end;
   display: flex;
   flex-direction: column;
   gap: 2px;
@@ -407,9 +411,9 @@
   gap: 2px;
 }
 
-/* Numeric keypad — cols 1-2, rows 6-9 (under arrow keys) */
+/* Numeric keypad — sub-cols 1-4, rows 6-9 (under arrow keys) */
 .numericArea {
-  grid-column: 1 / 3;
+  grid-column: 1 / 5;
   grid-row: 6 / span 4;
   display: flex;
   flex-direction: column;
@@ -419,6 +423,7 @@
 .numRow {
   display: flex;
   gap: 2px;
+  justify-content: center;
 }
 
 /* Individual key button */
@@ -449,6 +454,15 @@
   background: #666;
   color: #fff;
   transform: scale(0.96);
+}
+
+/* Numeric keypad buttons — circular */
+.keyNum {
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  flex: 0 0 32px;
 }
 
 /* Compass keys (E, N, S, W) have a box border */
@@ -846,6 +860,13 @@
     min-width: 24px;
     height: 26px;
     font-size: 11px;
+  }
+
+  .keyNum {
+    width: 28px;
+    height: 28px;
+    min-width: 28px;
+    flex: 0 0 28px;
   }
 
   .pageKey {
