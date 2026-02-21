@@ -342,6 +342,17 @@
   border-color: #00aa00;
 }
 
+.pageKeyDisabled {
+  color: #555;
+  cursor: default;
+  opacity: 0.6;
+}
+
+.pageKeyDisabled:hover {
+  background: #222;
+  color: #555;
+}
+
 /* BRT/DIM rocker — spans rows 1-2 of controls grid */
 .rocker {
   display: flex;
@@ -425,7 +436,7 @@
 /* Numeric keypad — 2.5 page-key widths, left-aligned under arrows */
 .numericArea {
   grid-column: 1 / 6;
-  grid-row: 6 / span 4;
+  grid-row: 5 / span 4;
   display: flex;
   flex-direction: column;
   gap: 2px;

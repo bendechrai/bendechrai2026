@@ -618,20 +618,20 @@ export default function FmsTheme() {
   );
 
   const pageKeysRow1 = [
-    { id: "dir" as const, label: "DIR", page: "init" as McduPage },
+    { id: "dir" as const, label: "DIR", page: null },
     { id: "prog" as const, label: "PROG", page: "prog" as McduPage },
     { id: "perf" as const, label: "PERF", page: "perf" as McduPage },
     { id: "init" as const, label: "INIT", page: "init" as McduPage },
     { id: "data" as const, label: "DATA", page: "data" as McduPage },
-    { id: "video" as const, label: "VIDEO", page: "init" as McduPage },
+    { id: "radnav" as const, label: "RAD\nNAV", page: null },
   ];
   const pageKeysRow2 = [
-    { id: "fpln" as const, label: "F-PLAN", page: "fPln" as McduPage },
-    { id: "radnav" as const, label: "RAD\nNAV", page: "init" as McduPage },
-    { id: "fuelpred" as const, label: "FUEL\nPRED", page: "init" as McduPage },
-    { id: "secfpln" as const, label: "SEC\nF-PLAN", page: "fPln" as McduPage },
+    { id: "fpln" as const, label: "F-PLN", page: "fPln" as McduPage },
+    { id: "fuelpred" as const, label: "FUEL\nPRED", page: null },
+    { id: "secfpln" as const, label: "SEC\nF-PLN", page: null },
     { id: "atccomm" as const, label: "ATC\nCOMM", page: "atcComm" as McduPage },
     { id: "mcdumenu" as const, label: "MCDU\nMENU", page: "init" as McduPage },
+    { id: "airport" as const, label: "AIR\nPORT", page: null },
   ];
 
   // Screen-only reading mode: scrollable content without MCDU hardware
@@ -799,8 +799,9 @@ export default function FmsTheme() {
               {pageKeysRow1.map((pk) => (
                 <button
                   key={pk.id}
-                  className={`${styles.pageKey} ${activePage === pk.page ? styles.pageKeyActive : ""}`}
-                  onClick={() => handlePageKey(pk.page)}
+                  className={`${styles.pageKey} ${pk.page === null ? styles.pageKeyDisabled : ""} ${pk.page !== null && activePage === pk.page ? styles.pageKeyActive : ""}`}
+                  onClick={pk.page !== null ? () => handlePageKey(pk.page) : undefined}
+                  disabled={pk.page === null}
                 >
                   {pk.label}
                 </button>
@@ -810,28 +811,19 @@ export default function FmsTheme() {
               {pageKeysRow2.map((pk) => (
                 <button
                   key={pk.id}
-                  className={`${styles.pageKey} ${activePage === pk.page ? styles.pageKeyActive : ""}`}
-                  onClick={() => handlePageKey(pk.page)}
+                  className={`${styles.pageKey} ${pk.page === null ? styles.pageKeyDisabled : ""} ${pk.page !== null && activePage === pk.page ? styles.pageKeyActive : ""}`}
+                  onClick={pk.page !== null ? () => handlePageKey(pk.page) : undefined}
+                  disabled={pk.page === null}
                 >
                   {pk.label}
                 </button>
               ))}
 
-              {/* Row 3: AIRPORT + blank */}
-              <button
-                className={`${styles.pageKey} ${activePage === "prog" ? styles.pageKeyActive : ""}`}
-                onClick={() => handlePageKey("prog")}
-                style={{ gridColumn: '1 / span 2', gridRow: 3 }}
-              >
-                {"AIR\nPORT"}
-              </button>
-              <div className={styles.blankKey} style={{ gridColumn: '3 / span 2', gridRow: 3 }} />
-
-              {/* Rows 4-5: arrow keys */}
-              <button className={styles.arrowKey} onClick={handleSlewUp} style={{ gridColumn: '1 / span 2', gridRow: 4 }} aria-label="Slew left">&larr;</button>
-              <button className={styles.arrowKey} onClick={handleSlewUp} style={{ gridColumn: '3 / span 2', gridRow: 4 }} aria-label="Slew up">&uarr;</button>
-              <button className={styles.arrowKey} style={{ gridColumn: '1 / span 2', gridRow: 5 }} aria-label="Slew right">&rarr;</button>
-              <button className={styles.arrowKey} onClick={handleSlewDown} style={{ gridColumn: '3 / span 2', gridRow: 5 }} aria-label="Slew down">&darr;</button>
+              {/* Rows 3-4: arrow keys */}
+              <button className={styles.arrowKey} onClick={handleSlewUp} style={{ gridColumn: '1 / span 2', gridRow: 3 }} aria-label="Previous page">&larr;</button>
+              <button className={styles.arrowKey} onClick={handleSlewUp} style={{ gridColumn: '3 / span 2', gridRow: 3 }} aria-label="Previous page">&uarr;</button>
+              <button className={styles.arrowKey} style={{ gridColumn: '1 / span 2', gridRow: 4 }} aria-label="Next page">&rarr;</button>
+              <button className={styles.arrowKey} onClick={handleSlewDown} style={{ gridColumn: '3 / span 2', gridRow: 4 }} aria-label="Next page">&darr;</button>
 
               {/* Keyboard: numpad under arrows, alpha beside AIRPORT/arrows */}
               <MCDUKeyboard
