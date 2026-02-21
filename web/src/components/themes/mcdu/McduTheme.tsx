@@ -383,13 +383,14 @@ function AtcCommRows({
 
   return (
     <ScreenRows rows={[
-      { leftLabel: "FROM", leftData: name || "\u00A0", leftColor: name ? "cyan" : "amber", onLeftClick: () => {}, rightLabel: "GITHUB", rightData: "@bendechrai", rightColor: "cyan", onRightClick: () => window.open(SOCIAL_LINKS.github, "_blank", "noopener,noreferrer") },
-      { leftLabel: "MESSAGE", leftData: message ? message.slice(0, 30) + (message.length > 30 ? "..." : "") : "\u00A0", leftColor: message ? "cyan" : "amber", onLeftClick: () => {}, rightLabel: "LINKEDIN", rightData: "li/bendechrai", rightColor: "cyan", onRightClick: () => window.open(SOCIAL_LINKS.linkedin, "_blank", "noopener,noreferrer") },
-      { leftLabel: message.length > 30 ? "MSG CONT" : undefined, leftData: message.length > 30 ? message.slice(30, 80) + (message.length > 80 ? "..." : "") : undefined, leftColor: "green", rightLabel: "TWITTER", rightData: "@bendechrai", rightColor: "cyan", onRightClick: () => window.open(SOCIAL_LINKS.twitter, "_blank", "noopener,noreferrer") },
-      {},
-      {},
+      { rightLabel: "GITHUB", rightData: "@bendechrai", rightColor: "cyan", onRightClick: () => window.open(SOCIAL_LINKS.github, "_blank", "noopener,noreferrer") },
+      { rightLabel: "LINKEDIN", rightData: "li/bendechrai", rightColor: "cyan", onRightClick: () => window.open(SOCIAL_LINKS.linkedin, "_blank", "noopener,noreferrer") },
+      { rightLabel: "TWITTER", rightData: "@bendechrai", rightColor: "cyan", onRightClick: () => window.open(SOCIAL_LINKS.twitter, "_blank", "noopener,noreferrer") },
+      { leftLabel: "FROM", leftData: name || "\u00A0", leftColor: name ? "cyan" : "amber", onLeftClick: () => {} },
+      { leftLabel: "MESSAGE", leftData: message ? message.slice(0, 30) + (message.length > 30 ? "..." : "") : "\u00A0", leftColor: message ? "cyan" : "amber", onLeftClick: () => {} },
       {
-        fullData: !name ? "TYPE IN SCRATCHPAD, PRESS L1" : !message ? "TYPE IN SCRATCHPAD, PRESS L2" : undefined,
+        leftLabel: message.length > 30 ? "MSG CONT" : undefined, leftData: message.length > 30 ? message.slice(30, 80) + (message.length > 80 ? "..." : "") : undefined, leftColor: "green",
+        fullData: !name ? "TYPE EMAIL ADDRESS IN SCRATCHPAD, PRESS L4" : !message ? "TYPE MESSAGE IN SCRATCHPAD, PRESS L5" : undefined,
         fullColor: "white",
         rightLabel: sending ? "TRANSMITTING" : name.trim() && message.trim() ? "SEND *" : undefined,
         rightData: name.trim() && message.trim() && !sending ? "TRANSMIT" : undefined,
@@ -646,27 +647,32 @@ export default function McduTheme() {
   const handleLsk = useCallback(
     (side: "left" | "right", row: number) => {
       if (activePage === "atcComm") {
-        // L1: load scratchpad into FROM field
-        if (side === "left" && row === 1) {
+        // L4: load scratchpad into FROM field
+        if (side === "left" && row === 4) {
           if (scratchpad.trim()) {
             setMsgName(scratchpad.trim());
             setScratchpad("");
           } else {
             showScratchError("ENTRY REQUIRED");
           }
+          return;
         }
-        // L2: load scratchpad into MESSAGE field
-        else if (side === "left" && row === 2) {
+        // L5: load scratchpad into MESSAGE field
+        if (side === "left" && row === 5) {
           if (scratchpad.trim()) {
             setMsgBody(scratchpad.trim());
             setScratchpad("");
           } else {
             showScratchError("ENTRY REQUIRED");
           }
+          return;
         }
         // R6: transmit
-        else if (side === "right" && row === 6) handleSendMessage();
-        return;
+        if (side === "right" && row === 6) {
+          handleSendMessage();
+          return;
+        }
+        // Fall through to generic handler for R1-R3 social links etc.
       }
 
       // For article detail body pages, handle prev/next on row 6
