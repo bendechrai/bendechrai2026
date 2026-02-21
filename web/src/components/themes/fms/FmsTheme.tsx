@@ -480,6 +480,20 @@ export default function FmsTheme() {
   const [screenOnly, setScreenOnly] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
 
+  // Screen brightness (0.3–1.0)
+  const [brightness, setBrightness] = useState(0.8);
+  useEffect(() => {
+    const saved = localStorage.getItem("fms-brightness");
+    if (saved) setBrightness(parseFloat(saved));
+  }, []);
+  const adjustBrightness = useCallback((delta: number) => {
+    setBrightness((prev) => {
+      const next = Math.round(Math.min(1.0, Math.max(0.3, prev + delta)) * 10) / 10;
+      localStorage.setItem("fms-brightness", String(next));
+      return next;
+    });
+  }, []);
+
   // Pagination per page type
   const [listPage, setListPage] = useState(0);
   const [detailPage, setDetailPage] = useState(0);
@@ -840,7 +854,7 @@ export default function FmsTheme() {
             </div>
 
             {/* Screen area: title | LSKs+rows | scratchpad */}
-            <div className={styles.screenArea}>
+            <div className={styles.screenArea} style={{ filter: `brightness(${brightness})` }}>
               {/* Screen background (dark bezel spanning full middle column) */}
               <div className={styles.screenBg} />
 
@@ -913,8 +927,8 @@ export default function FmsTheme() {
             <nav className={styles.controlsArea} role="navigation" aria-label="FMS page navigation">
               {/* BRT/DIM rocker — col 7, rows 1-2 */}
               <div className={styles.rocker} style={{ gridColumn: 13, gridRow: "1 / 3" }}>
-                <span className={styles.rockerLabel}>BRT</span>
-                <span className={styles.rockerLabel}>DIM</span>
+                <button className={styles.rockerLabel} onClick={() => adjustBrightness(0.1)}>BRT</button>
+                <button className={styles.rockerLabel} onClick={() => adjustBrightness(-0.1)}>DIM</button>
               </div>
 
               {/* Row 1: page keys */}

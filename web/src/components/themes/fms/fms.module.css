@@ -407,6 +407,18 @@
   padding: 4px 6px;
   text-align: center;
   letter-spacing: 0.1em;
+  cursor: pointer;
+  transition: background 0.1s, color 0.1s;
+}
+
+.rockerLabel:hover {
+  background: #2a2a2a;
+  color: #888;
+}
+
+.rockerLabel:active {
+  background: #333;
+  color: #aaa;
 }
 
 .rockerLabel:first-child {
