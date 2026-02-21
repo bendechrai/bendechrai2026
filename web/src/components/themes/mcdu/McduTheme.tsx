@@ -386,9 +386,11 @@ function AtcCommRows({
       { leftLabel: "FROM", leftData: name || "\u00A0", leftColor: name ? "cyan" : "amber", onLeftClick: () => {}, rightLabel: "GITHUB", rightData: "github.com/bendechrai", rightColor: "cyan", onRightClick: () => window.open(SOCIAL_LINKS.github, "_blank", "noopener,noreferrer") },
       { leftLabel: "MESSAGE", leftData: message ? message.slice(0, 30) + (message.length > 30 ? "..." : "") : "\u00A0", leftColor: message ? "cyan" : "amber", onLeftClick: () => {}, rightLabel: "LINKEDIN", rightData: "linkedin.com/in/bendechrai", rightColor: "cyan", onRightClick: () => window.open(SOCIAL_LINKS.linkedin, "_blank", "noopener,noreferrer") },
       { leftLabel: message.length > 30 ? "MSG CONT" : undefined, leftData: message.length > 30 ? message.slice(30, 80) + (message.length > 80 ? "..." : "") : undefined, leftColor: "green", rightLabel: "TWITTER", rightData: "twitter.com/bendechrai", rightColor: "cyan", onRightClick: () => window.open(SOCIAL_LINKS.twitter, "_blank", "noopener,noreferrer") },
-      { leftData: !name ? "TYPE IN SCRATCHPAD, PRESS L1" : !message ? "TYPE IN SCRATCHPAD, PRESS L2" : undefined, leftColor: "white" },
+      {},
       {},
       {
+        fullData: !name ? "TYPE IN SCRATCHPAD, PRESS L1" : !message ? "TYPE IN SCRATCHPAD, PRESS L2" : undefined,
+        fullColor: "white",
         rightLabel: sending ? "TRANSMITTING" : name.trim() && message.trim() ? "SEND *" : undefined,
         rightData: name.trim() && message.trim() && !sending ? "TRANSMIT" : undefined,
         rightColor: "amber",
