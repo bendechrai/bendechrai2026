@@ -422,8 +422,8 @@
 
 .numRow {
   display: flex;
-  gap: 8px;
-  justify-content: center;
+  gap: 2px;
+  justify-content: space-between;
 }
 
 /* Individual key button */
