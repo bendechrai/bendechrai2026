@@ -350,7 +350,7 @@ function MCDUKeyboard({ onKey, onClear, onSpace }: {
   };
 
   return (
-    <div className={styles.keyboardArea}>
+    <>
       <div className={styles.numericArea}>
         {numRows.map((row, ri) => (
           <div key={ri} className={styles.numRow}>
@@ -381,7 +381,7 @@ function MCDUKeyboard({ onKey, onClear, onSpace }: {
           </div>
         ))}
       </div>
-    </div>
+    </>
   );
 }
 
