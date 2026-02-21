@@ -457,12 +457,23 @@ function AtcCommRows({
 
 // ============ Physical MCDU Keyboard ============
 
+const symbolMap: Record<string, string> = {
+  A: "!", B: "@", C: "#", D: "$", E: "%",
+  F: "^", G: "&", H: "*", I: "(", J: ")",
+  K: ",", L: ".", M: "/", N: ";", O: "'",
+  P: "<", Q: ">", R: "?", S: ":", T: '"',
+  U: "-", V: "_", W: "=", X: "+", Y: "|",
+  Z: "~",
+};
+
 function MCDUKeyboard({ onKey, onClear, onSpace, onSubmit }: {
   onKey: (key: string) => void;
   onClear: () => void;
   onSpace: () => void;
   onSubmit: () => void;
 }) {
+  const [symbolMode, setSymbolMode] = useState(false);
+
   const alphaRows = [
     ["A", "B", "C", "D", "E"],
     ["F", "G", "H", "I", "J"],
@@ -485,7 +496,16 @@ function MCDUKeyboard({ onKey, onClear, onSpace, onSubmit }: {
     else if (k === "CLR") onClear();
     else if (k === "OVFY") onSubmit();
     else if (k === "/") onKey("/");
+    else if (symbolMode && symbolMap[k]) {
+      onKey(symbolMap[k]);
+      setSymbolMode(false);
+    }
     else onKey(k);
+  };
+
+  const displayKey = (k: string) => {
+    if (symbolMode && symbolMap[k]) return symbolMap[k];
+    return k;
   };
 
   return (
@@ -497,9 +517,9 @@ function MCDUKeyboard({ onKey, onClear, onSpace, onSubmit }: {
               <button
                 key={k}
                 className={`${styles.key} ${styles.keyNum} ${k === "+/-" ? styles.keySpecial : ""}`}
-                onClick={() => onKey(k === "+/-" ? "-" : k)}
+                onClick={() => k === "+/-" ? setSymbolMode(!symbolMode) : onKey(k)}
               >
-                {k}
+                {k === "+/-" ? (symbolMode ? "A-Z" : "+/-") : k}
               </button>
             ))}
           </div>
@@ -514,7 +534,7 @@ function MCDUKeyboard({ onKey, onClear, onSpace, onSubmit }: {
                 className={`${styles.key} ${styles.keyAlpha} ${compassKeys.has(k) ? styles.keyCompass : ""} ${k === "CLR" ? styles.keyClear : ""} ${["SP", "/", "CLR", "OVFY"].includes(k) ? styles.keySpecial : ""}`}
                 onClick={() => handleAlphaKey(k)}
               >
-                {k}
+                {displayKey(k)}
               </button>
             ))}
           </div>
