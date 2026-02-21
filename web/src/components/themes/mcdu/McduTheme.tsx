@@ -984,22 +984,22 @@ export default function McduTheme() {
 
               {/* Scratchpad — below L6/R6, no LSKs beside it */}
               <div className={styles.screenScratchArea} onClick={() => { if (!scratchError) scratchRef.current?.focus(); }}>
-                {scratchError ? (
+                <input
+                  ref={scratchRef}
+                  type="text"
+                  inputMode="none"
+                  value={scratchpad}
+                  onChange={(e) => setScratchpad(e.target.value)}
+                  onKeyDown={handleScratchKeyDown}
+                  className={styles.scratchpadInput}
+                  placeholder=""
+                  spellCheck={false}
+                  autoComplete="off"
+                  aria-label="Scratchpad input"
+                  style={scratchError ? { visibility: "hidden" } : undefined}
+                />
+                {scratchError && (
                   <span className={styles.scratchpadAmber}>{scratchError}</span>
-                ) : (
-                  <input
-                    ref={scratchRef}
-                    type="text"
-                    inputMode="none"
-                    value={scratchpad}
-                    onChange={(e) => setScratchpad(e.target.value)}
-                    onKeyDown={handleScratchKeyDown}
-                    className={styles.scratchpadInput}
-                    placeholder=""
-                    spellCheck={false}
-                    autoComplete="off"
-                    aria-label="Scratchpad input"
-                  />
                 )}
               </div>
             </div>
