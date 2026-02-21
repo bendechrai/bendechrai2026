@@ -10,7 +10,7 @@ const BOOT_DURATION: Record<ThemeName, number> = {
   starship: 2000,
   holographic: 3000,
   retro: 2500,
-  fms: 2500,
+  mcdu: 2500,
 };
 
 function TerminalBoot({ onComplete }: { onComplete: () => void }) {
@@ -357,7 +357,7 @@ function RetroBoot({ onComplete }: { onComplete: () => void }) {
   );
 }
 
-function FmsBoot({ onComplete }: { onComplete: () => void }) {
+function McduBoot({ onComplete }: { onComplete: () => void }) {
   const [lines, setLines] = useState<string[]>([]);
   const bootLines = [
     "MCDU POWER ON",
@@ -367,7 +367,7 @@ function FmsBoot({ onComplete }: { onComplete: () => void }) {
     "ACARS DATALINK...ONLINE",
     "",
     "WELCOME",
-    "BENDECHRAI/FMS",
+    "BENDECHRAI/MCDU",
   ];
 
   useEffect(() => {
@@ -442,7 +442,7 @@ const BOOT_COMPONENTS: Record<ThemeName, React.ComponentType<{ onComplete: () =>
   starship: StarshipBoot,
   holographic: HolographicBoot,
   retro: RetroBoot,
-  fms: FmsBoot,
+  mcdu: McduBoot,
 };
 
 function markBooted(t: string) {

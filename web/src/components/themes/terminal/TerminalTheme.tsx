@@ -309,14 +309,14 @@ export default function TerminalTheme() {
         }
       } else if (trimmed.startsWith("theme ") || trimmed === "7") {
         const themeName = trimmed === "7" ? "" : trimmed.slice(6).trim();
-        const validThemes = ["starship", "cyberpunk", "terminal", "holographic", "retro", "fms"];
+        const validThemes = ["starship", "cyberpunk", "terminal", "holographic", "retro", "mcdu"];
         if (validThemes.includes(themeName)) {
           addLines([``, `  Switching to ${themeName} theme...`, ``]);
           setTimeout(() => setTheme(themeName as Parameters<typeof setTheme>[0]), 500);
         } else {
           addLines([
             "",
-            "  Available themes: starship, cyberpunk, terminal, holographic, retro, fms",
+            "  Available themes: starship, cyberpunk, terminal, holographic, retro, mcdu",
             "  Usage: theme <name>",
             "",
           ]);

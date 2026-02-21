@@ -5,7 +5,7 @@ import { useTheme } from "@/context/ThemeContext";
 import { ARTICLES, EVENTS, TALKS, PROJECTS, SOCIAL_LINKS, getArticleBySlug, getTalkBySlug } from "@/data/content";
 import { sendMessage } from "@/lib/sendMessage";
 import { useSection } from "@/hooks/useSection";
-import styles from "./fms.module.css";
+import styles from "./mcdu.module.css";
 
 // MCDU page IDs mapped to website sections
 type McduPage = "init" | "fPln" | "data" | "prog" | "atcComm" | "perf";
@@ -469,7 +469,7 @@ function MCDUKeyboard({ onKey, onClear, onSpace, onSubmit }: {
 
 // ============ Main FMS Theme ============
 
-export default function FmsTheme() {
+export default function McduTheme() {
   const { setTheme } = useTheme();
   const { section, articleSlug, talkSlug, navigate } = useSection();
   const activePage = sectionToPage(section);
@@ -482,13 +482,13 @@ export default function FmsTheme() {
   // Screen brightness (0.3–1.0)
   const [brightness, setBrightness] = useState(0.8);
   useEffect(() => {
-    const saved = localStorage.getItem("fms-brightness");
+    const saved = localStorage.getItem("mcdu-brightness");
     if (saved) setBrightness(parseFloat(saved));
   }, []);
   const adjustBrightness = useCallback((delta: number) => {
     setBrightness((prev) => {
       const next = Math.round(Math.min(1.0, Math.max(0.3, prev + delta)) * 10) / 10;
-      localStorage.setItem("fms-brightness", String(next));
+      localStorage.setItem("mcdu-brightness", String(next));
       return next;
     });
   }, []);
@@ -528,7 +528,7 @@ export default function FmsTheme() {
       else if (["menu", "mcdu"].includes(trimmed)) setShowMenu(true);
       else if (trimmed.startsWith("theme ")) {
         const name = trimmed.slice(6).trim();
-        const valid = ["starship", "cyberpunk", "terminal", "holographic", "retro", "fms"];
+        const valid = ["starship", "cyberpunk", "terminal", "holographic", "retro", "mcdu"];
         if (valid.includes(name)) {
           setTimeout(() => setTheme(name as Parameters<typeof setTheme>[0]), 300);
         }

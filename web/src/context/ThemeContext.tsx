@@ -28,6 +28,7 @@ const ThemeContext = createContext<ThemeContextValue | null>(null);
 const THEME_MIGRATIONS: Record<string, string> = {
   lcars: "starship",
   win31: "retro",
+  fms: "mcdu",
 };
 
 function getInitialTheme(): ThemeName {

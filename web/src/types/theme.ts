@@ -1,4 +1,4 @@
-export const THEME_NAMES = ["starship", "cyberpunk", "terminal", "holographic", "retro", "fms"] as const;
+export const THEME_NAMES = ["starship", "cyberpunk", "terminal", "holographic", "retro", "mcdu"] as const;
 export type ThemeName = (typeof THEME_NAMES)[number];
 
 export const DEFAULT_THEME: ThemeName = "cyberpunk";
@@ -101,9 +101,9 @@ export const THEME_CONFIGS: Record<ThemeName, ThemeConfig> = {
       surface: "#C0C0C0",
     },
   },
-  fms: {
-    name: "fms",
-    label: "FMS",
+  mcdu: {
+    name: "mcdu",
+    label: "MCDU",
     fonts: {
       display: "'B612 Mono', 'Courier New', monospace",
       body: "'B612 Mono', 'Courier New', monospace",

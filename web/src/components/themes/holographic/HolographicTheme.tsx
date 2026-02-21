@@ -328,7 +328,7 @@ export default function HolographicTheme() {
       { label: "THEME TERMINAL", action: () => { setTheme("terminal"); setPaletteOpen(false); } },
       { label: "THEME HOLOGRAPHIC", action: () => { setTheme("holographic"); setPaletteOpen(false); } },
       { label: "THEME RETRO", action: () => { setTheme("retro"); setPaletteOpen(false); } },
-      { label: "THEME FMS", action: () => { setTheme("fms"); setPaletteOpen(false); } },
+      { label: "THEME MCDU", action: () => { setTheme("mcdu"); setPaletteOpen(false); } },
     ];
     if (!q) return commands;
     return commands.filter((c) => c.label.toLowerCase().includes(q));
