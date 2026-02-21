@@ -272,6 +272,18 @@ function buildPerfRows(page: number): { rows: ScreenRowData[]; totalPages: numbe
   return { rows: rows.slice(0, 6), totalPages };
 }
 
+function buildMenuRows(navigate: (p: string) => void, closeMenu: () => void): ScreenRowData[] {
+  const go = (path: string) => () => { navigate(path); closeMenu(); };
+  return [
+    { leftLabel: "INIT", leftData: "ABOUT ME", leftColor: "green", onLeftClick: go("/"), rightLabel: "F-PLAN", rightData: "ARTICLES", rightColor: "green", onRightClick: go("/articles") },
+    { leftLabel: "PROG", leftData: "EVENTS", leftColor: "green", onLeftClick: go("/events"), rightLabel: "DATA", rightData: "TALKS", rightColor: "green", onRightClick: go("/talks") },
+    { leftLabel: "PERF", leftData: "PROJECTS", leftColor: "green", onLeftClick: go("/projects"), rightLabel: "ATC COMM", rightData: "CONTACT", rightColor: "green", onRightClick: go("/contact") },
+    {},
+    {},
+    { leftLabel: "SELECT PAGE", leftData: "USE L/R KEYS", leftColor: "white" },
+  ];
+}
+
 // ============ ATC COMM page (special - has message form) ============
 
 function AtcCommRows({
@@ -319,10 +331,11 @@ function AtcCommRows({
 
 // ============ Physical MCDU Keyboard ============
 
-function MCDUKeyboard({ onKey, onClear, onSpace }: {
+function MCDUKeyboard({ onKey, onClear, onSpace, onSubmit }: {
   onKey: (key: string) => void;
   onClear: () => void;
   onSpace: () => void;
+  onSubmit: () => void;
 }) {
   const alphaRows = [
     ["A", "B", "C", "D", "E"],
@@ -344,7 +357,7 @@ function MCDUKeyboard({ onKey, onClear, onSpace }: {
   const handleAlphaKey = (k: string) => {
     if (k === "SP") onSpace();
     else if (k === "CLR") onClear();
-    else if (k === "OVFY") onKey(".");
+    else if (k === "OVFY") onSubmit();
     else if (k === "/") onKey("/");
     else onKey(k);
   };
@@ -395,6 +408,7 @@ export default function FmsTheme() {
   const scratchRef = useRef<HTMLInputElement>(null);
   const initializedRef = useRef(false);
   const [screenOnly, setScreenOnly] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
 
   // Pagination per page type
   const [listPage, setListPage] = useState(0);
@@ -422,12 +436,13 @@ export default function FmsTheme() {
   const handleScratchCommand = useCallback(
     (cmd: string) => {
       const trimmed = cmd.trim().toLowerCase();
-      if (["articles", "f-pln", "fpln", "log"].includes(trimmed)) navigate("/articles");
-      else if (["events", "prog", "departures"].includes(trimmed)) navigate("/events");
-      else if (["talks", "data", "nav"].includes(trimmed)) navigate("/talks");
-      else if (["projects", "perf"].includes(trimmed)) navigate("/projects");
-      else if (["contact", "comms", "atc", "msg"].includes(trimmed)) navigate("/contact");
-      else if (["init", "home", "ident"].includes(trimmed)) navigate("/");
+      if (["articles", "f-pln", "fpln", "log"].includes(trimmed)) { setShowMenu(false); navigate("/articles"); }
+      else if (["events", "prog", "departures"].includes(trimmed)) { setShowMenu(false); navigate("/events"); }
+      else if (["talks", "data", "nav"].includes(trimmed)) { setShowMenu(false); navigate("/talks"); }
+      else if (["projects", "perf"].includes(trimmed)) { setShowMenu(false); navigate("/projects"); }
+      else if (["contact", "comms", "atc", "msg"].includes(trimmed)) { setShowMenu(false); navigate("/contact"); }
+      else if (["init", "home", "ident"].includes(trimmed)) { setShowMenu(false); navigate("/"); }
+      else if (["menu", "mcdu"].includes(trimmed)) setShowMenu(true);
       else if (trimmed.startsWith("theme ")) {
         const name = trimmed.slice(6).trim();
         const valid = ["starship", "cyberpunk", "terminal", "holographic", "retro", "fms"];
@@ -462,6 +477,11 @@ export default function FmsTheme() {
     setScratchpad((prev) => prev + " ");
   }, []);
 
+  const handleKeySubmit = useCallback(() => {
+    handleScratchCommand(scratchpad);
+    setScratchpad("");
+  }, [handleScratchCommand, scratchpad]);
+
   const handleSendMessage = useCallback(async () => {
     if (!msgName.trim() || !msgBody.trim() || sending) return;
     setSending(true);
@@ -481,7 +501,10 @@ export default function FmsTheme() {
   let pageNum = 1;
   let totalPages = 1;
 
-  if (activePage === "init") {
+  if (showMenu) {
+    screenTitle = "MCDU MENU";
+    screenRows = buildMenuRows(navigate, () => setShowMenu(false));
+  } else if (activePage === "init") {
     screenTitle = "INIT";
     screenRows = buildInitRows(navigate);
   } else if (activePage === "fPln" && articleSlug) {
@@ -612,26 +635,27 @@ export default function FmsTheme() {
 
   const handlePageKey = useCallback(
     (page: McduPage) => {
+      setShowMenu(false);
       navigate(pageToPath(page));
     },
     [navigate],
   );
 
-  const pageKeysRow1 = [
-    { id: "dir" as const, label: "DIR", page: null },
-    { id: "prog" as const, label: "PROG", page: "prog" as McduPage },
-    { id: "perf" as const, label: "PERF", page: "perf" as McduPage },
-    { id: "init" as const, label: "INIT", page: "init" as McduPage },
-    { id: "data" as const, label: "DATA", page: "data" as McduPage },
-    { id: "video" as const, label: "VIDEO", page: null },
+  const pageKeysRow1: { id: string; label: string; page: McduPage | "menu" | null }[] = [
+    { id: "dir", label: "DIR", page: null },
+    { id: "prog", label: "PROG", page: "prog" },
+    { id: "perf", label: "PERF", page: "perf" },
+    { id: "init", label: "INIT", page: "init" },
+    { id: "data", label: "DATA", page: "data" },
+    { id: "video", label: "VIDEO", page: null },
   ];
-  const pageKeysRow2 = [
-    { id: "fpln" as const, label: "F-PLAN", page: "fPln" as McduPage },
-    { id: "radnav" as const, label: "RAD\nNAV", page: null },
-    { id: "fuelpred" as const, label: "FUEL\nPRED", page: null },
-    { id: "secfpln" as const, label: "SEC\nF-PLAN", page: null },
-    { id: "atccomm" as const, label: "ATC\nCOMM", page: "atcComm" as McduPage },
-    { id: "mcdumenu" as const, label: "MCDU\nMENU", page: "init" as McduPage },
+  const pageKeysRow2: { id: string; label: string; page: McduPage | "menu" | null }[] = [
+    { id: "fpln", label: "F-PLAN", page: "fPln" },
+    { id: "radnav", label: "RAD\nNAV", page: null },
+    { id: "fuelpred", label: "FUEL\nPRED", page: null },
+    { id: "secfpln", label: "SEC\nF-PLAN", page: null },
+    { id: "atccomm", label: "ATC\nCOMM", page: "atcComm" },
+    { id: "mcdumenu", label: "MCDU\nMENU", page: "menu" },
   ];
 
   // Screen-only reading mode: scrollable content without MCDU hardware
@@ -799,8 +823,8 @@ export default function FmsTheme() {
               {pageKeysRow1.map((pk) => (
                 <button
                   key={pk.id}
-                  className={`${styles.pageKey} ${pk.page === null ? styles.pageKeyDisabled : ""} ${pk.page !== null && activePage === pk.page ? styles.pageKeyActive : ""}`}
-                  onClick={pk.page !== null ? () => handlePageKey(pk.page) : undefined}
+                  className={`${styles.pageKey} ${pk.page === null ? styles.pageKeyDisabled : ""} ${pk.page !== null && pk.page !== "menu" && activePage === pk.page ? styles.pageKeyActive : ""} ${pk.page === "menu" && showMenu ? styles.pageKeyActive : ""}`}
+                  onClick={pk.page === null ? undefined : pk.page === "menu" ? () => setShowMenu((v) => !v) : () => handlePageKey(pk.page as McduPage)}
                   disabled={pk.page === null}
                 >
                   {pk.label}
@@ -811,8 +835,8 @@ export default function FmsTheme() {
               {pageKeysRow2.map((pk) => (
                 <button
                   key={pk.id}
-                  className={`${styles.pageKey} ${pk.page === null ? styles.pageKeyDisabled : ""} ${pk.page !== null && activePage === pk.page ? styles.pageKeyActive : ""}`}
-                  onClick={pk.page !== null ? () => handlePageKey(pk.page) : undefined}
+                  className={`${styles.pageKey} ${pk.page === null ? styles.pageKeyDisabled : ""} ${pk.page !== null && pk.page !== "menu" && activePage === pk.page ? styles.pageKeyActive : ""} ${pk.page === "menu" && showMenu ? styles.pageKeyActive : ""}`}
+                  onClick={pk.page === null ? undefined : pk.page === "menu" ? () => setShowMenu((v) => !v) : () => handlePageKey(pk.page as McduPage)}
                   disabled={pk.page === null}
                 >
                   {pk.label}
@@ -840,6 +864,7 @@ export default function FmsTheme() {
                 onKey={handleKeyPress}
                 onClear={handleKeyClear}
                 onSpace={handleKeySpace}
+                onSubmit={handleKeySubmit}
               />
             </nav>
 
