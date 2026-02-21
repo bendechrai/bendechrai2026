@@ -400,7 +400,7 @@
 /* Alpha keyboard — to the right of numpad */
 .alphaKeys {
   grid-column: 6 / -1;
-  grid-row: 3 / span 6;
+  grid-row: 3 / span 7;
   align-self: end;
   display: flex;
   flex-direction: column;
