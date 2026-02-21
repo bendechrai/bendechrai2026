@@ -82,6 +82,54 @@ function ScreenRows({ rows }: { rows: ScreenRowData[] }) {
   return (
     <>
       {padded.slice(0, 6).map((row, i) => {
+        // Hybrid mode: full-width label with split left/right data
+        if (row.fullLabel !== undefined && row.fullData === undefined) {
+          const clickHandler = row.onFullClick || row.onLeftClick;
+          const rightClickHandler = row.onFullClick || row.onRightClick;
+          return (
+            <div key={i} className={styles.rowPair}>
+              <div className={`${styles.cell} ${styles.cellFull} ${styles.labelRow}`}>
+                <span className={`${styles.label} ${clickHandler ? styles.labelAmber : ""}`}>
+                  {row.fullLabel}
+                </span>
+                {row.fullLabelRight && (
+                  <span className={`${styles.label} ${rightClickHandler ? styles.labelAmber : ""}`}>
+                    {row.fullLabelRight}
+                  </span>
+                )}
+              </div>
+              <div className={`${styles.cell} ${styles.cellLeft}`}>
+                {row.leftHref ? (
+                  <a href={row.leftHref} target="_blank" rel="noopener noreferrer" className={styles.socialLink}>
+                    <span className={`${colorClass(row.leftColor)} ${styles.dataNoWrap}`}>{row.leftData || "\u00A0"}</span>
+                  </a>
+                ) : (
+                  <span
+                    className={`${colorClass(row.leftColor)} ${clickHandler ? styles.lskData : ""} ${styles.dataNoWrap}`}
+                    onClick={clickHandler}
+                  >
+                    {row.leftData || "\u00A0"}
+                  </span>
+                )}
+              </div>
+              <div className={`${styles.cell} ${styles.cellRight}`}>
+                {row.rightHref ? (
+                  <a href={row.rightHref} target="_blank" rel="noopener noreferrer" className={styles.socialLink}>
+                    <span className={`${colorClass(row.rightColor)} ${styles.dataNoWrap}`}>{row.rightData || "\u00A0"}</span>
+                  </a>
+                ) : (
+                  <span
+                    className={`${colorClass(row.rightColor)} ${rightClickHandler ? styles.lskData : ""} ${styles.dataNoWrap}`}
+                    onClick={rightClickHandler}
+                  >
+                    {row.rightData || "\u00A0"}
+                  </span>
+                )}
+              </div>
+            </div>
+          );
+        }
+
         // Full-width row mode: label spans both cols, data spans both cols
         if (row.fullData !== undefined) {
           return (
@@ -187,10 +235,11 @@ function buildFPlnListRows(page: number, navigate: (p: string) => void): { rows:
   const start = page * perPage;
   const slice = ARTICLES.slice(start, start + perPage);
   const rows: ScreenRowData[] = slice.map((a) => ({
-    fullLabel: formatDate(a.date),
-    fullLabelRight: a.tag,
-    fullData: a.title,
-    fullColor: "green" as const,
+    fullLabel: a.title,
+    leftData: a.tag,
+    leftColor: "cyan" as const,
+    rightData: formatDate(a.date),
+    rightColor: "cyan" as const,
     onFullClick: () => navigate(`/articles/${a.slug}`),
   }));
   return { rows, totalPages };
@@ -254,10 +303,11 @@ function buildProgRows(page: number, navigate: (p: string) => void): { rows: Scr
     // Find matching talk slug for navigation
     const matchingTalk = ev.talk ? TALKS.find((t) => t.title === ev.talk) : null;
     return {
-      fullLabel: `${ev.name} · ${ev.location}`,
-      fullLabelRight: formatDate(ev.date),
-      fullData: ev.talk || (ev.role === "attending" ? "ATTENDING" : "—"),
-      fullColor: "green" as const,
+      fullLabel: ev.talk || (ev.role === "attending" ? "ATTENDING" : "—"),
+      leftData: `${ev.name} · ${ev.location}`,
+      leftColor: "cyan" as const,
+      rightData: formatDate(ev.date),
+      rightColor: "cyan" as const,
       onFullClick: matchingTalk ? () => navigate(`/talks/${matchingTalk.slug}`) : undefined,
     };
   });
@@ -270,9 +320,11 @@ function buildDataRows(page: number, navigate: (p: string) => void): { rows: Scr
   const start = page * perPage;
   const slice = TALKS.slice(start, start + perPage);
   const rows: ScreenRowData[] = slice.map((t) => ({
-    fullLabel: t.type === "workshop" ? "WORKSHOP" : "TALK",
-    fullData: t.title,
-    fullColor: "green" as const,
+    fullLabel: t.title,
+    leftData: `${t.type === "workshop" ? "WORKSHOP" : "TALK"} · ${t.event}`,
+    leftColor: "cyan" as const,
+    rightData: formatDate(t.date),
+    rightColor: "cyan" as const,
     onFullClick: () => navigate(`/talks/${t.slug}`),
   }));
   return { rows, totalPages };
@@ -284,11 +336,13 @@ function buildPerfRows(page: number): { rows: ScreenRowData[]; totalPages: numbe
   const start = page * perPage;
   const slice = PROJECTS.slice(start, start + perPage);
   const rows: ScreenRowData[] = slice.map((p) => ({
-    fullLabel: p.category.toUpperCase(),
+    fullLabel: p.name,
     fullLabelRight: p.status.toUpperCase(),
-    fullData: `${p.name} — ${p.tagline}`,
-    fullColor: "green" as const,
-    fullHref: p.url,
+    leftData: p.tagline,
+    leftColor: "cyan" as const,
+    leftHref: p.url,
+    rightData: p.category.toUpperCase(),
+    rightColor: "cyan" as const,
     onFullClick: () => window.open(p.url, "_blank", "noopener,noreferrer"),
   }));
   return { rows, totalPages };
