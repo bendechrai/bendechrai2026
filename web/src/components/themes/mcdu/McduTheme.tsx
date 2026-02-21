@@ -298,7 +298,7 @@ function buildMenuRows(navigate: (p: string) => void, closeMenu: () => void): Sc
   const go = (path: string) => () => { navigate(path); closeMenu(); };
   return [
     { leftLabel: "INIT", leftData: "ABOUT ME", leftColor: "green", onLeftClick: go("/"), rightLabel: "F-PLAN", rightData: "ARTICLES", rightColor: "green", onRightClick: go("/articles") },
-    { leftLabel: "PROG", leftData: "EVENTS", leftColor: "green", onLeftClick: go("/events"), rightLabel: "DATA", rightData: "TALKS", rightColor: "green", onRightClick: go("/talks") },
+    { leftLabel: "PROG", leftData: "EVENTS", leftColor: "green", onLeftClick: go("/events"), rightLabel: "DATA", rightData: "TALKS/WORKSHOPS", rightColor: "green", onRightClick: go("/talks") },
     { leftLabel: "PERF", leftData: "PROJECTS", leftColor: "green", onLeftClick: go("/projects"), rightLabel: "ATC COMM", rightData: "CONTACT", rightColor: "green", onRightClick: go("/contact") },
     {},
     {},
