@@ -426,8 +426,11 @@
 
 .numRow {
   display: flex;
-  gap: 2px;
   justify-content: space-between;
+}
+
+.numRow::before {
+  content: '';
 }
 
 /* Individual key button */
