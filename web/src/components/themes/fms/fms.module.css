@@ -411,7 +411,11 @@
 
 .alphaRow {
   display: flex;
-  gap: 2px;
+  justify-content: space-between;
+}
+
+.alphaRow::before {
+  content: '';
 }
 
 /* Numeric keypad — 2.5 page-key widths, left-aligned under arrows */
