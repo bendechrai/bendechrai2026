@@ -43,6 +43,8 @@ function formatDate(dateStr: string) {
 interface ScreenRowData {
   leftLabel?: string;
   rightLabel?: string;
+  leftLabelColor?: "white" | "amber";
+  rightLabelColor?: "white" | "amber";
   leftData?: string;
   rightData?: string;
   leftColor?: "green" | "white" | "cyan" | "amber" | "magenta";
@@ -89,11 +91,11 @@ function ScreenRows({ rows }: { rows: ScreenRowData[] }) {
           return (
             <div key={i} className={styles.rowPair}>
               <div className={`${styles.cell} ${styles.cellFull} ${styles.labelRow}`}>
-                <span className={`${styles.label} ${clickHandler ? styles.labelAmber : ""}`}>
+                <span className={styles.label}>
                   {row.fullLabel}
                 </span>
                 {row.fullLabelRight && (
-                  <span className={`${styles.label} ${rightClickHandler ? styles.labelAmber : ""}`}>
+                  <span className={styles.label}>
                     {row.fullLabelRight}
                   </span>
                 )}
@@ -136,11 +138,11 @@ function ScreenRows({ rows }: { rows: ScreenRowData[] }) {
             <div key={i} className={styles.rowPair}>
               {/* Labels in a single flex row spanning both columns */}
               <div className={`${styles.cell} ${styles.cellFull} ${styles.labelRow}`}>
-                <span className={`${styles.label} ${row.onFullClick || row.onLeftClick ? styles.labelAmber : ""}`}>
+                <span className={styles.label}>
                   {row.fullLabel || row.leftLabel || "\u00A0"}
                 </span>
                 {(row.fullLabelRight || row.rightLabel) && (
-                  <span className={`${styles.label} ${row.onRightClick ? styles.labelAmber : ""}`}>
+                  <span className={styles.label}>
                     {row.fullLabelRight || row.rightLabel}
                   </span>
                 )}
@@ -169,13 +171,13 @@ function ScreenRows({ rows }: { rows: ScreenRowData[] }) {
           <div key={i} className={styles.rowPair}>
             {/* Label left */}
             <div className={`${styles.cell} ${styles.cellLeft}`}>
-              <span className={`${styles.label} ${row.onLeftClick ? styles.labelAmber : ""}`}>
+              <span className={`${styles.label} ${row.leftLabelColor === "amber" ? styles.labelAmber : ""}`}>
                 {row.leftLabel || "\u00A0"}
               </span>
             </div>
             {/* Label right */}
             <div className={`${styles.cell} ${styles.cellRight}`}>
-              <span className={`${styles.label} ${row.onRightClick ? styles.labelAmber : ""}`}>
+              <span className={`${styles.label} ${row.rightLabelColor === "amber" ? styles.labelAmber : ""}`}>
                 {row.rightLabel || "\u00A0"}
               </span>
             </div>
@@ -341,8 +343,6 @@ function buildPerfRows(page: number): { rows: ScreenRowData[]; totalPages: numbe
     leftData: p.tagline,
     leftColor: "cyan" as const,
     leftHref: p.url,
-    rightData: p.category.toUpperCase(),
-    rightColor: "cyan" as const,
     onFullClick: () => window.open(p.url, "_blank", "noopener,noreferrer"),
   }));
   return { rows, totalPages };
@@ -440,8 +440,8 @@ function AtcCommRows({
       { rightLabel: "GITHUB", rightData: "@bendechrai", rightColor: "cyan", onRightClick: () => window.open(SOCIAL_LINKS.github, "_blank", "noopener,noreferrer") },
       { rightLabel: "LINKEDIN", rightData: "li/bendechrai", rightColor: "cyan", onRightClick: () => window.open(SOCIAL_LINKS.linkedin, "_blank", "noopener,noreferrer") },
       { rightLabel: "TWITTER", rightData: "@bendechrai", rightColor: "cyan", onRightClick: () => window.open(SOCIAL_LINKS.twitter, "_blank", "noopener,noreferrer") },
-      { leftLabel: "FROM", leftData: name || "\u00A0", leftColor: name ? "cyan" : "amber", onLeftClick: () => {} },
-      { leftLabel: "MESSAGE", leftData: message ? message.slice(0, 30) + (message.length > 30 ? "..." : "") : "\u00A0", leftColor: message ? "cyan" : "amber", onLeftClick: () => {} },
+      { leftLabel: "FROM", leftLabelColor: name ? "white" : "amber", leftData: name || "\u00A0", leftColor: name ? "cyan" : "amber", onLeftClick: () => {} },
+      { leftLabel: "MESSAGE", leftLabelColor: message ? "white" : "amber", leftData: message ? message.slice(0, 30) + (message.length > 30 ? "..." : "") : "\u00A0", leftColor: message ? "cyan" : "amber", onLeftClick: () => {} },
       {
         leftLabel: message.length > 30 ? "MSG CONT" : undefined, leftData: message.length > 30 ? message.slice(30, 80) + (message.length > 80 ? "..." : "") : undefined, leftColor: "green",
         fullData: !name ? "TYPE EMAIL ADDRESS IN SCRATCHPAD, PRESS L4" : !message ? "TYPE MESSAGE IN SCRATCHPAD, PRESS L5" : undefined,
