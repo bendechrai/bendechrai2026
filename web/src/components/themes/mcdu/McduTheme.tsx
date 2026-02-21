@@ -100,7 +100,7 @@ function ScreenRows({ rows }: { rows: ScreenRowData[] }) {
                   </span>
                 )}
               </div>
-              <div className={`${styles.cell} ${styles.cellLeft}`}>
+              <div className={`${styles.cell} ${styles.cellFull} ${styles.dataRow}`}>
                 {row.leftHref ? (
                   <a href={row.leftHref} target="_blank" rel="noopener noreferrer" className={styles.socialLink}>
                     <span className={`${colorClass(row.leftColor)} ${styles.dataNoWrap}`}>{row.leftData || "\u00A0"}</span>
@@ -113,19 +113,19 @@ function ScreenRows({ rows }: { rows: ScreenRowData[] }) {
                     {row.leftData || "\u00A0"}
                   </span>
                 )}
-              </div>
-              <div className={`${styles.cell} ${styles.cellRight}`}>
-                {row.rightHref ? (
-                  <a href={row.rightHref} target="_blank" rel="noopener noreferrer" className={styles.socialLink}>
-                    <span className={`${colorClass(row.rightColor)} ${styles.dataNoWrap}`}>{row.rightData || "\u00A0"}</span>
-                  </a>
-                ) : (
-                  <span
-                    className={`${colorClass(row.rightColor)} ${rightClickHandler ? styles.lskData : ""} ${styles.dataNoWrap}`}
-                    onClick={rightClickHandler}
-                  >
-                    {row.rightData || "\u00A0"}
-                  </span>
+                {row.rightData && (
+                  row.rightHref ? (
+                    <a href={row.rightHref} target="_blank" rel="noopener noreferrer" className={styles.socialLink}>
+                      <span className={`${colorClass(row.rightColor)} ${styles.dataNoWrap}`}>{row.rightData}</span>
+                    </a>
+                  ) : (
+                    <span
+                      className={`${colorClass(row.rightColor)} ${rightClickHandler ? styles.lskData : ""} ${styles.dataNoWrap}`}
+                      onClick={rightClickHandler}
+                    >
+                      {row.rightData}
+                    </span>
+                  )
                 )}
               </div>
             </div>

@@ -195,6 +195,25 @@
   white-space: nowrap;
 }
 
+/* Full-width data row — left data grows, right data shrinks to fit */
+.dataRow {
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.dataRow > *:first-child {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dataRow > *:last-child {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
 /* Prevent text wrapping — truncate with ellipsis */
 .dataNoWrap {
   white-space: nowrap;
