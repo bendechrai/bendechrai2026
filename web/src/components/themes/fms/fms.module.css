@@ -299,6 +299,7 @@
   grid-template-columns: repeat(12, 1fr) auto;
   gap: 3px;
   padding: 2px 2px;
+  margin-left: 28px;
 }
 
 .pageKey {
