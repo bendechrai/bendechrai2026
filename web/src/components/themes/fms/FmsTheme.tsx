@@ -270,8 +270,7 @@ function buildDataRows(page: number, navigate: (p: string) => void): { rows: Scr
   const start = page * perPage;
   const slice = TALKS.slice(start, start + perPage);
   const rows: ScreenRowData[] = slice.map((t) => ({
-    fullLabel: `${t.event} · ${formatDate(t.date)}`,
-    fullLabelRight: t.type === "workshop" ? "WKSHP" : "TALK",
+    fullLabel: t.type === "workshop" ? "WORKSHOP" : "TALK",
     fullData: t.title,
     fullColor: "green" as const,
     onFullClick: () => navigate(`/talks/${t.slug}`),
