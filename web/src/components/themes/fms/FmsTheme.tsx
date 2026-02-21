@@ -284,8 +284,8 @@ function buildPerfRows(page: number): { rows: ScreenRowData[]; totalPages: numbe
   const start = page * perPage;
   const slice = PROJECTS.slice(start, start + perPage);
   const rows: ScreenRowData[] = slice.map((p) => ({
-    fullLabel: `${p.category.toUpperCase()} · ${p.status.toUpperCase()}`,
-    fullLabelRight: p.tech.slice(0, 2).join("/"),
+    fullLabel: p.category.toUpperCase(),
+    fullLabelRight: p.status.toUpperCase(),
     fullData: `${p.name} — ${p.tagline}`,
     fullColor: "green" as const,
     fullHref: p.url,
@@ -607,7 +607,7 @@ export default function FmsTheme() {
     pageNum = listPage + 1;
   } else if (activePage === "perf") {
     const result = buildPerfRows(listPage);
-    screenTitle = "PERF / PROJ";
+    screenTitle = "PERF / PROJECTS";
     screenRows = result.rows;
     totalPages = result.totalPages;
     pageNum = listPage + 1;
