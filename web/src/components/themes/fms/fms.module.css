@@ -399,7 +399,7 @@
 
 /* Alpha keyboard — to the right of numpad */
 .alphaKeys {
-  grid-column: 8 / -1;
+  grid-column: 6 / -1;
   grid-row: 3 / span 6;
   align-self: end;
   display: flex;
@@ -413,10 +413,10 @@
   gap: 2px;
 }
 
-/* Numeric keypad — between arrows and alpha pad */
+/* Numeric keypad — 2.5 page-key widths, left-aligned under arrows */
 .numericArea {
-  grid-column: 5 / 8;
-  grid-row: 5 / span 4;
+  grid-column: 1 / 6;
+  grid-row: 6 / span 4;
   display: flex;
   flex-direction: column;
   gap: 2px;
