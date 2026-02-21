@@ -298,11 +298,12 @@
   grid-template-columns: repeat(12, 1fr) auto;
   gap: 3px;
   padding: 2px 2px;
+  border: 2px dashed magenta;
 }
 
 .pageKey {
   background: #222;
-  border: 1px solid #444;
+  border: 2px solid orange;
   border-radius: 3px;
   color: #bbb;
   font-family: 'B612 Mono', 'Courier New', monospace;
@@ -369,7 +370,7 @@
 /* Arrow keys in cols 1-2, rows 4-5 of controls grid */
 .arrowKey {
   background: #222;
-  border: 1px solid #444;
+  border: 2px solid lime;
   border-radius: 3px;
   color: #999;
   font-size: 12px;
@@ -390,20 +391,21 @@
 /* Blank key placeholder (visible dark button) */
 .blankKey {
   background: #1a1a1a;
-  border: 1px solid #333;
+  border: 2px solid yellow;
   border-radius: 3px;
   height: 32px;
   box-sizing: border-box;
 }
 
-/* Alpha keyboard — sub-cols 6+, rows 3-8 (gap at sub-col 5) */
+/* Alpha keyboard — to the right of numpad */
 .alphaKeys {
-  grid-column: 6 / -1;
+  grid-column: 8 / -1;
   grid-row: 3 / span 6;
   align-self: end;
   display: flex;
   flex-direction: column;
   gap: 2px;
+  border: 2px solid blue;
 }
 
 .alphaRow {
@@ -411,13 +413,14 @@
   gap: 2px;
 }
 
-/* Numeric keypad — sub-cols 1-4, rows 6-9 (under arrow keys) */
+/* Numeric keypad — between arrows and alpha pad */
 .numericArea {
-  grid-column: 1 / 5;
-  grid-row: 6 / span 4;
+  grid-column: 5 / 8;
+  grid-row: 5 / span 4;
   display: flex;
   flex-direction: column;
   gap: 2px;
+  border: 2px solid red;
 }
 
 .numRow {
