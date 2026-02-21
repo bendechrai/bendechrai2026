@@ -114,7 +114,8 @@
 
 .lsk {
   background: #222;
-  border: 1px solid #444;
+  border: 1px solid;
+  border-color: #555 #222 #222 #555;
   border-radius: 2px;
   color: #777;
   font-size: 7px;
@@ -128,13 +129,13 @@
 
 .lsk:hover {
   background: #333;
-  border-color: #666;
+  border-color: #666 #333 #333 #666;
   color: #aaa;
 }
 
 .lsk:active {
   background: #444;
-  border-color: #888;
+  border-color: #888 #444 #444 #888;
 }
 
 /* Transparent wrappers — children go directly into outer grid */
@@ -302,6 +303,8 @@
 
 .pageKey {
   background: #222;
+  border: 1px solid;
+  border-color: #555 #222 #222 #555;
   border-radius: 3px;
   color: #bbb;
   font-family: 'B612 Mono', 'Courier New', monospace;
@@ -368,6 +371,8 @@
 /* Arrow keys in cols 1-2, rows 4-5 of controls grid */
 .arrowKey {
   background: #222;
+  border: 1px solid;
+  border-color: #555 #222 #222 #555;
   border-radius: 3px;
   color: #999;
   font-size: 12px;
@@ -388,6 +393,8 @@
 /* Blank key placeholder (visible dark button) */
 .blankKey {
   background: #1a1a1a;
+  border: 1px solid;
+  border-color: #444 #111 #111 #444;
   border-radius: 3px;
   height: 32px;
   box-sizing: border-box;
@@ -434,7 +441,8 @@
 /* Individual key button */
 .key {
   background: #222;
-  border: 1px solid #444;
+  border: 1px solid;
+  border-color: #555 #222 #222 #555;
   border-radius: 3px;
   color: #ccc;
   font-family: 'B612 Mono', 'Courier New', monospace;
