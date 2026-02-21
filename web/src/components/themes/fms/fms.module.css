@@ -176,6 +176,25 @@
   overflow: hidden;
 }
 
+/* Full-width label row — left label grows, right label shrinks to fit */
+.labelRow {
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.labelRow > .label:first-child {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.labelRow > .label:last-child {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
 /* Prevent text wrapping — truncate with ellipsis */
 .dataNoWrap {
   white-space: nowrap;

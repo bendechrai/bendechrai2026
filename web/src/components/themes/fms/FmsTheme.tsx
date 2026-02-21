@@ -86,16 +86,16 @@ function ScreenRows({ rows }: { rows: ScreenRowData[] }) {
         if (row.fullData !== undefined) {
           return (
             <div key={i} className={styles.rowPair}>
-              {/* Label spanning both columns */}
-              <div className={`${styles.cell} ${styles.cellLeft}`}>
+              {/* Labels in a single flex row spanning both columns */}
+              <div className={`${styles.cell} ${styles.cellFull} ${styles.labelRow}`}>
                 <span className={`${styles.label} ${row.onFullClick || row.onLeftClick ? styles.labelAmber : ""}`}>
                   {row.fullLabel || row.leftLabel || "\u00A0"}
                 </span>
-              </div>
-              <div className={`${styles.cell} ${styles.cellRight}`}>
-                <span className={`${styles.label} ${row.onRightClick ? styles.labelAmber : ""}`}>
-                  {row.fullLabelRight || row.rightLabel || "\u00A0"}
-                </span>
+                {(row.fullLabelRight || row.rightLabel) && (
+                  <span className={`${styles.label} ${row.onRightClick ? styles.labelAmber : ""}`}>
+                    {row.fullLabelRight || row.rightLabel}
+                  </span>
+                )}
               </div>
               {/* Data spanning full width */}
               <div className={`${styles.cell} ${styles.cellFull}`}>
@@ -253,8 +253,8 @@ function buildProgRows(page: number, navigate: (p: string) => void): { rows: Scr
     // Find matching talk slug for navigation
     const matchingTalk = ev.talk ? TALKS.find((t) => t.title === ev.talk) : null;
     return {
-      fullLabel: `${ev.name} · ${formatDate(ev.date)}`,
-      fullLabelRight: ev.location,
+      fullLabel: `${ev.name} · ${ev.location}`,
+      fullLabelRight: formatDate(ev.date),
       fullData: ev.talk || (ev.role === "attending" ? "ATTENDING" : "—"),
       fullColor: "green" as const,
       onFullClick: matchingTalk ? () => navigate(`/talks/${matchingTalk.slug}`) : undefined,
