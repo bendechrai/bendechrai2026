@@ -17,8 +17,10 @@ export interface Event {
 
 export interface Talk {
   title: string;
+  slug: string;
   type: "talk" | "workshop";
   event: string;
+  eventUrl?: string;
   date: string;
   description: string;
 }
@@ -188,6 +190,10 @@ export function getArticleBySlug(slug: string): Article | undefined {
   return ARTICLES.find((a) => a.slug === slug);
 }
 
+export function getTalkBySlug(slug: string): Talk | undefined {
+  return TALKS.find((t) => t.slug === slug);
+}
+
 export const EVENTS: Event[] = [
   {
     name: "NDC Sydney",
@@ -217,39 +223,115 @@ export const EVENTS: Event[] = [
     role: "speaking",
     talk: "Securing the Edge: Auth at the CDN Layer",
   },
+  {
+    name: "YOW! Conference",
+    date: "2025-12-05",
+    location: "Melbourne, AU",
+    role: "speaking",
+    talk: "Privacy by Design in Practice",
+  },
+  {
+    name: "Linux.conf.au",
+    date: "2025-01-22",
+    location: "Auckland, NZ",
+    role: "speaking",
+    talk: "IoT Auth: Beyond Shared Secrets",
+  },
+  {
+    name: "NDC Melbourne",
+    date: "2025-06-19",
+    location: "Melbourne, AU",
+    role: "speaking",
+    talk: "Rust for the Reluctant Web Developer",
+  },
+  {
+    name: "Web Directions Code",
+    date: "2025-09-12",
+    location: "Melbourne, AU",
+    role: "speaking",
+    talk: "The Developer Experience Manifesto",
+  },
 ];
 
 export const TALKS: Talk[] = [
   {
     title: "Zero Trust Authentication for the Modern Web",
+    slug: "zero-trust-auth",
     type: "talk",
     event: "NDC Sydney 2026",
+    eventUrl: "https://ndcsydney.com/",
     date: "2026-03-17",
     description:
-      "Exploring zero-trust principles applied to web authentication, from mTLS to WebAuthn.",
+      "Passwords are the weakest link in modern authentication. This talk explores zero-trust principles applied to web authentication — from mutual TLS and certificate pinning to FIDO2 WebAuthn and passkeys. We'll walk through real-world implementations, examine the threat models that traditional session-based auth fails to address, and demonstrate how to build authentication flows that assume the network is hostile. You'll leave with practical patterns for implementing zero-trust auth in your own applications, whether you're building SPAs, mobile apps, or server-rendered sites.",
   },
   {
     title: "The Art of Developer Advocacy",
+    slug: "art-of-devrel",
     type: "talk",
     event: "Web Directions Summit 2026",
+    eventUrl: "https://webdirections.org/",
     date: "2026-04-08",
     description:
-      "What makes developer advocacy effective, and how to bridge the gap between product and community.",
+      "Developer advocacy sits at the intersection of engineering, education, and community building. But what actually makes it effective? Drawing from a decade of speaking at conferences, writing documentation, and building developer communities, this talk examines the principles that separate great developer advocacy from corporate noise. We'll cover how to identify what developers actually need versus what marketing thinks they need, how to build trust through technical authenticity, and how to measure impact beyond vanity metrics.",
   },
   {
     title: "Building with WebAuthn: Hands-On Workshop",
+    slug: "webauthn-workshop",
     type: "workshop",
     event: "DDD Melbourne 2026",
+    eventUrl: "https://dddmelbourne.com/",
     date: "2026-06-20",
     description:
-      "A 3-hour hands-on workshop building a complete passwordless auth system from scratch.",
+      "A 3-hour hands-on workshop where you'll build a complete passwordless authentication system from scratch. Starting with the WebAuthn specification and the browser's Credential Management API, we'll implement registration and authentication flows, handle multiple authenticators per user, and add account recovery. We'll use SimpleWebAuthn on the server and vanilla JavaScript on the client so you understand every layer. Bring a laptop with Node.js 20+ installed and a browser that supports WebAuthn (all modern browsers do).",
   },
   {
     title: "Securing the Edge: Auth at the CDN Layer",
+    slug: "edge-auth",
     type: "talk",
     event: "JSConf Australia 2026",
+    eventUrl: "https://jsconfau.com/",
     date: "2026-08-12",
     description:
-      "Moving authentication decisions to the edge for faster, more resilient web applications.",
+      "What if your authentication decisions happened before the request ever reached your origin server? Edge computing platforms like Cloudflare Workers and Deno Deploy make it possible to validate tokens, enforce RBAC policies, and terminate suspicious sessions at the CDN layer — cutting latency and reducing attack surface simultaneously. This talk covers the architecture patterns, the tradeoffs, and the gotchas of moving auth to the edge, with live demos showing the performance difference.",
+  },
+  {
+    title: "Privacy by Design in Practice",
+    slug: "privacy-by-design",
+    type: "talk",
+    event: "YOW! Conference 2025",
+    eventUrl: "https://yowconference.com/",
+    date: "2025-12-05",
+    description:
+      "Privacy regulations are tightening worldwide, but compliance-driven privacy misses the point. This talk presents privacy as an engineering discipline — a set of architectural patterns that protect user data by default rather than by policy. We'll explore end-to-end encryption for application data, privacy-preserving analytics, data minimization at the schema level, and the surprisingly difficult problem of truly deleting a user's data. Real examples from production systems show that privacy-first architecture often leads to simpler, more maintainable code.",
+  },
+  {
+    title: "IoT Auth: Beyond Shared Secrets",
+    slug: "iot-auth",
+    type: "talk",
+    event: "Linux.conf.au 2025",
+    eventUrl: "https://linux.conf.au/",
+    date: "2025-01-22",
+    description:
+      "Most IoT devices still ship with hardcoded credentials, shared API keys, or authentication schemes that would embarrass a web developer in 2005. This talk surveys the state of IoT authentication, examines real vulnerabilities found in consumer devices, and presents modern alternatives: FIDO Device Onboard for provisioning, Matter/Thread for authenticated communication, and hardware secure enclaves for credential storage. If you're building connected devices, this talk will change how you think about device identity.",
+  },
+  {
+    title: "Rust for the Reluctant Web Developer",
+    slug: "rust-for-web",
+    type: "talk",
+    event: "NDC Melbourne 2025",
+    eventUrl: "https://ndcmelbourne.com/",
+    date: "2025-06-19",
+    description:
+      "You've heard the hype about Rust but you live in JavaScript-land and the borrow checker terrifies you. This talk is for you. We'll build a small but complete web API in Rust using Axum, exploring ownership and lifetimes through practical examples rather than abstract theory. Along the way, we'll see compile-time SQL checking with sqlx, type-safe routing, and tower middleware. You won't become a Rust expert in 45 minutes, but you'll understand why the investment is worth it and have a clear path to get started.",
+  },
+  {
+    title: "The Developer Experience Manifesto",
+    slug: "dx-manifesto",
+    type: "talk",
+    event: "Web Directions Code 2025",
+    eventUrl: "https://webdirections.org/",
+    date: "2025-09-12",
+    description:
+      "Developer experience has become a first-class concern, but too many teams confuse DX with 'nice CLI output.' This talk proposes a more rigorous framework: DX is the sum of every interaction a developer has with your system, from first discovery to production debugging. We'll examine what makes tools like Stripe, Vercel, and Tailwind feel so good to use, distill the common patterns, and provide a practical checklist for evaluating and improving the DX of your own projects and APIs.",
   },
 ];

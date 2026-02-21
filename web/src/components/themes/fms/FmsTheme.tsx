@@ -2,7 +2,7 @@
 
 import { useState, useRef, useCallback, useEffect } from "react";
 import { useTheme } from "@/context/ThemeContext";
-import { ARTICLES, EVENTS, TALKS, PROJECTS, SOCIAL_LINKS, getArticleBySlug } from "@/data/content";
+import { ARTICLES, EVENTS, TALKS, PROJECTS, SOCIAL_LINKS, getArticleBySlug, getTalkBySlug } from "@/data/content";
 import { sendMessage } from "@/lib/sendMessage";
 import { useSection } from "@/hooks/useSection";
 import styles from "./fms.module.css";
@@ -53,6 +53,14 @@ interface ScreenRowData {
   onRightClick?: () => void;
   leftHref?: string;
   rightHref?: string;
+  // Full-width data that spans both columns (label row + data row)
+  fullLabel?: string;
+  fullLabelRight?: string;
+  fullData?: string;
+  fullColor?: "green" | "white" | "cyan" | "amber" | "magenta";
+  fullSmall?: boolean;
+  onFullClick?: () => void;
+  fullHref?: string;
 }
 
 const colorClass = (c?: string) => {
@@ -73,52 +81,89 @@ function ScreenRows({ rows }: { rows: ScreenRowData[] }) {
 
   return (
     <>
-      {padded.slice(0, 6).map((row, i) => (
-        <div key={i} className={styles.rowPair}>
-          {/* Label left */}
-          <div className={`${styles.cell} ${styles.cellLeft}`}>
-            <span className={`${styles.label} ${row.onLeftClick ? styles.labelAmber : ""}`}>
-              {row.leftLabel || "\u00A0"}
-            </span>
-          </div>
-          {/* Label right */}
-          <div className={`${styles.cell} ${styles.cellRight}`}>
-            <span className={`${styles.label} ${row.onRightClick ? styles.labelAmber : ""}`}>
-              {row.rightLabel || "\u00A0"}
-            </span>
-          </div>
-          {/* Data left */}
-          <div className={`${styles.cell} ${styles.cellLeft}`}>
-            {row.leftHref ? (
-              <a href={row.leftHref} target="_blank" rel="noopener noreferrer" className={styles.socialLink}>
-                <span className={colorClass(row.leftColor)}>{row.leftData || "\u00A0"}</span>
-              </a>
-            ) : (
-              <span
-                className={`${colorClass(row.leftColor)} ${row.onLeftClick ? styles.lskData : ""}`}
-                onClick={row.onLeftClick}
-              >
-                {row.leftData || "\u00A0"}
+      {padded.slice(0, 6).map((row, i) => {
+        // Full-width row mode: label spans both cols, data spans both cols
+        if (row.fullData !== undefined) {
+          return (
+            <div key={i} className={styles.rowPair}>
+              {/* Label spanning both columns */}
+              <div className={`${styles.cell} ${styles.cellLeft}`}>
+                <span className={`${styles.label} ${row.onFullClick || row.onLeftClick ? styles.labelAmber : ""}`}>
+                  {row.fullLabel || row.leftLabel || "\u00A0"}
+                </span>
+              </div>
+              <div className={`${styles.cell} ${styles.cellRight}`}>
+                <span className={`${styles.label} ${row.onRightClick ? styles.labelAmber : ""}`}>
+                  {row.fullLabelRight || row.rightLabel || "\u00A0"}
+                </span>
+              </div>
+              {/* Data spanning full width */}
+              <div className={`${styles.cell} ${styles.cellFull}`}>
+                {row.fullHref ? (
+                  <a href={row.fullHref} target="_blank" rel="noopener noreferrer" className={styles.socialLink}>
+                    <span className={`${colorClass(row.fullColor)} ${styles.dataNoWrap}`}>{row.fullData || "\u00A0"}</span>
+                  </a>
+                ) : (
+                  <span
+                    className={`${colorClass(row.fullColor)} ${row.onFullClick ? styles.lskData : ""} ${styles.dataNoWrap}`}
+                    onClick={row.onFullClick}
+                  >
+                    {row.fullData || "\u00A0"}
+                  </span>
+                )}
+              </div>
+            </div>
+          );
+        }
+
+        // Standard 2-column row
+        return (
+          <div key={i} className={styles.rowPair}>
+            {/* Label left */}
+            <div className={`${styles.cell} ${styles.cellLeft}`}>
+              <span className={`${styles.label} ${row.onLeftClick ? styles.labelAmber : ""}`}>
+                {row.leftLabel || "\u00A0"}
               </span>
-            )}
-          </div>
-          {/* Data right */}
-          <div className={`${styles.cell} ${styles.cellRight}`}>
-            {row.rightHref ? (
-              <a href={row.rightHref} target="_blank" rel="noopener noreferrer" className={styles.socialLink}>
-                <span className={colorClass(row.rightColor)}>{row.rightData || "\u00A0"}</span>
-              </a>
-            ) : (
-              <span
-                className={`${colorClass(row.rightColor)} ${row.onRightClick ? styles.lskData : ""}`}
-                onClick={row.onRightClick}
-              >
-                {row.rightData || "\u00A0"}
+            </div>
+            {/* Label right */}
+            <div className={`${styles.cell} ${styles.cellRight}`}>
+              <span className={`${styles.label} ${row.onRightClick ? styles.labelAmber : ""}`}>
+                {row.rightLabel || "\u00A0"}
               </span>
-            )}
+            </div>
+            {/* Data left */}
+            <div className={`${styles.cell} ${styles.cellLeft}`}>
+              {row.leftHref ? (
+                <a href={row.leftHref} target="_blank" rel="noopener noreferrer" className={styles.socialLink}>
+                  <span className={colorClass(row.leftColor)}>{row.leftData || "\u00A0"}</span>
+                </a>
+              ) : (
+                <span
+                  className={`${colorClass(row.leftColor)} ${row.onLeftClick ? styles.lskData : ""}`}
+                  onClick={row.onLeftClick}
+                >
+                  {row.leftData || "\u00A0"}
+                </span>
+              )}
+            </div>
+            {/* Data right */}
+            <div className={`${styles.cell} ${styles.cellRight}`}>
+              {row.rightHref ? (
+                <a href={row.rightHref} target="_blank" rel="noopener noreferrer" className={styles.socialLink}>
+                  <span className={colorClass(row.rightColor)}>{row.rightData || "\u00A0"}</span>
+                </a>
+              ) : (
+                <span
+                  className={`${colorClass(row.rightColor)} ${row.onRightClick ? styles.lskData : ""}`}
+                  onClick={row.onRightClick}
+                >
+                  {row.rightData || "\u00A0"}
+                </span>
+              )}
+            </div>
           </div>
-        </div>
-      ))}
+        );
+      })}
     </>
   );
 }
@@ -142,10 +187,10 @@ function buildFPlnListRows(page: number, navigate: (p: string) => void): { rows:
   const start = page * perPage;
   const slice = ARTICLES.slice(start, start + perPage);
   const rows: ScreenRowData[] = slice.map((a) => ({
-    leftLabel: formatDate(a.date),
-    leftData: a.title,
-    leftColor: "green" as const,
-    onLeftClick: () => navigate(`/articles/${a.slug}`),
+    fullLabel: formatDate(a.date),
+    fullData: a.title,
+    fullColor: "green" as const,
+    onFullClick: () => navigate(`/articles/${a.slug}`),
   }));
   return { rows, totalPages };
 }
@@ -199,77 +244,53 @@ function buildArticleDetailRows(slug: string, navigate: (p: string) => void, bod
   return { rows, totalPages };
 }
 
-function buildProgRows(page: number): { rows: ScreenRowData[]; totalPages: number } {
-  const perPage = 3; // 2 rows per event (name+date, talk)
+function buildProgRows(page: number, navigate: (p: string) => void): { rows: ScreenRowData[]; totalPages: number } {
+  const perPage = 6;
   const totalPages = Math.ceil(EVENTS.length / perPage);
   const start = page * perPage;
   const slice = EVENTS.slice(start, start + perPage);
-  const rows: ScreenRowData[] = [];
-  for (const ev of slice) {
-    rows.push({
-      leftLabel: ev.role === "workshop" ? "WKSHP" : ev.role === "speaking" ? "SPEAK" : "ATND",
-      rightLabel: ev.location,
-      leftData: ev.name,
-      leftColor: "green",
-      rightData: formatDate(ev.date),
-      rightColor: "magenta",
-    });
-    if (ev.talk) {
-      rows.push({
-        leftData: ev.talk,
-        leftColor: "white",
-        leftSmall: true,
-      });
-    }
-  }
-  return { rows: rows.slice(0, 6), totalPages };
+  const rows: ScreenRowData[] = slice.map((ev) => {
+    // Find matching talk slug for navigation
+    const matchingTalk = ev.talk ? TALKS.find((t) => t.title === ev.talk) : null;
+    return {
+      fullLabel: `${ev.name} · ${formatDate(ev.date)}`,
+      fullLabelRight: ev.location,
+      fullData: ev.talk || (ev.role === "attending" ? "ATTENDING" : "—"),
+      fullColor: "green" as const,
+      onFullClick: matchingTalk ? () => navigate(`/talks/${matchingTalk.slug}`) : undefined,
+    };
+  });
+  return { rows, totalPages };
 }
 
-function buildDataRows(page: number): { rows: ScreenRowData[]; totalPages: number } {
-  const perPage = 3; // ~2 rows per talk
+function buildDataRows(page: number, navigate: (p: string) => void): { rows: ScreenRowData[]; totalPages: number } {
+  const perPage = 6;
   const totalPages = Math.ceil(TALKS.length / perPage);
   const start = page * perPage;
   const slice = TALKS.slice(start, start + perPage);
-  const rows: ScreenRowData[] = [];
-  for (const t of slice) {
-    rows.push({
-      leftLabel: t.type === "workshop" ? "WORKSHOP" : "TALK",
-      rightLabel: formatDate(t.date),
-      leftData: t.title,
-      leftColor: "green",
-    });
-    rows.push({
-      leftData: `${t.event} - ${t.description}`,
-      leftColor: "green",
-      leftSmall: true,
-    });
-  }
-  return { rows: rows.slice(0, 6), totalPages };
+  const rows: ScreenRowData[] = slice.map((t) => ({
+    fullLabel: `${t.event} · ${formatDate(t.date)}`,
+    fullLabelRight: t.type === "workshop" ? "WKSHP" : "TALK",
+    fullData: t.title,
+    fullColor: "green" as const,
+    onFullClick: () => navigate(`/talks/${t.slug}`),
+  }));
+  return { rows, totalPages };
 }
 
 function buildPerfRows(page: number): { rows: ScreenRowData[]; totalPages: number } {
-  const perPage = 3; // ~2 rows per project
+  const perPage = 6;
   const totalPages = Math.ceil(PROJECTS.length / perPage);
   const start = page * perPage;
   const slice = PROJECTS.slice(start, start + perPage);
-  const rows: ScreenRowData[] = [];
-  for (const p of slice) {
-    rows.push({
-      leftLabel: p.category.toUpperCase(),
-      rightLabel: p.status.toUpperCase(),
-      leftData: p.name,
-      leftColor: "green",
-      rightData: p.tech.slice(0, 2).join("/"),
-      rightColor: "cyan",
-      leftHref: p.url,
-    });
-    rows.push({
-      leftData: p.tagline,
-      leftColor: "white",
-      leftSmall: true,
-    });
-  }
-  return { rows: rows.slice(0, 6), totalPages };
+  const rows: ScreenRowData[] = slice.map((p) => ({
+    fullLabel: `${p.category.toUpperCase()} · ${p.status.toUpperCase()}`,
+    fullLabelRight: p.tech.slice(0, 2).join("/"),
+    fullData: `${p.name} — ${p.tagline}`,
+    fullColor: "green" as const,
+    fullHref: p.url,
+  }));
+  return { rows, totalPages };
 }
 
 function buildMenuRows(navigate: (p: string) => void, closeMenu: () => void): ScreenRowData[] {
@@ -282,6 +303,53 @@ function buildMenuRows(navigate: (p: string) => void, closeMenu: () => void): Sc
     {},
     { leftLabel: "SELECT PAGE", leftData: "USE L/R KEYS", leftColor: "white" },
   ];
+}
+
+function buildTalkDetailRows(slug: string, navigate: (p: string) => void, bodyPage: number): { rows: ScreenRowData[]; totalPages: number } {
+  const talk = getTalkBySlug(slug);
+  if (!talk) return { rows: [], totalPages: 1 };
+
+  if (bodyPage === 0) {
+    return {
+      rows: [
+        { leftLabel: "< RETURN", leftData: "DATA LIST", leftColor: "amber", onLeftClick: () => navigate("/talks") },
+        { fullLabel: "TITLE", fullData: talk.title, fullColor: "white" as const },
+        { leftLabel: "EVENT", leftData: talk.event, leftColor: "green", rightLabel: "DATE", rightData: formatDate(talk.date), rightColor: "magenta" },
+        { leftLabel: "TYPE", leftData: talk.type.toUpperCase(), leftColor: "green" },
+        ...(talk.eventUrl ? [{ leftLabel: "EVENT SITE", leftData: talk.eventUrl.replace(/^https?:\/\//, ""), leftColor: "cyan" as const, leftHref: talk.eventUrl }] : [{}]),
+        { rightLabel: "ABSTRACT >", rightData: "NEXT", rightColor: "amber" as const },
+      ],
+      totalPages: 1 + Math.ceil(talk.description.split("\n\n").length / 3),
+    };
+  }
+
+  // Abstract pages: 3 paragraphs per page
+  const paragraphs = talk.description.split("\n\n").filter(Boolean);
+  const perPage = 3;
+  const totalBodyPages = Math.ceil(paragraphs.length / perPage);
+  const totalPages = 1 + totalBodyPages;
+  const bodyIdx = bodyPage - 1;
+  const slice = paragraphs.slice(bodyIdx * perPage, bodyIdx * perPage + perPage);
+
+  const rows: ScreenRowData[] = slice.map((p) => ({
+    leftData: p,
+    leftColor: "green" as const,
+    leftSmall: true,
+  }));
+
+  while (rows.length < 5) rows.push({});
+  rows.push({
+    leftLabel: bodyPage > 1 ? "< PREV" : "< RETURN",
+    leftColor: "amber",
+    leftData: bodyPage > 1 ? "PREV PAGE" : "DETAIL",
+    onLeftClick: () => {},
+    rightLabel: bodyIdx < totalBodyPages - 1 ? "NEXT >" : undefined,
+    rightData: bodyIdx < totalBodyPages - 1 ? "NEXT PAGE" : undefined,
+    rightColor: "amber",
+    onRightClick: bodyIdx < totalBodyPages - 1 ? () => {} : undefined,
+  });
+
+  return { rows, totalPages };
 }
 
 // ============ ATC COMM page (special - has message form) ============
@@ -402,7 +470,7 @@ function MCDUKeyboard({ onKey, onClear, onSpace, onSubmit }: {
 
 export default function FmsTheme() {
   const { setTheme } = useTheme();
-  const { section, articleSlug, navigate } = useSection();
+  const { section, articleSlug, talkSlug, navigate } = useSection();
   const activePage = sectionToPage(section);
   const [scratchpad, setScratchpad] = useState("");
   const scratchRef = useRef<HTMLInputElement>(null);
@@ -418,7 +486,7 @@ export default function FmsTheme() {
   useEffect(() => {
     setListPage(0);
     setDetailPage(0);
-  }, [activePage, articleSlug]);
+  }, [activePage, articleSlug, talkSlug]);
 
   // COMMS page state
   const [msgName, setMsgName] = useState("");
@@ -515,25 +583,31 @@ export default function FmsTheme() {
     pageNum = detailPage + 1;
   } else if (activePage === "fPln") {
     const result = buildFPlnListRows(listPage, navigate);
-    screenTitle = "F-PLN";
+    screenTitle = "F-PLN / LOG";
     screenRows = result.rows;
     totalPages = result.totalPages;
     pageNum = listPage + 1;
   } else if (activePage === "prog") {
-    const result = buildProgRows(listPage);
-    screenTitle = "PROG";
+    const result = buildProgRows(listPage, navigate);
+    screenTitle = "PROG / SPEAK";
     screenRows = result.rows;
     totalPages = result.totalPages;
     pageNum = listPage + 1;
+  } else if (activePage === "data" && talkSlug) {
+    const result = buildTalkDetailRows(talkSlug, navigate, detailPage);
+    screenTitle = "DATA DETAIL";
+    screenRows = result.rows;
+    totalPages = result.totalPages;
+    pageNum = detailPage + 1;
   } else if (activePage === "data") {
-    const result = buildDataRows(listPage);
-    screenTitle = "DATA";
+    const result = buildDataRows(listPage, navigate);
+    screenTitle = "DATA / TALKS";
     screenRows = result.rows;
     totalPages = result.totalPages;
     pageNum = listPage + 1;
   } else if (activePage === "perf") {
     const result = buildPerfRows(listPage);
-    screenTitle = "PERF";
+    screenTitle = "PERF / PROJ";
     screenRows = result.rows;
     totalPages = result.totalPages;
     pageNum = listPage + 1;
@@ -602,14 +676,36 @@ export default function FmsTheme() {
         return;
       }
 
+      // For talk detail body pages, handle prev/next on row 6
+      if (activePage === "data" && talkSlug && detailPage > 0) {
+        if (row === 6 && side === "left") {
+          if (detailPage > 1) setDetailPage((p) => p - 1);
+          else setDetailPage(0);
+          return;
+        }
+        if (row === 6 && side === "right") {
+          const paragraphs = (getTalkBySlug(talkSlug)?.description || "").split("\n\n").filter(Boolean);
+          const totalBodyPages = Math.ceil(paragraphs.length / 3);
+          if (detailPage - 1 < totalBodyPages - 1) setDetailPage((p) => p + 1);
+          return;
+        }
+        return;
+      }
+
+      // For talk detail page 0, row 6 right = go to abstract
+      if (activePage === "data" && talkSlug && detailPage === 0 && row === 6 && side === "right") {
+        setDetailPage(1);
+        return;
+      }
+
       const idx = row - 1;
       if (idx >= 0 && idx < screenRows.length) {
         const r = screenRows[idx];
-        if (side === "left" && r.onLeftClick) r.onLeftClick();
+        if (side === "left" && (r.onLeftClick || r.onFullClick)) (r.onLeftClick || r.onFullClick)!();
         else if (side === "right" && r.onRightClick) r.onRightClick();
       }
     },
-    [activePage, articleSlug, detailPage, screenRows, handleSendMessage, scratchpad, showScratchError],
+    [activePage, articleSlug, talkSlug, detailPage, screenRows, handleSendMessage, scratchpad, showScratchError],
   );
 
   // Slew keys for pagination - use ref for totalPages to avoid stale closures
@@ -617,21 +713,21 @@ export default function FmsTheme() {
   totalPagesRef.current = totalPages;
 
   const handleSlewUp = useCallback(() => {
-    if (articleSlug) {
+    if (articleSlug || talkSlug) {
       setDetailPage((p) => Math.max(0, p - 1));
     } else {
       setListPage((p) => Math.max(0, p - 1));
     }
-  }, [articleSlug]);
+  }, [articleSlug, talkSlug]);
 
   const handleSlewDown = useCallback(() => {
     const tp = totalPagesRef.current;
-    if (articleSlug) {
+    if (articleSlug || talkSlug) {
       setDetailPage((p) => p < tp - 1 ? p + 1 : p);
     } else {
       setListPage((p) => p < tp - 1 ? p + 1 : p);
     }
-  }, [articleSlug]);
+  }, [articleSlug, talkSlug]);
 
   const handlePageKey = useCallback(
     (page: McduPage) => {
@@ -767,7 +863,7 @@ export default function FmsTheme() {
 
               {/* 6 data rows */}
               <div className={styles.screenRowsArea}>
-                {activePage === "atcComm" ? (
+                {activePage === "atcComm" && !showMenu ? (
                   <AtcCommRows
                     name={msgName}
                     message={msgBody}
