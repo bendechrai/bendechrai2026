@@ -469,7 +469,7 @@ function MCDUKeyboard({ onKey, onClear, onSpace, onSubmit }: {
     ["K", "L", "M", "N", "O"],
     ["P", "Q", "R", "S", "T"],
     ["U", "V", "W", "X", "Y"],
-    ["Z", "SP", "/", "CLR", "OVFY"],
+    ["Z", "SP", "/", "OVFY", "CLR"],
   ];
   const compassKeys = new Set(["E", "N", "S", "W"]);
 
