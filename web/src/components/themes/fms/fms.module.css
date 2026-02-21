@@ -95,6 +95,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative;
 }
 
 /* LSK columns — span rows 2-13 (the 6 label+data pairs) */
@@ -184,7 +185,6 @@
   text-transform: uppercase;
   line-height: 1;
   padding: 0 4px;
-  position: relative;
 }
 
 /* Label text */

@@ -726,10 +726,10 @@ export default function FmsTheme() {
               <div className={styles.screenTitleArea}>
                 <div className={styles.pageTitle}>
                   {screenTitle}
-                  {totalPages > 1 && (
-                    <span className={styles.pageArrow}>{pageNum}/{totalPages}</span>
-                  )}
                 </div>
+                {totalPages > 1 && (
+                  <span className={styles.pageArrow}>{pageNum}/{totalPages}</span>
+                )}
               </div>
 
               {/* Left LSKs (L1-L6) — aligned with data rows */}
