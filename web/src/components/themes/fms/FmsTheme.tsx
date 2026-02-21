@@ -76,19 +76,19 @@ function ScreenRows({ rows }: { rows: ScreenRowData[] }) {
       {padded.slice(0, 6).map((row, i) => (
         <div key={i} className={styles.rowPair}>
           {/* Label left */}
-          <div className={`${styles.cell} ${styles.cellLeft} ${styles.cellLabel}`}>
+          <div className={`${styles.cell} ${styles.cellLeft}`}>
             <span className={`${styles.label} ${row.onLeftClick ? styles.labelAmber : ""}`}>
               {row.leftLabel || "\u00A0"}
             </span>
           </div>
           {/* Label right */}
-          <div className={`${styles.cell} ${styles.cellRight} ${styles.cellLabel}`}>
+          <div className={`${styles.cell} ${styles.cellRight}`}>
             <span className={`${styles.label} ${row.onRightClick ? styles.labelAmber : ""}`}>
               {row.rightLabel || "\u00A0"}
             </span>
           </div>
           {/* Data left */}
-          <div className={`${styles.cell} ${styles.cellLeft} ${styles.cellData}`}>
+          <div className={`${styles.cell} ${styles.cellLeft}`}>
             {row.leftHref ? (
               <a href={row.leftHref} target="_blank" rel="noopener noreferrer" className={styles.socialLink}>
                 <span className={colorClass(row.leftColor)}>{row.leftData || "\u00A0"}</span>
@@ -103,7 +103,7 @@ function ScreenRows({ rows }: { rows: ScreenRowData[] }) {
             )}
           </div>
           {/* Data right */}
-          <div className={`${styles.cell} ${styles.cellRight} ${styles.cellData}`}>
+          <div className={`${styles.cell} ${styles.cellRight}`}>
             {row.rightHref ? (
               <a href={row.rightHref} target="_blank" rel="noopener noreferrer" className={styles.socialLink}>
                 <span className={colorClass(row.rightColor)}>{row.rightData || "\u00A0"}</span>

@@ -165,15 +165,6 @@
   justify-content: flex-end;
 }
 
-/* Labels hug bottom, data hugs top — groups each label+data pair visually */
-.cellLabel {
-  align-items: flex-end;
-}
-
-.cellData {
-  align-items: flex-start;
-}
-
 /* Scratchpad area — row 14, spans both content columns */
 .screenScratchArea {
   grid-column: 2 / 4;
@@ -528,6 +519,8 @@
 .socialLink {
   text-decoration: none;
   cursor: pointer;
+  font-size: 13px;
+  line-height: 1;
 }
 
 .socialLink:hover .dataCyan {
