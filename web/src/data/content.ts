@@ -5,6 +5,8 @@ export interface Article {
   summary: string;
   body: string;
   image: string;
+  tag: string;
+  tags?: string[];
 }
 
 export interface Event {
@@ -85,6 +87,8 @@ export const ARTICLES: Article[] = [
     title: "Building Passwordless Auth with WebAuthn",
     slug: "passwordless-webauthn",
     date: "2026-01-15",
+    tag: "AUTH",
+    tags: ["auth", "webauthn", "security"],
     summary:
       "A deep dive into implementing FIDO2 WebAuthn for seamless, passwordless user authentication.",
     image: "https://picsum.photos/seed/webauthn-security/800/400",
@@ -104,6 +108,8 @@ If you're building authentication today, there's no reason not to support WebAut
     title: "The State of Developer Experience in 2026",
     slug: "dx-2026",
     date: "2025-12-03",
+    tag: "DX",
+    tags: ["dx", "tooling", "opinion"],
     summary:
       "Reflections on how DX tooling has evolved and where it's heading next.",
     image: "https://picsum.photos/seed/developer-tools/800/400",
@@ -125,6 +131,8 @@ Looking ahead, I expect 2027 to bring tighter integration between development an
     title: "Privacy-First Architecture for Modern Web Apps",
     slug: "privacy-first-architecture",
     date: "2025-10-18",
+    tag: "PRIVACY",
+    tags: ["privacy", "architecture", "security"],
     summary:
       "Practical patterns for building applications that respect user privacy by default.",
     image: "https://picsum.photos/seed/privacy-architecture/800/400",
@@ -146,6 +154,8 @@ The regulatory landscape (GDPR, CCPA, and their successors) is making privacy-fi
     title: "Rust for Web Developers: A Practical Guide",
     slug: "rust-for-web-devs",
     date: "2025-08-22",
+    tag: "RUST",
+    tags: ["rust", "web", "languages"],
     summary:
       "Why Rust is worth learning even if you live in JavaScript-land, with real-world examples.",
     image: "https://picsum.photos/seed/rust-programming/800/400",
@@ -167,6 +177,8 @@ The investment pays off. Rust has made me a better programmer in every language 
     title: "Why Your Smart Lock Needs Better Auth",
     slug: "smart-lock-auth",
     date: "2025-06-10",
+    tag: "IOT",
+    tags: ["iot", "security", "auth"],
     summary:
       "IoT security is still a mess. Here's what manufacturers keep getting wrong.",
     image: "https://picsum.photos/seed/iot-smart-lock/800/400",

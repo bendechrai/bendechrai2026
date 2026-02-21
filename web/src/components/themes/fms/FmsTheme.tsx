@@ -174,9 +174,9 @@ function buildInitRows(navigate: (p: string) => void): ScreenRowData[] {
   return [
     { leftLabel: "OPERATOR", rightLabel: "STATUS", leftData: "BEN DECHRAI", leftColor: "cyan", rightData: "ACTIVE", rightColor: "green" },
     { leftLabel: "ROLE", rightLabel: "BASE", leftData: "DEV / SPEAKER", leftColor: "cyan", rightData: "KMCI", rightColor: "green" },
-    { leftLabel: "CODE ARCHIVE", leftData: "github.com/bendechrai", leftColor: "cyan", leftHref: SOCIAL_LINKS.github },
-    { leftLabel: "NETWORK", leftData: "linkedin.com/in/bendechrai", leftColor: "cyan", leftHref: SOCIAL_LINKS.linkedin },
-    { leftLabel: "TWITTER", leftData: "twitter.com/bendechrai", leftColor: "cyan", leftHref: SOCIAL_LINKS.twitter },
+    { leftLabel: "CODE ARCHIVE", leftData: "github.com/bendechrai", leftColor: "cyan", leftHref: SOCIAL_LINKS.github, onLeftClick: () => window.open(SOCIAL_LINKS.github, "_blank", "noopener,noreferrer") },
+    { leftLabel: "NETWORK", leftData: "linkedin.com/in/bendechrai", leftColor: "cyan", leftHref: SOCIAL_LINKS.linkedin, onLeftClick: () => window.open(SOCIAL_LINKS.linkedin, "_blank", "noopener,noreferrer") },
+    { leftLabel: "TWITTER", leftData: "twitter.com/bendechrai", leftColor: "cyan", leftHref: SOCIAL_LINKS.twitter, onLeftClick: () => window.open(SOCIAL_LINKS.twitter, "_blank", "noopener,noreferrer") },
     { rightLabel: "ATC COMM >", rightData: "SEND MSG", rightColor: "amber", onRightClick: () => navigate("/contact") },
   ];
 }
@@ -188,6 +188,7 @@ function buildFPlnListRows(page: number, navigate: (p: string) => void): { rows:
   const slice = ARTICLES.slice(start, start + perPage);
   const rows: ScreenRowData[] = slice.map((a) => ({
     fullLabel: formatDate(a.date),
+    fullLabelRight: a.tag,
     fullData: a.title,
     fullColor: "green" as const,
     onFullClick: () => navigate(`/articles/${a.slug}`),
@@ -289,6 +290,7 @@ function buildPerfRows(page: number): { rows: ScreenRowData[]; totalPages: numbe
     fullData: `${p.name} — ${p.tagline}`,
     fullColor: "green" as const,
     fullHref: p.url,
+    onFullClick: () => window.open(p.url, "_blank", "noopener,noreferrer"),
   }));
   return { rows, totalPages };
 }
@@ -583,7 +585,7 @@ export default function FmsTheme() {
     pageNum = detailPage + 1;
   } else if (activePage === "fPln") {
     const result = buildFPlnListRows(listPage, navigate);
-    screenTitle = "F-PLN / LOG";
+    screenTitle = "F-PLN / ARTICLES";
     screenRows = result.rows;
     totalPages = result.totalPages;
     pageNum = listPage + 1;
@@ -702,7 +704,7 @@ export default function FmsTheme() {
       if (idx >= 0 && idx < screenRows.length) {
         const r = screenRows[idx];
         if (side === "left" && (r.onLeftClick || r.onFullClick)) (r.onLeftClick || r.onFullClick)!();
-        else if (side === "right" && r.onRightClick) r.onRightClick();
+        else if (side === "right" && (r.onRightClick || r.onFullClick)) (r.onRightClick || r.onFullClick)!();
       }
     },
     [activePage, articleSlug, talkSlug, detailPage, screenRows, handleSendMessage, scratchpad, showScratchError],
