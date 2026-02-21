@@ -397,11 +397,20 @@
   box-sizing: border-box;
 }
 
+/* Keyboard wrapper — spans from after arrows to end (under rocker) */
+.keyboardArea {
+  --kbd-gap: 6px;
+  grid-column: 5 / -1;
+  grid-row: 3 / span 7;
+  display: flex;
+  gap: var(--kbd-gap);
+  align-items: flex-end;
+  padding-left: 3px;
+  border: 2px solid cyan;
+}
+
 /* Alpha keyboard — to the right of numpad */
 .alphaKeys {
-  grid-column: 6 / -1;
-  grid-row: 3 / span 6;
-  align-self: end;
   display: flex;
   flex-direction: column;
   gap: 2px;
@@ -410,13 +419,11 @@
 
 .alphaRow {
   display: flex;
-  gap: 2px;
+  gap: var(--kbd-gap);
 }
 
-/* Numeric keypad — 2.5 page-key widths, left-aligned under arrows */
+/* Numeric keypad */
 .numericArea {
-  grid-column: 1 / 6;
-  grid-row: 6 / span 4;
   display: flex;
   flex-direction: column;
   gap: 2px;
@@ -425,8 +432,7 @@
 
 .numRow {
   display: flex;
-  gap: 2px;
-  justify-content: space-between;
+  gap: var(--kbd-gap);
 }
 
 /* Individual key button */
