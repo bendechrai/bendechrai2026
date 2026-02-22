@@ -224,10 +224,10 @@ function buildInitRows(navigate: (p: string) => void): ScreenRowData[] {
   return [
     { leftLabel: "OPERATOR", rightLabel: "STATUS", leftData: "BEN DECHRAI", leftColor: "cyan", rightData: "ACTIVE", rightColor: "green" },
     { leftLabel: "ROLE", rightLabel: "BASE", leftData: "DEV / SPEAKER", leftColor: "cyan", rightData: "KMCI", rightColor: "green" },
+    { leftLabel: "TYPE", rightLabel: "RECOG", leftData: "AGENTIC ENGINEER", leftColor: "cyan", rightData: "MS MVP", rightColor: "green" },
+    { leftLabel: "AVAIL", rightLabel: "SPEC", leftData: "CONTRACT HIRE", leftColor: "cyan", rightData: "SECURITY", rightColor: "green" },
+    { leftLabel: "COMM", rightLabel: "PUBLISHED", leftData: "CONF ORGANISER", leftColor: "cyan", rightData: "AUTHOR", rightColor: "green" },
     {},
-    {},
-    {},
-    { rightLabel: "ATC COMM >", rightData: "SEND MSG", rightColor: "amber", onRightClick: () => navigate("/contact") },
   ];
 }
 
